@@ -1,0 +1,58 @@
+[package]
+name = "jbyte"
+version = "0.1.0"
+authors = [
+    "jankincai <jankincai12@gmail.com>"
+]
+edition = "2021"
+description = "This is a byte stream structured serialization and deserialization library."
+repository = "https://github.com/caizhengxin/jbyte"
+homepage = "https://github.com/caizhengxin/jbyte"
+readme = "README.md"
+# https://crates.io/category_slugs
+categories = [
+    "development-tools",
+]
+keywords = [
+    "jbyte",
+]
+license = "MIT OR Apache-2.0"
+include = [
+    "src/*",
+    "benches/*",
+    "examples/*",
+    "Cargo.toml",
+    "LICENSE*",
+    "README.md",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+members = [
+    "derive"
+]
+
+[profile.dev]
+opt-level = 1
+overflow-checks = false
+
+[features]
+default = ["std"]
+std = [
+    "jkcenum/std",
+]
+derive = ["jbyte_derive"]
+full = [
+    "serde",
+]
+
+[dependencies]
+jbyte_derive = { path = "derive", version = "0.1.0", optional = true }
+thiserror = "1.0"
+thiserror-no-std = "2.0.2"
+serde = { version = "1.0", default-features = false, optional = true }
+jkcenum = { version = "0.3.2", default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+jbyte_derive = { path = "derive", version = "0.1.0" }
