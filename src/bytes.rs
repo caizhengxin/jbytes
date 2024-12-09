@@ -4,19 +4,22 @@ use crate::errors::{JResult, make_error, ErrorKind};
 
 
 #[derive(Debug)]
-pub struct Buffer<'a> {
-    data: &'a [u8],
+pub struct Buffer<T> {
+    data: T,
     position: usize,
 }
 
 
-impl<'a> Buffer<'a> {
-    pub fn new(data: &'a [u8]) -> Self {
+impl<T> Buffer<T>
+where
+    T: AsRef<[u8]>,
+{
+    pub fn new(data: T) -> Self {
         Self { data, position: 0 }
     }
 
-    pub fn remain(&self) -> &'a [u8] {
-        &self.data[self.position..]
+    pub fn remain(&self) -> &'_ [u8] {
+        &self.data.as_ref()[self.position..]
     }
 
     pub fn reset(&mut self) {
@@ -25,6 +28,10 @@ impl<'a> Buffer<'a> {
 
     pub fn set_position(&mut self, position: usize) {
         self.position = position
+    }
+
+    pub fn offset(&mut self, offset: isize) {
+        self.position = (self.position as isize - offset) as usize;
     }
 }
 
@@ -44,16 +51,35 @@ impl<'a> Buffer<'a> {
 // }
 
 
-impl<'a> Take for Buffer<'a>
+impl<T> Take for Buffer<T>
+where
+    T: AsRef<[u8]>,
 {
+    fn take(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
+        let data = self.data.as_ref();
+        let input = &data[self.position..];
+        let input_len = input.len();
+        let nbyte = nbyte.into();
+
+        if input_len < nbyte {
+            return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
+        }
+
+        let value = &input[..nbyte];
+        self.position += nbyte;
+
+        Ok(value)
+    }
+
     fn take_int(&mut self, byteorder: ByteOrder, nbyte: u8) -> JResult<u128> {
-        let input = &self.data[self.position..];
-        let input_len = self.data.len();
+        let data = self.data.as_ref();
+        let input = &data[self.position..];
+        let input_len = input.len();
         let nbyte = nbyte.into();
         let mut value: u128 = 0;
     
         if input_len < nbyte {
-            return Err(make_error(self.data, self.position, ErrorKind::InvalidByteLength));
+            return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
         }
     
         match byteorder {
@@ -85,11 +111,15 @@ impl<'a> Take for Buffer<'a>
     }
 
     fn take_u8(&mut self) -> JResult<u8> {
-        if self.data.is_empty() {
-            return Err(make_error(self.data, self.position, ErrorKind::InvalidByteLength));
+        let data = self.data.as_ref();
+        let input = &data[self.position..];
+        // let input_len = input.len();
+
+        if input.is_empty() {
+            return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
         }
 
-        let value = self.data[self.position];
+        let value = data[self.position];
         self.position += 1;
 
         Ok(value)
@@ -173,19 +203,47 @@ mod tests {
 
     #[test]
     fn test_take_int() {
-        let mut buffer = Buffer::new(&[0x01, 0x02, 0x03, 0x04, 0x05]);
-        assert_eq!(0x0102, buffer.take_be_int(2).unwrap());
-        assert_eq!(0x0403, buffer.take_le_int(2).unwrap());
-        assert_eq!([0x05], buffer.remain());
+        let value = [0x01, 0x02, 0x03, 0x04, 0x05];
+        let mut buffer = Buffer::new(&value);
+        assert_eq!(buffer.take_be_int(2).unwrap(), 0x0102);
+        assert_eq!(buffer.take_le_int(2).unwrap(), 0x0403);
+        assert_eq!(buffer.remain(), [0x05]);
+        assert_eq!(buffer.take_le_int(2), Err(make_error(&value[4..], 4, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_le_int(1).unwrap(), 0x05);
+        assert_eq!(buffer.position, 5);
+    }
+
+    #[test]
+    fn test_take_u8() {
+        let mut buffer = Buffer::new(&[0x01, 0x02, 0x03]);
+        assert_eq!(buffer.take_u8().unwrap(), 0x01);
+        assert_eq!(buffer.take_u8().unwrap(), 0x02);
+        assert_eq!(buffer.remain(), [0x03]);
+        assert_eq!(buffer.take_u8().unwrap(), 0x03);
+        assert_eq!(buffer.remain(), []);
+        assert_eq!(buffer.position, 3);
+        assert_eq!(buffer.take_u8().is_err(), true);
+    }
+
+    #[test]
+    fn test_take_string_type() {
+        let mut buffer = Buffer::new("abcde");
+        assert_eq!(buffer.take_be_int(2).unwrap(), 0x6162);
+        assert_eq!(buffer.take_le_int(2).unwrap(), 0x6463);
+        assert_eq!(buffer.remain(), &[0x65]);
+        assert_eq!(buffer.take_le_int(2).is_err(), true);
+        assert_eq!(buffer.take_le_int(1).unwrap(), 0x65);
+        assert_eq!(buffer.position, 5);
     }
 
     #[test]
     fn test_take() {
-        let mut buffer = Buffer::new(&[0x01, 0x02, 0x03]);
-        let value = buffer.take_u8().unwrap();
-        assert_eq!(value, 0x01);
-        let value = buffer.take_u8().unwrap();
-        assert_eq!(value, 0x02);
-        assert_eq!(buffer.position, 2);
+        let mut buffer = Buffer::new([0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.take(2).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.take(2).unwrap(), &[0x03, 0x04]);
+        assert_eq!(buffer.remain(), &[0x05]);
+        assert_eq!(buffer.take(2).is_err(), true);
+        assert_eq!(buffer.take(1).unwrap(), &[0x05]);
+        assert_eq!(buffer.position, 5);
     }
 }
