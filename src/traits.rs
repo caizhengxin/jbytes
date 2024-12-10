@@ -1,9 +1,11 @@
-use crate::errors::JResult;
-use crate::byteorder::ByteOrder;
+use crate::{
+    ByteOrder,
+    errors::JResult,
+};
 
 
-pub trait Take {
-    fn take(&mut self, nbyte: usize) -> JResult<&'_ [u8]>;
+pub trait Read {
+    fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]>;
 
     fn take_int(&mut self, byteorder: ByteOrder, nbyte: u8) -> JResult<u128>;
 
@@ -92,4 +94,60 @@ pub trait Take {
         let value = self.take_le_int(16)?;
         Ok(value as u128)
     }
+}
+
+
+pub trait Write {
+    fn push<V: AsRef<[u8]>>(&mut self, value: V);
+
+    fn push_char(&mut self, value: char);
+
+    fn push_bytes(&mut self, value: &[u8]);
+
+    fn push_u8(&mut self, value: u8);
+
+    #[inline]
+    fn push_u16(&mut self, value: u16) {
+        self.push_be_u16(value);
+    }
+
+    fn push_be_u16(&mut self, value: u16);
+
+    fn push_le_u16(&mut self, value: u16);
+
+    #[inline]
+    fn push_u24(&mut self, value: u32) {
+        self.push_be_u24(value);
+    }
+
+    fn push_be_u24(&mut self, value: u32);
+
+    fn push_le_u24(&mut self, value: u32);
+
+    #[inline]
+    fn push_u32(&mut self, value: u32) {
+        self.push_be_u32(value);
+    }
+
+    fn push_be_u32(&mut self, value: u32);
+
+    fn push_le_u32(&mut self, value: u32);
+
+    #[inline]
+    fn push_u64(&mut self, value: u64) {
+        self.push_be_u64(value);
+    }
+
+    fn push_be_u64(&mut self, value: u64);
+
+    fn push_le_u64(&mut self, value: u64);
+
+    #[inline]
+    fn push_u128(&mut self, value: u128) {
+        self.push_be_u128(value);
+    }
+
+    fn push_be_u128(&mut self, value: u128);
+
+    fn push_le_u128(&mut self, value: u128);
 }

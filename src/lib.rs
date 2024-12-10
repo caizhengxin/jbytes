@@ -16,13 +16,13 @@ pub mod errors;
 pub mod byteorder;
 pub mod buffer;
 pub mod bytes;
-pub mod take;
+pub mod traits;
 pub mod std;
 
 pub use byteorder::ByteOrder;
 pub use buffer::Buffer;
 pub use bytes::Bytes;
-pub use take::Take;
+pub use traits::{Read, Write};
 
 
 pub trait ByteDecode {
