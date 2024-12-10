@@ -14,9 +14,15 @@ pub use jbyte_derive::ByteDecode;
 
 pub mod errors;
 pub mod byteorder;
+pub mod buffer;
 pub mod bytes;
 pub mod take;
 pub mod std;
+
+pub use byteorder::ByteOrder;
+pub use buffer::Buffer;
+pub use bytes::Bytes;
+pub use take::Take;
 
 
 pub trait ByteDecode {
