@@ -1,5 +1,6 @@
+use core::ops::Deref;
 use crate::{
-    take::Take,
+    traits::Read,
     byteorder::ByteOrder,
     errors::{JResult, make_error, ErrorKind},
 };
@@ -16,37 +17,47 @@ impl<T> Bytes<T>
 where
     T: AsRef<[u8]>,
 {
+    #[inline]
     pub fn new(data: T) -> Self {
         Self { data, position: 0 }
     }
 
+    #[inline]
     pub fn remain(&self) -> &'_ [u8] {
         &self.data.as_ref()[self.position..]
     }
 
+    #[inline]
     pub fn reset(&mut self) {
         self.position = 0;
     }
 
+    #[inline]
     pub fn set_position(&mut self, position: usize) {
         self.position = position
     }
 
+    #[inline]
     pub fn offset(&mut self, offset: isize) {
         self.position = (self.position as isize - offset) as usize;
     }
-
-    // pub fn push_u8(&mut self, value: u8) {
-    //     let ss = self.data.push(value);
-    // }
 }
 
 
-impl<T> Take for Bytes<T>
+impl<T> Deref for Bytes<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+
+
+impl<T> Read for Bytes<T>
 where
     T: AsRef<[u8]>,
 {
-    fn take(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
+    fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
         let data = self.data.as_ref();
         let input = &data[self.position..];
         let input_len = input.len();
@@ -149,11 +160,11 @@ mod tests {
     #[test]
     fn test_take() {
         let mut buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
-        assert_eq!(buffer.take(2).unwrap(), &[0x01, 0x02]);
-        assert_eq!(buffer.take(2).unwrap(), &[0x03, 0x04]);
+        assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);
         assert_eq!(buffer.remain(), &[0x05]);
-        assert_eq!(buffer.take(2).is_err(), true);
-        assert_eq!(buffer.take(1).unwrap(), &[0x05]);
+        assert_eq!(buffer.take_bytes(2).is_err(), true);
+        assert_eq!(buffer.take_bytes(1).unwrap(), &[0x05]);
         assert_eq!(buffer.position, 5);
     }
 }

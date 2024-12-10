@@ -1,7 +1,10 @@
 #[cfg(feature = "std")]
 use std::io::{self, Read, Write, Seek, SeekFrom};
-use crate::{Take, ByteOrder};
-use crate::errors::{JResult, make_error, ErrorKind};
+use core::ops::Deref;
+use crate::{
+    ByteOrder,
+    errors::{JResult, make_error, ErrorKind},
+};
 
 
 #[derive(Debug)]
@@ -12,6 +15,7 @@ pub struct Buffer {
 
 
 impl Buffer {
+    #[inline]
     pub fn new(data: Vec<u8>) -> Self {
         Self {
             data,
@@ -19,26 +23,39 @@ impl Buffer {
         }
     }
 
+    #[inline]
     pub fn remain(&self) -> &'_ [u8] {
         &self.data[self.position..]
     }
 
+    #[inline]
     pub fn reset(&mut self) {
         self.position = 0;
     }
 
+    #[inline]
     pub fn set_position(&mut self, position: usize) {
         self.position = position
     }
 
+    #[inline]
     pub fn offset(&mut self, offset: isize) {
         self.position = (self.position as isize - offset) as usize;
     }
 }
 
 
-impl Take for Buffer {
-    fn take(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
+impl Deref for Buffer {
+    type Target = Vec<u8>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+
+
+impl crate::Read for Buffer {
+    fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
         let input = &self.data[self.position..];
         let input_len = input.len();
         let nbyte = nbyte.into();
@@ -92,6 +109,79 @@ impl Take for Buffer {
         self.position += 1;
 
         Ok(value)
+    }
+}
+
+
+impl crate::Write for Buffer {
+    #[inline]
+    fn push<V: AsRef<[u8]>>(&mut self, value: V) {
+        self.data.extend_from_slice(value.as_ref());        
+    }
+
+    #[inline]
+    fn push_char(&mut self, value: char) {
+        self.data.push(value as u8);
+    }
+
+    #[inline]
+    fn push_bytes(&mut self, value: &[u8]) {
+        self.data.extend_from_slice(value);
+    }
+
+    #[inline]
+    fn push_u8(&mut self, value: u8) {
+        self.data.push(value);
+    }
+
+    #[inline]
+    fn push_be_u16(&mut self, value: u16) {
+        self.data.extend(value.to_be_bytes());        
+    }
+
+    #[inline]
+    fn push_le_u16(&mut self, value: u16) {
+        self.data.extend(value.to_le_bytes());        
+    }
+
+    #[inline]
+    fn push_be_u24(&mut self, value: u32) {
+        self.data.extend(&value.to_be_bytes()[1..]);        
+    }
+
+    #[inline]
+    fn push_le_u24(&mut self, value: u32) {
+        self.data.extend(&value.to_le_bytes()[..3]);        
+    }
+
+    #[inline]
+    fn push_be_u32(&mut self, value: u32) {
+        self.data.extend(value.to_be_bytes());        
+    }
+
+    #[inline]
+    fn push_le_u32(&mut self, value: u32) {
+        self.data.extend(value.to_le_bytes());        
+    }
+
+    #[inline]
+    fn push_be_u64(&mut self, value: u64) {
+        self.data.extend(value.to_be_bytes());        
+    }
+
+    #[inline]
+    fn push_le_u64(&mut self, value: u64) {
+        self.data.extend(value.to_le_bytes());        
+    }
+
+    #[inline]
+    fn push_be_u128(&mut self, value: u128) {
+        self.data.extend(value.to_be_bytes());        
+    }
+
+    #[inline]
+    fn push_le_u128(&mut self, value: u128) {
+        self.data.extend(value.to_le_bytes());        
     }
 }
 
@@ -159,9 +249,14 @@ impl Seek for Buffer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        traits::Read as JRead,
+        traits::Write as JWrite,
+    };
 
+    #[cfg(feature = "std")]
     #[test]
-    fn test_buffer_vec() {
+    fn test_buffer_read_write() {
         let mut buffer = Buffer::new(b"Hello, world!".to_vec());
 
         // Read Data
@@ -184,5 +279,84 @@ mod tests {
         // Write Data
         buffer.write(b"!").unwrap();
         assert_eq!(&buffer.data, b"Rusto, worl!!");
+    }
+
+    #[test]
+    fn test_take_int() {
+        let value = vec![0x01, 0x02, 0x03, 0x04, 0x05];
+        let mut buffer = Buffer::new(value.clone());
+        assert_eq!(buffer.take_be_int(2).unwrap(), 0x0102);
+        assert_eq!(buffer.take_le_int(2).unwrap(), 0x0403);
+        assert_eq!(buffer.remain(), [0x05]);
+        assert_eq!(buffer.take_le_int(2), Err(make_error(&value[4..], 4, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_le_int(1).unwrap(), 0x05);
+        assert_eq!(buffer.position, 5);
+    }
+
+    #[test]
+    fn test_take_u8() {
+        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03]);
+        assert_eq!(buffer.take_u8().unwrap(), 0x01);
+        assert_eq!(buffer.take_u8().unwrap(), 0x02);
+        assert_eq!(buffer.remain(), [0x03]);
+        assert_eq!(buffer.take_u8().unwrap(), 0x03);
+        assert_eq!(buffer.remain(), []);
+        assert_eq!(buffer.position, 3);
+        assert_eq!(buffer.take_u8().is_err(), true);
+    }
+
+    #[test]
+    fn test_take_int_with_string_type() {
+        let mut buffer = Buffer::new("abcde".as_bytes().to_vec());
+        assert_eq!(buffer.take_be_int(2).unwrap(), 0x6162);
+        assert_eq!(buffer.take_le_int(2).unwrap(), 0x6463);
+        assert_eq!(buffer.remain(), &[0x65]);
+        assert_eq!(buffer.take_le_int(2).is_err(), true);
+        assert_eq!(buffer.take_le_int(1).unwrap(), 0x65);
+        assert_eq!(buffer.position, 5);
+    }
+
+    #[test]
+    fn test_take_bytes() {
+        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);
+        assert_eq!(buffer.remain(), &[0x05]);
+        assert_eq!(buffer.take_bytes(2).is_err(), true);
+        assert_eq!(buffer.take_bytes(1).unwrap(), &[0x05]);
+        assert_eq!(buffer.position, 5);
+    }
+
+    #[test]
+    fn test_push() {
+        let mut buffer = Buffer::new(vec![0x01]);
+        buffer.push_u8(0x02);
+        buffer.push_u16(0x03);
+        buffer.push_u24(0x04);
+        buffer.push_u32(0x05);
+        buffer.push_u64(0x06);
+        buffer.push_u128(0x07);
+        buffer.push_char('1');
+        buffer.push("23");
+        buffer.push("45".to_string());
+        buffer.push([4, 5]);
+        buffer.push(vec![6, 7]);
+        buffer.push(&[8, 9]);
+
+        assert_eq!(*buffer, [
+            0x01,
+            0x02,
+            0x00, 0x03,
+            0x00, 0x00, 0x04,
+            0x00, 0x00, 0x00, 0x05,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
+            0x31,
+            0x32, 0x33,
+            0x34, 0x35,
+            0x04, 0x05,
+            0x06, 0x07,
+            0x08, 0x09,
+        ]);
     }
 }
