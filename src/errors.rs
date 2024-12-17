@@ -55,6 +55,8 @@ pub enum ErrorKind {
     SubSequence,
     #[error("parse byte failure")]
     Fail,
+    #[error("invalid position ({0})")]
+    InvalidPosition(usize),
 }
 
 
