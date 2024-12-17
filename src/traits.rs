@@ -4,7 +4,11 @@ use crate::{
 };
 
 
-pub trait Read {
+pub trait BufRead {
+    fn remain(&self) -> &'_ [u8];
+
+    fn advance(&mut self, nbyte: usize);
+
     fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]>;
 
     fn take_int(&mut self, byteorder: ByteOrder, nbyte: u8) -> JResult<u128>;
@@ -97,7 +101,7 @@ pub trait Read {
 }
 
 
-pub trait Write {
+pub trait BufWrite {
     fn push<V: AsRef<[u8]>>(&mut self, value: V);
 
     fn push_char(&mut self, value: char);

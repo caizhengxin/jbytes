@@ -2,7 +2,7 @@
 use std::io::{self, Read, Write, Seek, SeekFrom};
 use core::ops::Deref;
 use crate::{
-    ByteOrder,
+    ByteOrder, BufRead, BufWrite,
     errors::{JResult, make_error, ErrorKind},
 };
 
@@ -24,23 +24,8 @@ impl Buffer {
     }
 
     #[inline]
-    pub fn remain(&self) -> &'_ [u8] {
-        &self.data[self.position..]
-    }
-
-    #[inline]
-    pub fn reset(&mut self) {
+    pub fn reset_position(&mut self) {
         self.position = 0;
-    }
-
-    #[inline]
-    pub fn set_position(&mut self, position: usize) {
-        self.position = position
-    }
-
-    #[inline]
-    pub fn offset(&mut self, offset: isize) {
-        self.position = (self.position as isize - offset) as usize;
     }
 }
 
@@ -54,7 +39,17 @@ impl Deref for Buffer {
 }
 
 
-impl crate::Read for Buffer {
+impl BufRead for Buffer {
+    #[inline]
+    fn remain(&self) -> &'_ [u8] {
+        &self.data[self.position..]
+    }
+
+    #[inline]
+    fn advance(&mut self, nbyte: usize) {
+        self.position += nbyte;
+    }
+
     fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
         let input = &self.data[self.position..];
         let input_len = input.len();
@@ -113,7 +108,7 @@ impl crate::Read for Buffer {
 }
 
 
-impl crate::Write for Buffer {
+impl BufWrite for Buffer {
     #[inline]
     fn push<V: AsRef<[u8]>>(&mut self, value: V) {
         self.data.extend_from_slice(value.as_ref());        
@@ -249,10 +244,6 @@ impl Seek for Buffer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        traits::Read as JRead,
-        traits::Write as JWrite,
-    };
 
     #[cfg(feature = "std")]
     #[test]

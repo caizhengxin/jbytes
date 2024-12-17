@@ -1,7 +1,6 @@
 use core::ops::Deref;
 use crate::{
-    traits::Read,
-    byteorder::ByteOrder,
+    ByteOrder, BufRead,
     errors::{JResult, make_error, ErrorKind},
 };
 
@@ -23,23 +22,8 @@ where
     }
 
     #[inline]
-    pub fn remain(&self) -> &'_ [u8] {
-        &self.data.as_ref()[self.position..]
-    }
-
-    #[inline]
-    pub fn reset(&mut self) {
+    pub fn reset_position(&mut self) {
         self.position = 0;
-    }
-
-    #[inline]
-    pub fn set_position(&mut self, position: usize) {
-        self.position = position
-    }
-
-    #[inline]
-    pub fn offset(&mut self, offset: isize) {
-        self.position = (self.position as isize - offset) as usize;
     }
 }
 
@@ -53,10 +37,20 @@ impl<T> Deref for Bytes<T> {
 }
 
 
-impl<T> Read for Bytes<T>
+impl<T> BufRead for Bytes<T>
 where
     T: AsRef<[u8]>,
 {
+    #[inline]
+    fn remain(&self) -> &'_ [u8] {
+        &self.data.as_ref()[self.position..]
+    }
+
+    #[inline]
+    fn advance(&mut self, nbyte: usize) {
+        self.position += nbyte;
+    }
+
     fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
         let data = self.data.as_ref();
         let input = &data[self.position..];
