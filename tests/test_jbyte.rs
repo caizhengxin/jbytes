@@ -10,5 +10,5 @@ pub struct Example {
 
 #[test]
 fn test_jbyte() {
-    println!("{:?}", Example { a:1 }.hello_world());
+    // println!("{:?}", Example { a:1 }.hello_world());
 }

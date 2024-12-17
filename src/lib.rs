@@ -22,7 +22,7 @@ pub mod std;
 pub use byteorder::ByteOrder;
 pub use buffer::Buffer;
 pub use bytes::Bytes;
-pub use traits::{Read, Write};
+pub use traits::{BufRead, BufWrite};
 
 
 pub trait ByteDecode {
