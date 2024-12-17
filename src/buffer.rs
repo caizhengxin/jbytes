@@ -81,15 +81,11 @@ impl BufRead for Buffer {
     }
 
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
-        let input = &self.data[self.position..];
-        let input_len = input.len();
-        let nbytes = nbytes.into();
+        let value = match self.data.get(self.position..self.position + nbytes) {
+            Some(value) => value,
+            None => return Err(make_error(self.remaining_data(), self.position, ErrorKind::InvalidByteLength)),
+        };
 
-        if input_len < nbytes {
-            return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
-        }
-
-        let value = &input[..nbytes];
         self.position += nbytes;
 
         Ok(value)
