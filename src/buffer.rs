@@ -18,8 +18,8 @@ impl Buffer {
     #[inline]
     pub fn new(data: Vec<u8>) -> Self {
         Self {
-            data,
             position: 0,
+            data,
         }
     }
 
@@ -41,54 +41,84 @@ impl Deref for Buffer {
 
 impl BufRead for Buffer {
     #[inline]
+    fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    #[inline]
     fn remain(&self) -> &'_ [u8] {
         &self.data[self.position..]
     }
 
     #[inline]
-    fn advance(&mut self, nbyte: usize) {
-        self.position += nbyte;
+    fn remaining_data(&self) -> &'_ [u8] {
+        &self.data[self.position..]
     }
 
-    fn take_bytes(&mut self, nbyte: usize) -> JResult<&'_ [u8]> {
+    #[inline]
+    fn remaining_len(&self) -> usize {
+        self.data.len() - self.position
+    }
+
+    #[inline]
+    fn current_position(&self) -> usize {
+        self.position
+    }
+
+    #[inline]
+    fn set_position(&mut self, position: usize) -> JResult<()> {
+        if position > self.data.len() {
+            return Err(make_error(self.remaining_data(), self.current_position(), ErrorKind::InvalidPosition(position)));
+        }
+
+        self.position = position;
+        Ok(())
+    }
+
+    #[inline]
+    fn advance(&mut self, nbytes: usize) {
+        self.position += nbytes;
+    }
+
+    fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
         let input = &self.data[self.position..];
         let input_len = input.len();
-        let nbyte = nbyte.into();
+        let nbytes = nbytes.into();
 
-        if input_len < nbyte {
+        if input_len < nbytes {
             return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
         }
 
-        let value = &input[..nbyte];
-        self.position += nbyte;
+        let value = &input[..nbytes];
+        self.position += nbytes;
 
         Ok(value)
     }
 
-    fn take_int(&mut self, byteorder: ByteOrder, nbyte: u8) -> JResult<u128> {
+    fn take_int(&mut self, byteorder: ByteOrder, nbytes: u8) -> JResult<u128> {
         let input = &self.data[self.position..];
         let input_len = input.len();
-        let nbyte = nbyte.into();
+        let nbytes = nbytes.into();
         let mut value: u128 = 0;
     
-        if input_len < nbyte {
+        if input_len < nbytes {
             return Err(make_error(input, self.position, ErrorKind::InvalidByteLength));
         }
     
         match byteorder {
             ByteOrder::Be => {
-                for byte in input.iter().take(nbyte) {
+                for byte in input.iter().take(nbytes) {
                     value = (value << 8) + *byte as u128;
                 }
             },
             ByteOrder::Le => {
-                for (index, byte) in input.iter().enumerate().take(nbyte) {
+                for (index, byte) in input.iter().enumerate().take(nbytes) {
                     value += (*byte as u128) << (8 * index);
                 }
             }
         }
 
-        self.position += nbyte;
+        self.position += nbytes;
     
         Ok(value)
     }
@@ -110,8 +140,18 @@ impl BufRead for Buffer {
 
 impl BufWrite for Buffer {
     #[inline]
-    fn push<V: AsRef<[u8]>>(&mut self, value: V) {
-        self.data.extend_from_slice(value.as_ref());        
+    fn push<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<usize> {
+        let data = value.as_ref();
+        let data_len = data.len();
+
+        if data_len > self.remaining_len() {
+            self.data.resize(self.position + data_len, 0);
+        }
+
+        self.data[self.position..self.position + data_len].clone_from_slice(data);
+        self.position += data_len;
+
+        Ok(data_len)
     }
 }
 
@@ -126,11 +166,11 @@ impl Read for Buffer
             return Ok(0);
         }
 
-        let nbyte = std::cmp::min(buf.len(), data_len - self.position);
-        buf[..nbyte].copy_from_slice(&self.data[self.position..self.position + nbyte]);
-        self.position += nbyte;
+        let nbytes = std::cmp::min(buf.len(), data_len - self.position);
+        buf[..nbytes].copy_from_slice(&self.data[self.position..self.position + nbytes]);
+        self.position += nbytes;
 
-        Ok(nbyte)
+        Ok(nbytes)
     }
 }
 
@@ -255,22 +295,21 @@ mod tests {
 
     #[test]
     fn test_push() {
-        let mut buffer = Buffer::new(vec![0x01]);
-        buffer.push_u8(0x02);
-        buffer.push_u16(0x03);
-        buffer.push_u24(0x04);
-        buffer.push_u32(0x05);
-        buffer.push_u64(0x06);
-        buffer.push_u128(0x07);
-        buffer.push_char('1');
-        buffer.push("23");
-        buffer.push("45".to_string());
-        buffer.push([4, 5]);
-        buffer.push(vec![6, 7]);
-        buffer.push(&[8, 9]);
+        let mut buffer = Buffer::new(vec![]);
+        buffer.push_u8(0x02).unwrap();
+        buffer.push_u16(0x03).unwrap();
+        buffer.push_u24(0x04).unwrap();
+        buffer.push_u32(0x05).unwrap();
+        buffer.push_u64(0x06).unwrap();
+        buffer.push_u128(0x07).unwrap();
+        buffer.push_char('1').unwrap();
+        buffer.push("23").unwrap();
+        buffer.push("45".to_string()).unwrap();
+        buffer.push([4, 5]).unwrap();
+        buffer.push(vec![6, 7]).unwrap();
+        buffer.push(&[8, 9]).unwrap();
 
         assert_eq!(*buffer, [
-            0x01,
             0x02,
             0x00, 0x03,
             0x00, 0x00, 0x04,

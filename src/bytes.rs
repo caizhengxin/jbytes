@@ -42,8 +42,38 @@ where
     T: AsRef<[u8]>,
 {
     #[inline]
+    fn len(&self) -> usize {
+        self.data.as_ref().len()
+    }
+
+    #[inline]
     fn remain(&self) -> &'_ [u8] {
         &self.data.as_ref()[self.position..]
+    }
+
+    #[inline]
+    fn remaining_data(&self) -> &'_ [u8] {
+        &self.data.as_ref()[self.position..]
+    }
+
+    #[inline]
+    fn remaining_len(&self) -> usize {
+        self.data.as_ref().len() - self.position
+    }
+
+    #[inline]
+    fn current_position(&self) -> usize {
+        self.position
+    }
+
+    #[inline]
+    fn set_position(&mut self, position: usize) -> JResult<()> {
+        if position > self.data.as_ref().len() {
+            return Err(make_error(self.remaining_data(), self.current_position(), ErrorKind::InvalidPosition(position)));
+        }
+
+        self.position = position;
+        Ok(())
     }
 
     #[inline]
