@@ -1,4 +1,4 @@
-use jbyte::ByteDecode;
+use jbyte::{ByteDecode, BufRead};
 use jbyte_derive::ByteDecode;
 
 
@@ -22,4 +22,6 @@ fn test_jbyte() {
     println!("{:?}", value[2..4].clone_from_slice(&[0x01, 0x02]));
     let n = 0x01_u64;
     println!(">>> {:?}", core::mem::size_of_val(&n).checked_sub(10));
+    // let mut buf = [0; 1024];
+    // buf.copy_from_slice(src)
 }

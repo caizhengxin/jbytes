@@ -1,6 +1,6 @@
 use core::mem;
 use crate::{
-    ByteOrder,
+    // ByteOrder,
     errors::{JResult, make_error, ErrorKind},
 };
 
@@ -23,36 +23,38 @@ macro_rules! macro_take_bytes {
 
 
 pub trait BufRead {
+    /// Returns the length of the buffer.
     fn len(&self) -> usize;
 
-    fn remain(&self) -> &'_ [u8];
+    /// Get the internal cursor of the `self`.
+    fn get_position_mut(&mut self) -> &mut usize;
 
-    fn remaining_data(&self) -> &'_ [u8];
+    /// Get the internal cursor of the `self`.
+    fn get_position(&self) -> usize;
 
+    /// Set the internal cursor of the `self`.
     #[inline]
-    fn remaining_len(&self) -> usize {
-        self.remaining_data().len()
+    fn set_position(&mut self, position: usize) {
+        *self.get_position_mut() = position;
     }
 
-    fn current_position(&self) -> usize;
+    /// Advance the internal cursor of the `self`.
+    #[inline]
+    fn advance(&mut self, nbytes: usize) {
+        *self.get_position_mut() += nbytes;
+    }
 
-    fn set_position(&mut self, position: usize) -> JResult<()>;
+    /// Returns the n-bytes between the current position and the end of the buffer.
+    fn remaining(&self) -> &'_ [u8];
 
-    fn advance(&mut self, nbytes: usize);
+    /// Returns the number of bytes between the current position and the end of the buffer.
+    #[inline]
+    fn remaining_len(&self) -> usize {
+        self.remaining().len()
+    }
 
+    /// Reads n-byte data from `self`.
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]>;
-
-    // fn take_int(&mut self, byteorder: ByteOrder, nbytes: u8) -> JResult<u128>;
-
-    // #[inline]
-    // fn take_be_int(&mut self, nbytes: u8) -> JResult<u128> {
-    //     self.take_int(ByteOrder::Be, nbytes)
-    // }
-
-    // #[inline]
-    // fn take_le_int(&mut self, nbytes: u8) -> JResult<u128> {
-    //     self.take_int(ByteOrder::Le, nbytes)
-    // }
 
     /// Reads an unsigned 8 bit integer from `self`.
     #[inline]
@@ -150,14 +152,32 @@ pub trait BufRead {
         macro_take_bytes!(self, i16::from_ne_bytes);
     }
 
+    /// Reads an unsigned 24 bit integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_u24(&mut self) -> JResult<u32> {
+        macro_take_bytes!(self, u32::from_be_bytes, 3);
+    }
+
+    /// Reads an unsigned 24 bit integer from `self` in big-endian byte order.
     #[inline]
     fn take_be_u24(&mut self) -> JResult<u32> {
         macro_take_bytes!(self, u32::from_be_bytes, 3);
     }
 
+    /// Reads an unsigned 24 bit integer from `self` in little-endian byte order.
     #[inline]
     fn take_le_u24(&mut self) -> JResult<u32> {
         macro_take_bytes!(self, u32::from_le_bytes, 3);
+    }
+
+    /// Reads an unsigned 24 bit integer from `self` in native-endian byte order.
+    #[inline]
+    fn take_ne_u24(&mut self) -> JResult<u32> {
+        if cfg!(target_endian = "big") {
+            self.take_be_u24()
+        } else {
+            self.take_le_u24()
+        }
     }
 
     /// Reads an unsigned 32 bit integer from `self` in big-endian byte order.
@@ -302,6 +322,102 @@ pub trait BufRead {
     #[inline]
     fn take_ne_i128(&mut self) -> JResult<i128> {
         macro_take_bytes!(self, i128::from_ne_bytes);
+    }
+
+    /// Reads an unsigned size integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_usize(&mut self) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_be_bytes);
+    }
+
+    /// Reads an unsigned size integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_be_usize(&mut self) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_be_bytes);
+    }
+
+    /// Reads an unsigned size integer from `self` in little-endian byte order.
+    #[inline]
+    fn take_le_usize(&mut self) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_le_bytes);
+    }
+
+    /// Reads an unsigned size integer from `self` in native-endian byte order.
+    #[inline]
+    fn take_ne_usize(&mut self) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_ne_bytes);
+    }
+
+    /// Reads a signed size integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_isize(&mut self) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_be_bytes);
+    }
+
+    /// Reads a signed size integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_be_isize(&mut self) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_be_bytes);
+    }
+
+    /// Reads a signed size integer from `self` in little-endian byte order.
+    #[inline]
+    fn take_le_isize(&mut self) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_le_bytes);
+    }
+
+    /// Reads a signed size integer from `self` in native-endian byte order.
+    #[inline]
+    fn take_ne_isize(&mut self) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_ne_bytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_uint(&mut self, nbytes: usize) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_be_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_be_uint(&mut self, nbytes: usize) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_be_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in little-endian byte order.
+    #[inline]
+    fn take_le_uint(&mut self, nbytes: usize) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_le_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in native-endian byte order.
+    #[inline]
+    fn take_ne_uint(&mut self, nbytes: usize) -> JResult<usize> {
+        macro_take_bytes!(self, usize::from_ne_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_int(&mut self, nbytes: usize) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_be_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in big-endian byte order.
+    #[inline]
+    fn take_be_int(&mut self, nbytes: usize) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_be_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in little-endian byte order.
+    #[inline]
+    fn take_le_int(&mut self, nbytes: usize) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_le_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in native-endian byte order.
+    #[inline]
+    fn take_ne_int(&mut self, nbytes: usize) -> JResult<isize> {
+        macro_take_bytes!(self, isize::from_ne_bytes, nbytes);
     }
 
     /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in big-endian byte order.
@@ -688,16 +804,16 @@ pub trait BufWrite: BufRead {
 
     /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+    fn push_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
         self.push_be_uint(value, nbytes)
     }
 
     /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_be_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+    fn push_be_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
         let start = match mem::size_of_val(&value).checked_sub(nbytes) {
             Some(start) => start,
-            None => return Err(make_error(self.remain(), self.current_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         self.push(&value.to_be_bytes()[start..])
@@ -705,11 +821,11 @@ pub trait BufWrite: BufRead {
 
     /// Writes an unsigned n-byte integer to `self` in little-endian byte order.
     #[inline]
-    fn push_le_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+    fn push_le_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
         let slice = value.to_le_bytes();
         let slice = match slice.get(..nbytes) {
             Some(slice) => slice,
-            None => return Err(make_error(self.remain(), self.current_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         self.push(slice)
@@ -717,7 +833,7 @@ pub trait BufWrite: BufRead {
 
     /// Writes an unsigned n-byte integer to `self` in native-endian byte order.
     #[inline]
-    fn push_ne_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+    fn push_ne_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
         if cfg!(target_endian = "big") {
             self.push_be_uint(value, nbytes)
         } else {
@@ -727,25 +843,25 @@ pub trait BufWrite: BufRead {
 
     /// Writes a signed n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
-        self.push_uint(value as u64, nbytes)
+    fn push_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
+        self.push_uint(value as usize, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_be_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
-        self.push_be_uint(value as u64, nbytes)
+    fn push_be_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
+        self.push_be_uint(value as usize, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in little-endian byte order.
     #[inline]
-    fn push_le_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
-        self.push_le_uint(value as u64, nbytes)
+    fn push_le_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
+        self.push_le_uint(value as usize, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in native-endian byte order.
     #[inline]
-    fn push_ne_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+    fn push_ne_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
         if cfg!(target_endian = "big") {
             self.push_be_int(value, nbytes)
         } else {
