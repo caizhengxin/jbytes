@@ -36,14 +36,17 @@ macro_rules! macro_take_bytes {
 
 
 pub trait BufRead {
-    /// Returns the length of the buffer.
-    fn len(&self) -> usize;
-
     /// Get the internal cursor of the `self`.
     fn get_position_mut(&mut self) -> &mut usize;
 
     /// Get the internal cursor of the `self`.
     fn get_position(&self) -> usize;
+
+    /// Reset the internal cursor of the `self`.
+    #[inline]
+    fn reset_position(&mut self) {
+        *self.get_position_mut() = 0;
+    }
 
     /// Set the internal cursor of the `self`.
     #[inline]
@@ -52,10 +55,7 @@ pub trait BufRead {
     }
 
     /// Advance the internal cursor of the `self`.
-    #[inline]
-    fn advance(&mut self, nbytes: usize) {
-        *self.get_position_mut() += nbytes;
-    }
+    fn advance(&mut self, nbytes: usize);
 
     /// Returns the n-bytes between the current position and the end of the buffer.
     fn remaining(&self) -> &'_ [u8];
@@ -492,8 +492,27 @@ pub trait BufRead {
 
 
 pub trait BufWrite: BufRead {
+    /// Returns the n-bytes between the current position and the end of the buffer.
+    fn remaining_mut(&mut self) -> &'_ mut [u8];
+
+    fn resize(&mut self, nbytes: usize) -> usize;
+
     /// Writes `AsRef<[u8]>` to `self`, eg: &[u8]/&str/String/array/vec, etc.
-    fn push<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<usize>;
+    fn push<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<usize> {
+        let data = value.as_ref();
+        let data_len = data.len();
+
+        if data_len > self.remaining_len() {
+            if self.resize(data_len) == 0 {
+                return Err(make_error(self.remaining(), self.get_position(), ErrorKind::PushFail));
+            }
+        }
+
+        self.remaining_mut()[..data_len].clone_from_slice(data);
+        self.advance(data_len);
+
+        Ok(data_len)
+    }
 
     /// Writes bytes(&[u8]) to `self`.
     #[inline]
