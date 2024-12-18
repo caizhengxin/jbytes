@@ -37,22 +37,7 @@ macro_rules! macro_take_bytes {
 
 pub trait BufRead {
     /// Get the internal cursor of the `self`.
-    fn get_position_mut(&mut self) -> &mut usize;
-
-    /// Get the internal cursor of the `self`.
     fn get_position(&self) -> usize;
-
-    /// Reset the internal cursor of the `self`.
-    #[inline]
-    fn reset_position(&mut self) {
-        *self.get_position_mut() = 0;
-    }
-
-    /// Set the internal cursor of the `self`.
-    #[inline]
-    fn set_position(&mut self, position: usize) {
-        *self.get_position_mut() = position;
-    }
 
     /// Advance the internal cursor of the `self`.
     fn advance(&mut self, nbytes: usize);

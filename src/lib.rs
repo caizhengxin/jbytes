@@ -18,6 +18,7 @@ pub mod buffer;
 pub mod bytes;
 pub mod traits;
 pub mod std;
+mod impls;
 
 pub use byteorder::ByteOrder;
 pub use buffer::Buffer;
