@@ -84,20 +84,8 @@ where
 mod tests {
     use super::*;
 
-    // #[test]
-    // fn test_take_int() {
-    //     let value = [0x01, 0x02, 0x03, 0x04, 0x05];
-    //     let mut buffer = Bytes::new(&value);
-    //     assert_eq!(buffer.take_be_int(2).unwrap(), 0x0102);
-    //     assert_eq!(buffer.take_le_int(2).unwrap(), 0x0403);
-    //     assert_eq!(buffer.remain(), [0x05]);
-    //     assert_eq!(buffer.take_le_int(2), Err(make_error(&value[4..], 4, ErrorKind::InvalidByteLength)));
-    //     assert_eq!(buffer.take_le_int(1).unwrap(), 0x05);
-    //     assert_eq!(buffer.position, 5);
-    // }
-
     #[test]
-    fn test_take_u8() {
+    fn test_bytes_take_u8() {
         let mut buffer = Bytes::new(&[0x01, 0x02, 0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x01);
         assert_eq!(buffer.take_u8().unwrap(), 0x02);
@@ -108,19 +96,8 @@ mod tests {
         assert_eq!(buffer.take_u8().is_err(), true);
     }
 
-    // #[test]
-    // fn test_take_string_type() {
-    //     let mut buffer = Bytes::new("abcde");
-    //     assert_eq!(buffer.take_be_int(2).unwrap(), 0x6162);
-    //     assert_eq!(buffer.take_le_int(2).unwrap(), 0x6463);
-    //     assert_eq!(buffer.remain(), &[0x65]);
-    //     assert_eq!(buffer.take_le_int(2).is_err(), true);
-    //     assert_eq!(buffer.take_le_int(1).unwrap(), 0x65);
-    //     assert_eq!(buffer.position, 5);
-    // }
-
     #[test]
-    fn test_take() {
+    fn test_bytes_take() {
         let mut buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);

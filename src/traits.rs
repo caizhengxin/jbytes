@@ -11,13 +11,26 @@ macro_rules! macro_take_bytes {
 
         return Ok($typ::$func(unsafe { *($this.take_bytes(SIZE)? as *const _ as *const [_; SIZE]) }));
     }};
-    ($this:ident, $typ:tt::$func:tt, $nbytes:expr) => {{
+    ($this:ident, $typ:tt::from_be_bytes, $nbytes:expr) => {{
         const SIZE: usize = core::mem::size_of::<$typ>();
 
         let mut buf = [0; SIZE];
+        let slice_at = match SIZE.checked_sub($nbytes) {
+            Some(slice_at) => slice_at,
+            None => return Err(make_error($this.remaining(), $this.get_position(), ErrorKind::InvalidByteLength)),
+        };
+        buf[slice_at..].copy_from_slice($this.take_bytes($nbytes)?);
+
+        return Ok($typ::from_be_bytes(buf));
+    }};
+    ($this:ident, $typ:tt::from_le_bytes, $nbytes:expr) => {{
+        const SIZE: usize = core::mem::size_of::<$typ>();
+
+        let mut buf = [0; SIZE];
+
         buf[..$nbytes].copy_from_slice($this.take_bytes($nbytes)?);
 
-        return Ok($typ::$func(buf));
+        return Ok($typ::from_le_bytes(buf));
     }};
 }
 
@@ -393,7 +406,11 @@ pub trait BufRead {
     /// Reads an unsigned n-byte integer from `self` in native-endian byte order.
     #[inline]
     fn take_ne_uint(&mut self, nbytes: usize) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_ne_bytes, nbytes);
+        if cfg!(target_endian = "big") {
+            self.take_be_uint(nbytes)
+        } else {
+            self.take_le_uint(nbytes)
+        }
     }
 
     /// Reads a signed n-byte integer from `self` in big-endian byte order.
@@ -417,7 +434,11 @@ pub trait BufRead {
     /// Reads a signed n-byte integer from `self` in native-endian byte order.
     #[inline]
     fn take_ne_int(&mut self, nbytes: usize) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_ne_bytes, nbytes);
+        if cfg!(target_endian = "big") {
+            self.take_be_int(nbytes)
+        } else {
+            self.take_le_int(nbytes)
+        }
     }
 
     /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in big-endian byte order.
@@ -837,7 +858,7 @@ pub trait BufWrite: BufRead {
         if cfg!(target_endian = "big") {
             self.push_be_uint(value, nbytes)
         } else {
-            self.push_be_uint(value, nbytes)
+            self.push_le_uint(value, nbytes)
         }
     }
 
@@ -865,7 +886,7 @@ pub trait BufWrite: BufRead {
         if cfg!(target_endian = "big") {
             self.push_be_int(value, nbytes)
         } else {
-            self.push_be_int(value, nbytes)
+            self.push_le_int(value, nbytes)
         }
     }
 

@@ -217,43 +217,105 @@ mod tests {
         assert_eq!(buffer.get_position(), 3);
     }
 
-    // #[test]
-    // fn test_take_int() {
-    //     let value = vec![0x01, 0x02, 0x03, 0x04, 0x05];
-    //     let mut buffer = Buffer::new(value.clone());
-    //     assert_eq!(buffer.take_be_int(2).unwrap(), 0x0102);
-    //     assert_eq!(buffer.take_le_int(2).unwrap(), 0x0403);
-    //     assert_eq!(buffer.remaining(), [0x05]);
-    //     assert_eq!(buffer.take_le_int(2), Err(make_error(&value[4..], 4, ErrorKind::InvalidByteLength)));
-    //     assert_eq!(buffer.take_le_int(1).unwrap(), 0x05);
-    //     assert_eq!(buffer.position, 5);
-    // }
-
     #[test]
-    fn test_take_u8() {
-        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03]);
-        assert_eq!(buffer.take_u8().unwrap(), 0x01);
-        assert_eq!(buffer.take_u8().unwrap(), 0x02);
-        assert_eq!(buffer.remaining(), [0x03]);
-        assert_eq!(buffer.take_u8().unwrap(), 0x03);
-        assert_eq!(buffer.remaining(), []);
-        assert_eq!(buffer.position, 3);
-        assert_eq!(buffer.take_u8().is_err(), true);
+    fn test_buffer_take_u16() {
+        let mut buffer = Buffer::new(vec![0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x04]);
+        assert_eq!(buffer.take_u16().unwrap(), 0x0001);
+        assert_eq!(buffer.take_be_u16().unwrap(), 0x0002);
+        assert_eq!(buffer.take_le_u16().unwrap(), 0x0300);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_u16(), Err(make_error(&[0x04][..], 6, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), 7);
     }
 
     #[test]
-    fn test_take_int_with_string_type() {
-        // let mut buffer = Buffer::new("abcde".as_bytes().to_vec());
-        // assert_eq!(buffer.take_be_int(2).unwrap(), 0x6162);
-        // assert_eq!(buffer.take_le_int(2).unwrap(), 0x6463);
-        // assert_eq!(buffer.remaining(), &[0x65]);
-        // assert_eq!(buffer.take_le_int(2).is_err(), true);
-        // assert_eq!(buffer.take_le_int(1).unwrap(), 0x65);
-        // assert_eq!(buffer.position, 5);
+    fn test_buffer_take_u24() {
+        let mut buffer = Buffer::new(vec![
+            0x00, 0x00, 0x01,
+            0x00, 0x00, 0x02,
+            0x00, 0x00, 0x03,
+            0x04
+        ]);
+        assert_eq!(buffer.take_u24().unwrap(), 0x000001);
+        assert_eq!(buffer.take_be_u24().unwrap(), 0x000002);
+        assert_eq!(buffer.take_le_u24().unwrap(), 0x030000);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_u24(), Err(make_error(&[0x04][..], 9, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), 10);
     }
 
     #[test]
-    fn test_take_bytes() {
+    fn test_buffer_take_u32() {
+        let mut buffer = Buffer::new(vec![
+            0x00, 0x00, 0x00, 0x01,
+            0x00, 0x00, 0x00, 0x02,
+            0x00, 0x00, 0x00, 0x03,
+            0x04
+        ]);
+        assert_eq!(buffer.take_u32().unwrap(), 0x00000001);
+        assert_eq!(buffer.take_be_u32().unwrap(), 0x00000002);
+        assert_eq!(buffer.take_le_u32().unwrap(), 0x03000000);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_u32(), Err(make_error(&[0x04][..], 12, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), 13);
+    }
+
+    #[test]
+    fn test_buffer_take_u64() {
+        let mut buffer = Buffer::new(vec![
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+            0x04
+        ]);
+        assert_eq!(buffer.take_u64().unwrap(), 0x0000000000000001);
+        assert_eq!(buffer.take_be_u64().unwrap(), 0x0000000000000002);
+        assert_eq!(buffer.take_le_u64().unwrap(), 0x0300000000000000);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_u64().is_err(), true);
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), buffer.len());
+    }
+
+    #[test]
+    fn test_buffer_take_u128() {
+        let mut buffer = Buffer::new(vec![
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+            0x04
+        ]);
+        assert_eq!(buffer.take_u128().unwrap(), 0x00000000000000000000000000000001);
+        assert_eq!(buffer.take_be_u128().unwrap(), 0x00000000000000000000000000000002);
+        assert_eq!(buffer.take_le_u128().unwrap(), 0x03000000000000000000000000000000);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_u128().is_err(), true);
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), buffer.len());
+    }
+
+    #[test]
+    fn test_buffer_take_uint() {
+        let mut buffer = Buffer::new(vec![
+            0x00, 0x00, 0x00, 0x00, 0x01,
+            0x00, 0x00, 0x00, 0x00, 0x02,
+            0x00, 0x00, 0x00, 0x00, 0x03,
+            0x04
+        ]);
+        assert_eq!(buffer.take_uint(5).unwrap(), 0x0000000001);
+        assert_eq!(buffer.take_be_uint(5).unwrap(), 0x0000000002);
+        assert_eq!(buffer.take_le_uint(5).unwrap(), 0x0300000000);
+        assert_eq!(buffer.remaining(), [0x04]);
+        assert_eq!(buffer.take_uint(5).is_err(), true);
+        assert_eq!(buffer.take_u8().unwrap(), 0x04);
+        assert_eq!(buffer.get_position(), buffer.len());
+    }
+
+    #[test]
+    fn test_buffer_take_bytes() {
         let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);
@@ -264,7 +326,7 @@ mod tests {
     }
 
     #[test]
-    fn test_push() {
+    fn test_buffer_push() {
         let mut buffer = Buffer::new(vec![]);
         buffer.push_u8(0x02).unwrap();
         buffer.push_u16(0x03).unwrap();
@@ -272,6 +334,8 @@ mod tests {
         buffer.push_u32(0x05).unwrap();
         buffer.push_u64(0x06).unwrap();
         buffer.push_u128(0x07).unwrap();
+        buffer.push_uint(1, 3).unwrap();
+        buffer.push_le_uint(1, 3).unwrap();
         buffer.push_char('1').unwrap();
         buffer.push("23").unwrap();
         buffer.push("45".to_string()).unwrap();
@@ -286,6 +350,8 @@ mod tests {
             0x00, 0x00, 0x00, 0x05,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
+            0x00, 0x00, 0x01,
+            0x01, 0x00, 0x00,
             0x31,
             0x32, 0x33,
             0x34, 0x35,
