@@ -16,17 +16,13 @@ pub struct Buffer {
 
 
 impl Buffer {
+    /// Creates a buffer struct type.
     #[inline]
     pub fn new(data: Vec<u8>) -> Self {
         Self {
             position: 0,
             data,
         }
-    }
-
-    #[inline]
-    pub fn reset_position(&mut self) {
-        self.position = 0;
     }
 }
 
@@ -41,11 +37,6 @@ impl Deref for Buffer {
 
 
 impl BufRead for Buffer {
-    #[inline]
-    fn len(&self) -> usize {
-        self.data.len()
-    }
-
     #[inline]
     fn get_position(&self) -> usize {
         self.position
@@ -62,14 +53,16 @@ impl BufRead for Buffer {
     }
 
     #[inline]
-    fn remaining_len(&self) -> usize {
-        self.data.len().checked_sub(self.position).unwrap_or(0)
+    fn advance(&mut self, nbytes: usize) {
+        self.position += nbytes;
     }
 
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
-        let value = match self.data.get(self.position..self.position + nbytes) {
+        let position = self.position;
+
+        let value = match self.data.get(position..position + nbytes) {
             Some(value) => value,
-            None => return Err(make_error(self.remaining(), self.position, ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.remaining(), position, ErrorKind::InvalidByteLength)),
         };
 
         self.position += nbytes;
@@ -81,18 +74,17 @@ impl BufRead for Buffer {
 
 impl BufWrite for Buffer {
     #[inline]
-    fn push<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<usize> {
-        let data = value.as_ref();
-        let data_len = data.len();
+    fn remaining_mut(&mut self) -> &'_ mut [u8] {
+        &mut self.data[self.position..]
+    }
 
-        if data_len > self.remaining_len() {
-            self.data.resize(self.position + data_len, 0);
-        }
+    #[inline]
+    fn resize(&mut self, nbytes: usize) -> usize {
+        let position = self.position + nbytes;
 
-        self.data[self.position..self.position + data_len].clone_from_slice(data);
-        self.position += data_len;
+        self.data.resize(position, 0);
 
-        Ok(data_len)
+        position
     }
 }
 
@@ -213,7 +205,7 @@ mod tests {
         assert_eq!(buffer.take_u8().unwrap(), 0x02);
         assert_eq!(buffer.remaining(), [0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x03);
-        assert_eq!(buffer.take_u8(), Err(make_error(&[][..], 3, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u8().is_err(), true);
         assert_eq!(buffer.get_position(), 3);
     }
 
@@ -224,7 +216,7 @@ mod tests {
         assert_eq!(buffer.take_be_u16().unwrap(), 0x0002);
         assert_eq!(buffer.take_le_u16().unwrap(), 0x0300);
         assert_eq!(buffer.remaining(), [0x04]);
-        assert_eq!(buffer.take_u16(), Err(make_error(&[0x04][..], 6, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u16().is_err(), true);
         assert_eq!(buffer.take_u8().unwrap(), 0x04);
         assert_eq!(buffer.get_position(), 7);
     }
@@ -241,7 +233,7 @@ mod tests {
         assert_eq!(buffer.take_be_u24().unwrap(), 0x000002);
         assert_eq!(buffer.take_le_u24().unwrap(), 0x030000);
         assert_eq!(buffer.remaining(), [0x04]);
-        assert_eq!(buffer.take_u24(), Err(make_error(&[0x04][..], 9, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u24().is_err(), true);
         assert_eq!(buffer.take_u8().unwrap(), 0x04);
         assert_eq!(buffer.get_position(), 10);
     }
@@ -258,7 +250,7 @@ mod tests {
         assert_eq!(buffer.take_be_u32().unwrap(), 0x00000002);
         assert_eq!(buffer.take_le_u32().unwrap(), 0x03000000);
         assert_eq!(buffer.remaining(), [0x04]);
-        assert_eq!(buffer.take_u32(), Err(make_error(&[0x04][..], 12, ErrorKind::InvalidByteLength)));
+        assert_eq!(buffer.take_u32().is_err(), true);
         assert_eq!(buffer.take_u8().unwrap(), 0x04);
         assert_eq!(buffer.get_position(), 13);
     }

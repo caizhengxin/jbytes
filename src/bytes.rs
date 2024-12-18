@@ -1,6 +1,5 @@
 use core::ops::Deref;
 use crate::{
-    // ByteOrder,
     BufRead,
     errors::{JResult, make_error, ErrorKind},
 };
@@ -13,18 +12,10 @@ pub struct Bytes<T> {
 }
 
 
-impl<T> Bytes<T>
-where
-    T: AsRef<[u8]>,
-{
+impl<T> Bytes<T> {
     #[inline]
     pub fn new(data: T) -> Self {
         Self { data, position: 0 }
-    }
-
-    #[inline]
-    pub fn reset_position(&mut self) {
-        self.position = 0;
     }
 }
 
@@ -43,11 +34,6 @@ where
     T: AsRef<[u8]>,
 {
     #[inline]
-    fn len(&self) -> usize {
-        self.data.as_ref().len()
-    }
-
-    #[inline]
     fn get_position(&self) -> usize {
         self.position
     }
@@ -58,13 +44,13 @@ where
     }
 
     #[inline]
-    fn remaining(&self) -> &'_ [u8] {
-        self.data.as_ref().get(self.position..).unwrap_or(&[])
+    fn advance(&mut self, nbytes: usize) {
+        self.position += nbytes;
     }
 
     #[inline]
-    fn remaining_len(&self) -> usize {
-        self.data.as_ref().len().checked_sub(self.position).unwrap_or(0)
+    fn remaining(&self) -> &'_ [u8] {
+        self.data.as_ref().get(self.position..).unwrap_or(&[])
     }
 
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
