@@ -17,6 +17,18 @@ impl<T> Bytes<T> {
     pub fn new(data: T) -> Self {
         Self { data, position: 0 }
     }
+
+    /// Reset the internal cursor of the `self`.
+    #[inline]
+    pub fn reset_position(&mut self) {
+        self.position = 0;
+    }
+
+    /// Set the internal cursor of the `self`.
+    #[inline]
+    pub fn set_position(&mut self, position: usize) {
+        self.position = position;
+    }
 }
 
 
@@ -36,11 +48,6 @@ where
     #[inline]
     fn get_position(&self) -> usize {
         self.position
-    }
-
-    #[inline]
-    fn get_position_mut(&mut self) -> &mut usize {
-        &mut self.position
     }
 
     #[inline]
