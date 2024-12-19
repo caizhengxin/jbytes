@@ -1,6 +1,7 @@
 #[cfg(feature = "std")]
 use std::io::{self, Read, Write, Seek, SeekFrom};
 use core::ops::Deref;
+use crate::std::*;
 use crate::{
     // ByteOrder,
     BufRead, BufWrite,

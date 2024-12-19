@@ -95,6 +95,12 @@ pub trait BufRead {
         Ok(&self.get_data()[position - nbytes..position])
     }
 
+    /// Reads a bool from `self`.
+    #[inline]
+    fn take_bool(&mut self) -> JResult<bool> {
+        Ok(if self.take_bytes(1)?[0] != 0 { true } else { false })
+    }
+
     /// Reads an unsigned 8 bit integer from `self`.
     #[inline]
     fn take_u8(&mut self) -> JResult<u8> {
@@ -547,6 +553,12 @@ pub trait BufWrite: BufRead {
     /// Writes a char to `self`.
     #[inline]
     fn push_char(&mut self, value: char) -> JResult<usize> {
+        self.push([value as u8])
+    }
+
+    /// Writes a bool to `self`.
+    #[inline]
+    fn push_bool(&mut self, value: bool) -> JResult<usize> {
         self.push([value as u8])
     }
 
