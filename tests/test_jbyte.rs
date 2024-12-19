@@ -1,5 +1,5 @@
-use jbyte::{ByteDecode, BufRead};
-use jbyte_derive::ByteDecode;
+use jbytes::{ByteDecode, BufRead};
+use jbytes_derive::ByteDecode;
 
 
 #[derive(Debug, ByteDecode)]

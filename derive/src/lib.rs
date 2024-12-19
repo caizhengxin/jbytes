@@ -1,11 +1,11 @@
 // #![feature(let_chains)]
 extern crate proc_macro;
 
-mod jbyte;
+mod jbytes;
 
-use jbyte::attribute::ContainerAttributes;
-use jbyte::derive_enum;
-use jbyte::derive_struct;
+use jbytes::attribute::ContainerAttributes;
+use jbytes::derive_enum;
+use jbytes::derive_struct;
 
 use proc_macro::TokenStream;
 use virtue::prelude::*;
@@ -40,6 +40,6 @@ fn derive_bytedecode_inner(input: TokenStream) -> Result<TokenStream> {
         }
     }
 
-    generator.export_to_file("jbyte", "ByteDecode");
+    generator.export_to_file("jbytes", "ByteDecode");
     generator.finish()
 }

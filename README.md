@@ -15,12 +15,12 @@
 
 ```toml
 [dependencies]
-jbyte = { git = "https://github.com/caizhengxin/jbyte.git" }
+jbytes = { git = "https://github.com/caizhengxin/jbyte.git" }
 ```
 
 or:
 
 ```toml
 [dependencies]
-jbyte = "0.1.0"
+jbytes = "0.1.0"
 ```

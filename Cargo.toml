@@ -1,20 +1,22 @@
 [package]
-name = "jbyte"
+name = "jbytes"
 version = "0.1.0"
 authors = [
     "jankincai <jankincai12@gmail.com>"
 ]
 edition = "2021"
 description = "This is a byte stream structured serialization and deserialization library."
-repository = "https://github.com/caizhengxin/jbyte"
-homepage = "https://github.com/caizhengxin/jbyte"
+repository = "https://github.com/caizhengxin/jbytes"
+homepage = "https://github.com/caizhengxin/jbytes"
 readme = "README.md"
 # https://crates.io/category_slugs
 categories = [
     "development-tools",
 ]
 keywords = [
-    "jbyte",
+    "byte",
+    "bytes",
+    "jbytes",
 ]
 license = "MIT OR Apache-2.0"
 include = [
@@ -42,17 +44,17 @@ default = ["std"]
 std = [
     "jkcenum/std",
 ]
-derive = ["jbyte_derive"]
+derive = ["jbytes_derive"]
 full = [
     "serde",
 ]
 
 [dependencies]
-jbyte_derive = { path = "derive", version = "0.1.0", optional = true }
+jbytes_derive = { path = "derive", version = "0.1.0", optional = true }
 thiserror = "1.0"
 thiserror-no-std = "2.0.2"
 serde = { version = "1.0", default-features = false, optional = true }
 jkcenum = { version = "0.3.2", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
-jbyte_derive = { path = "derive", version = "0.1.0" }
+jbytes_derive = { path = "derive", version = "0.1.0" }

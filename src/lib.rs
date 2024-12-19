@@ -5,13 +5,13 @@
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
-#[cfg(feature = "jbyte_derive")]
+#[cfg(feature = "jbytes_derive")]
 #[allow(unused_imports)]
 #[macro_use]
-extern crate jbyte_derive;
+extern crate jbytes_derive;
 
-#[cfg(feature = "jbyte_derive")]
-pub use jbyte_derive::ByteDecode;
+#[cfg(feature = "jbytes_derive")]
+pub use jbytes_derive::ByteDecode;
 
 
 pub mod errors;
