@@ -7,8 +7,6 @@ use crate::std::fmt;
 
 pub type JResult<'a, O, E = Error<&'a [u8]>> = Result<O, E>;
 
-// pub type JInputResult<I, O, E = Error<I>> = Result<(I, O), E>;
-
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Error<I> {

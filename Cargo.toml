@@ -43,6 +43,7 @@ overflow-checks = false
 default = ["std"]
 std = [
     "jkcenum/std",
+    "thiserror",
 ]
 derive = ["jbytes_derive"]
 full = [
@@ -51,7 +52,7 @@ full = [
 
 [dependencies]
 jbytes_derive = { path = "derive", version = "0.1.0", optional = true }
-thiserror = "1.0"
+thiserror = { version = "1.0", default-features = false, optional = true }
 thiserror-no-std = "2.0.2"
 serde = { version = "1.0", default-features = false, optional = true }
 jkcenum = { version = "0.3.2", default-features = false, features = ["derive"] }
