@@ -39,11 +39,17 @@ pub trait BufRead {
     /// Get the internal cursor of the `self`.
     fn get_position(&self) -> usize;
 
+    /// Get the internal data of the `self`.
+    fn get_data(&self) -> &'_ [u8];
+
     /// Advance the internal cursor of the `self`.
     fn advance(&mut self, nbytes: usize);
 
     /// Returns the n-bytes between the current position and the end of the buffer.
-    fn remaining(&self) -> &'_ [u8];
+    #[inline]
+    fn remaining(&self) -> &'_ [u8] {
+        &self.get_data().get(self.get_position()..).unwrap_or(&[])
+    }
 
     /// Returns the number of bytes between the current position and the end of the buffer.
     #[inline]
@@ -51,8 +57,43 @@ pub trait BufRead {
         self.remaining().len()
     }
 
+    /// Reads n-byte data to arrary from `self`.
+    #[inline]
+    fn copy_to_slice(&mut self, dst: &mut [u8]) -> JResult<()> {
+        let value = match self.remaining().get(..dst.len()) {
+            Some(value) => value,
+            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
+        };
+
+        dst.copy_from_slice(value);
+        self.advance(dst.len());
+
+        Ok(())
+    }
+
     /// Reads n-byte data from `self`.
-    fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]>;
+    #[inline]
+    fn take_array<const N: usize>(&mut self) -> JResult<[u8; N]> {
+        let mut array = [0_u8; N];
+
+        self.copy_to_slice(&mut array)?;
+
+        Ok(array)
+    }
+
+    /// Reads n-byte data from `self`.
+    #[inline]
+    fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
+        if self.remaining_len() < nbytes {
+            return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength));
+        }
+
+        self.advance(nbytes);
+
+        let position = self.get_position();
+
+        Ok(&self.get_data()[position - nbytes..position])
+    }
 
     /// Reads an unsigned 8 bit integer from `self`.
     #[inline]
@@ -487,10 +528,8 @@ pub trait BufWrite: BufRead {
         let data = value.as_ref();
         let data_len = data.len();
 
-        if data_len > self.remaining_len() {
-            if self.resize(data_len) == 0 {
-                return Err(make_error(self.remaining(), self.get_position(), ErrorKind::PushFail));
-            }
+        if data_len > self.remaining_len() && self.resize(data_len) == 0 {
+            return Err(make_error(self.remaining(), self.get_position(), ErrorKind::PushFail));
         }
 
         self.remaining_mut()[..data_len].clone_from_slice(data);

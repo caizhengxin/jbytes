@@ -1,3 +1,5 @@
+#![allow(clippy::needless_borrow)]
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]

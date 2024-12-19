@@ -24,4 +24,11 @@ fn test_jbyte() {
     println!(">>> {:?}", core::mem::size_of_val(&n).checked_sub(10));
     // let mut buf = [0; 1024];
     // buf.copy_from_slice(src)
+
+    let mut value = std::collections::VecDeque::new();
+    value.push_back(1_u8);
+    value.push_back(2_u8);
+    println!("{:?}", value.as_slices());
+    value.drain(..1);
+    println!("{:?}", value);
 }
