@@ -1,8 +1,8 @@
-use jbytes::{ByteDecode, BufRead};
-use jbytes_derive::ByteDecode;
+// use jbytes::{ByteDecode, BufRead};
+// use jbytes_derive::ByteDecode;
 
 
-#[derive(Debug, ByteDecode)]
+#[derive(Debug)]
 pub struct Example {
     pub a: u16,
 }

@@ -17,7 +17,7 @@ macro_rules! macro_take_bytes {
         let mut buf = [0; SIZE];
         let slice_at = match SIZE.checked_sub($nbytes) {
             Some(slice_at) => slice_at,
-            None => return Err(make_error($this.remaining(), $this.get_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error($this.get_position(), ErrorKind::InvalidByteLength)),
         };
         buf[slice_at..].copy_from_slice($this.take_bytes($nbytes)?);
 
@@ -62,7 +62,7 @@ pub trait BufRead {
     fn copy_to_slice(&mut self, dst: &mut [u8]) -> JResult<()> {
         let value = match self.remaining().get(..dst.len()) {
             Some(value) => value,
-            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         dst.copy_from_slice(value);
@@ -85,7 +85,7 @@ pub trait BufRead {
     #[inline]
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
         if self.remaining_len() < nbytes {
-            return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength));
+            return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength));
         }
 
         self.advance(nbytes);
@@ -535,7 +535,7 @@ pub trait BufWrite: BufRead {
         let data_len = data.len();
 
         if data_len > self.remaining_len() && self.resize(data_len) == 0 {
-            return Err(make_error(self.remaining(), self.get_position(), ErrorKind::PushFail));
+            return Err(make_error(self.get_position(), ErrorKind::PushFail));
         }
 
         self.remaining_mut()[..data_len].clone_from_slice(data);
@@ -889,7 +889,7 @@ pub trait BufWrite: BufRead {
     fn push_be_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
         let start = match mem::size_of_val(&value).checked_sub(nbytes) {
             Some(start) => start,
-            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         self.push(&value.to_be_bytes()[start..])
@@ -901,7 +901,7 @@ pub trait BufWrite: BufRead {
         let slice = value.to_le_bytes();
         let slice = match slice.get(..nbytes) {
             Some(slice) => slice,
-            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         self.push(slice)

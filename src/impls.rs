@@ -1,5 +1,5 @@
 use crate::{
-    traits::{BufRead, BufWrite},
+    BufRead,
     errors::{JResult, make_error, ErrorKind},
 };
 
@@ -29,7 +29,7 @@ impl BufRead for &'_ [u8] {
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
         let value = match self.get(..nbytes) {
             Some(value) => value,
-            None => return Err(make_error(self.remaining(), self.get_position(), ErrorKind::InvalidByteLength)),
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
         };
 
         self.advance(nbytes);

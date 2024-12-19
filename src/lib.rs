@@ -51,8 +51,5 @@ pub fn encode<T: ByteEncode>(t: T) -> JResult<Buffer> {
 
     t.encode(&mut buf, None, None)?;
 
-    // let v = true;
-    // v.encode(&mut buf, None, None)?;
-
     Ok(buf)
 }

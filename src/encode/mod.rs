@@ -9,10 +9,10 @@ use crate::{
 
 
 pub trait ByteEncode {
-    fn encode<'da, 'db, 'dc, T: BufWrite>(&'da self, input: &'db mut T, cattr: Option<&'dc ContainerAttrModifiers>, fattr: Option<&'dc FieldAttrModifiers>) -> JResult<'db, usize>;
+    fn encode<T: BufWrite>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 }
 
 
 pub trait BorrowByteEncode {
-    fn encode<'da, 'db, 'dc, T: BufWrite>(&'da self, input: &'db mut T, cattr: Option<&'dc ContainerAttrModifiers>, fattr: Option<&'dc FieldAttrModifiers>) -> JResult<'db, usize>;
+    fn encode<T: BufWrite>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 }

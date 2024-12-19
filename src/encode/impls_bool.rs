@@ -1,5 +1,5 @@
 impl crate::ByteEncode for bool {
-    fn encode<'da, 'db, 'dc, T: crate::BufWrite>(&'da self, input: &'db mut T, _cattr: Option<&'dc crate::ContainerAttrModifiers>, _fattr: Option<&'dc crate::FieldAttrModifiers>) -> crate::JResult<'db, usize> {
+    fn encode<T: crate::BufWrite>(&self, input: &mut T, _cattr: Option<&crate::ContainerAttrModifiers>, _fattr: Option<&crate::FieldAttrModifiers>) -> crate::JResult<usize> {
         input.push_bool(*self)
     }
 }

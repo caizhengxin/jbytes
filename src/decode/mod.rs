@@ -8,7 +8,7 @@ use crate::{
 
 
 pub trait ByteDecode {
-    fn decode<'da, 'db, T: BufRead>(input: &'da mut T, cattr: Option<&'db ContainerAttrModifiers>, fattr: Option<&'db FieldAttrModifiers>) -> JResult<'da, Self>
+    fn decode<T: BufRead>(input: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
@@ -16,7 +16,7 @@ pub trait ByteDecode {
 
 
 pub trait BorrowByteDecode<'de> {
-    fn decode<'da: 'de, 'db, T: BufRead>(input: &'da mut T, cattr: Option<&'db ContainerAttrModifiers>, fattr: Option<&'db FieldAttrModifiers>) -> JResult<'da, Self>
+    fn decode<'da: 'de, T: BufRead>(input: &'da mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
