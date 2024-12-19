@@ -4,7 +4,7 @@ use core::ops::Deref;
 use crate::{
     // ByteOrder,
     BufRead, BufWrite,
-    errors::{JResult, make_error, ErrorKind},
+    // errors::{JResult, make_error, ErrorKind},
 };
 
 
@@ -55,26 +55,13 @@ impl BufRead for Buffer {
     }
 
     #[inline]
-    fn remaining(&self) -> &'_ [u8] {
-        self.data.get(self.position..).unwrap_or(&[])
+    fn get_data(&self) -> &'_ [u8] {
+        &self.data
     }
 
     #[inline]
     fn advance(&mut self, nbytes: usize) {
         self.position += nbytes;
-    }
-
-    fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
-        let position = self.position;
-
-        let value = match self.data.get(position..position + nbytes) {
-            Some(value) => value,
-            None => return Err(make_error(self.remaining(), position, ErrorKind::InvalidByteLength)),
-        };
-
-        self.position += nbytes;
-
-        Ok(value)
     }
 }
 
@@ -87,11 +74,11 @@ impl BufWrite for Buffer {
 
     #[inline]
     fn resize(&mut self, nbytes: usize) -> usize {
-        let position = self.position + nbytes;
+        let nbytes = self.position + nbytes;
 
-        self.data.resize(position, 0);
+        self.data.resize(nbytes, 0);
 
-        position
+        nbytes
     }
 }
 
@@ -321,6 +308,17 @@ mod tests {
         assert_eq!(buffer.remaining(), &[0x05]);
         assert_eq!(buffer.take_bytes(2).is_err(), true);
         assert_eq!(buffer.take_bytes(1).unwrap(), &[0x05]);
+        assert_eq!(buffer.position, 5);
+    }
+
+    #[test]
+    fn test_buffer_take_array() {
+        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.take_array::<2>().unwrap(), [0x01, 0x02]);
+        assert_eq!(buffer.take_array::<2>().unwrap(), [0x03, 0x04]);
+        assert_eq!(buffer.remaining(), &[0x05]);
+        assert_eq!(buffer.take_array::<2>().is_err(), true);
+        assert_eq!(buffer.take_array::<1>().unwrap(), [0x05]);
         assert_eq!(buffer.position, 5);
     }
 

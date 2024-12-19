@@ -1,7 +1,7 @@
 use core::ops::Deref;
 use crate::{
     BufRead,
-    errors::{JResult, make_error, ErrorKind},
+    // errors::{JResult, make_error, ErrorKind},
 };
 
 
@@ -51,24 +51,13 @@ where
     }
 
     #[inline]
-    fn advance(&mut self, nbytes: usize) {
-        self.position += nbytes;
+    fn get_data(&self) -> &'_ [u8] {
+        self.data.as_ref()
     }
 
     #[inline]
-    fn remaining(&self) -> &'_ [u8] {
-        self.data.as_ref().get(self.position..).unwrap_or(&[])
-    }
-
-    fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
-        let value = match self.data.as_ref().get(self.position..self.position + nbytes) {
-            Some(value) => value,
-            None => return Err(make_error(self.remaining(), self.position, ErrorKind::InvalidByteLength)),
-        };
-
+    fn advance(&mut self, nbytes: usize) {
         self.position += nbytes;
-
-        Ok(value)
     }
 }
 
