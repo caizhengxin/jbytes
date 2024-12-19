@@ -1,20 +1,22 @@
 [package]
-name = "jbyte_derive"
+name = "jbytes_derive"
 version = "0.1.0"
 authors = [
     "jankincai <jankincai12@gmail.com>"
 ]
 edition = "2021"
 description = "This is a byte stream structured serialization and deserialization library."
-repository = "https://github.com/caizhengxin/jbyte"
-homepage = "https://github.com/caizhengxin/jbyte"
+repository = "https://github.com/caizhengxin/jbytes"
+homepage = "https://github.com/caizhengxin/jbytes"
 readme = "README.md"
 # https://crates.io/category_slugs
 categories = [
     "development-tools",
 ]
 keywords = [
-    "jbyte",
+    "byte",
+    "bytes",
+    "jbytes",
 ]
 license = "MIT OR Apache-2.0"
 include = [

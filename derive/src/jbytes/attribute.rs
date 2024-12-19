@@ -22,7 +22,7 @@ pub struct ContainerAttributes {
 impl Default for ContainerAttributes {
     fn default() -> Self {
         Self {
-            crate_name: "jbyte".to_string(),
+            crate_name: "jbytes".to_string(),
         }
     }
 }
