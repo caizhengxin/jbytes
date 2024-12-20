@@ -4,7 +4,7 @@ use core::ops::Deref;
 use crate::std::*;
 use crate::{
     // ByteOrder,
-    BufRead, BufWrite,
+    BufReadMut, BufWriteMut,
     // errors::{JResult, make_error, ErrorKind},
 };
 
@@ -49,7 +49,7 @@ impl Deref for Buffer {
 }
 
 
-impl BufRead for Buffer {
+impl BufReadMut for Buffer {
     #[inline]
     fn get_position(&self) -> usize {
         self.position
@@ -67,7 +67,7 @@ impl BufRead for Buffer {
 }
 
 
-impl BufWrite for Buffer {
+impl BufWriteMut for Buffer {
     #[inline]
     fn remaining_mut(&mut self) -> &'_ mut [u8] {
         &mut self.data[self.position..]

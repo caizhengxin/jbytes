@@ -17,7 +17,8 @@ pub use jbytes_derive::ByteDecode;
 pub mod errors;
 pub mod buffer;
 pub mod bytes;
-pub mod traits;
+pub mod buf_mut_traits;
+pub mod buf_traits;
 pub mod std;
 mod impls;
 
@@ -25,10 +26,12 @@ pub mod modifiers;
 pub mod byteorder;
 pub mod decode;
 pub mod encode;
+pub mod types;
 
 pub use buffer::Buffer;
 pub use bytes::Bytes;
-pub use traits::{BufRead, BufWrite};
+pub use buf_mut_traits::{BufReadMut, BufWriteMut};
+pub use buf_traits::{BufRead, BufWrite};
 pub use errors::{JResult, ErrorKind, make_error};
 
 pub use modifiers::{ContainerAttrModifiers, FieldAttrModifiers,  get_byteorder};
@@ -40,7 +43,7 @@ pub use encode::{ByteEncode, BorrowByteEncode};
 
 
 #[inline]
-pub fn decode<'a, I: BufRead, T: ByteDecode>(input: &'a mut I) -> JResult<T> {
+pub fn decode<'de, I: BufRead, T: ByteDecode<'de>>(input: &'de mut I) -> JResult<T> {
     T::decode(input, None, None)
 }
 

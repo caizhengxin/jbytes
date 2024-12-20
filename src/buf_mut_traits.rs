@@ -1,10 +1,10 @@
 use core::mem;
 use crate::{
-    // ByteOrder,
     errors::{JResult, make_error, ErrorKind},
 };
 
 
+#[macro_export]
 macro_rules! macro_take_bytes {
     ($this:ident, $typ:tt::$func:tt) => {{
         const SIZE: usize = core::mem::size_of::<$typ>();
@@ -35,7 +35,7 @@ macro_rules! macro_take_bytes {
 }
 
 
-pub trait BufRead {
+pub trait BufReadMut {
     /// Get the internal cursor of the `self`.
     fn get_position(&self) -> usize;
 
@@ -523,7 +523,7 @@ pub trait BufRead {
 }
 
 
-pub trait BufWrite: BufRead {
+pub trait BufWriteMut: BufReadMut {
     /// Returns the n-bytes between the current position and the end of the buffer.
     fn remaining_mut(&mut self) -> &'_ mut [u8];
 
