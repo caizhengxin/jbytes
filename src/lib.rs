@@ -43,8 +43,8 @@ pub use encode::{ByteEncode, BorrowByteEncode};
 
 
 #[inline]
-pub fn decode<'de, I: BufRead, T: ByteDecode<'de>>(input: &'de mut I) -> JResult<T> {
-    T::decode(input, None, None)
+pub fn decode<I: BufRead, T: ByteDecode>(input: &mut I) -> JResult<T> {
+    T::decode_inner(input, None, None)
 }
 
 
@@ -52,7 +52,7 @@ pub fn decode<'de, I: BufRead, T: ByteDecode<'de>>(input: &'de mut I) -> JResult
 pub fn encode<T: ByteEncode>(t: T) -> JResult<Buffer> {
     let mut buf = Buffer::new(Vec::new());
 
-    t.encode(&mut buf, None, None)?;
+    t.encode_inner(&mut buf, None, None)?;
 
     Ok(buf)
 }
