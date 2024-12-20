@@ -1,10 +1,10 @@
 use crate::{
-    BufRead,
+    BufReadMut,
     errors::{JResult, make_error, ErrorKind},
 };
 
 
-impl BufRead for &'_ [u8] {
+impl BufReadMut for &'_ [u8] {
     #[inline]
     fn get_position(&self) -> usize {
         0
@@ -40,7 +40,7 @@ impl BufRead for &'_ [u8] {
 
 
 #[cfg(feature = "std")]
-impl<T: AsRef<[u8]>> BufRead for std::io::Cursor<T> {
+impl<T: AsRef<[u8]>> BufReadMut for std::io::Cursor<T> {
     #[inline]
     fn get_position(&self) -> usize {
         self.position() as usize

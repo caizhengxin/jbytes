@@ -1,33 +1,33 @@
-use core::ops::Deref;
-use crate::{
-    BufRead,
-    // errors::{JResult, make_error, ErrorKind},
+use core::{
+    ops::Deref,
+    cell::Cell,
 };
+use crate::BufRead;
 
 
 #[derive(Debug)]
 pub struct Bytes<T> {
     data: T,
-    position: usize,
+    position: Cell<usize>,
 }
 
 
 impl<T> Bytes<T> {
     #[inline]
     pub fn new(data: T) -> Self {
-        Self { data, position: 0 }
+        Self { data, position: Cell::new(0) }
     }
 
     /// Reset the internal cursor of the `self`.
     #[inline]
     pub fn reset_position(&mut self) {
-        self.position = 0;
+        self.position = Cell::new(0);
     }
 
     /// Set the internal cursor of the `self`.
     #[inline]
     pub fn set_position(&mut self, position: usize) {
-        self.position = position;
+        self.position = Cell::new(position);
     }
 }
 
@@ -47,7 +47,7 @@ where
 {
     #[inline]
     fn get_position(&self) -> usize {
-        self.position
+        self.position.get()
     }
 
     #[inline]
@@ -56,8 +56,8 @@ where
     }
 
     #[inline]
-    fn advance(&mut self, nbytes: usize) {
-        self.position += nbytes;
+    fn advance(&self, nbytes: usize) {
+        self.position.set(self.position.get() + nbytes)
     }
 }
 
@@ -68,24 +68,24 @@ mod tests {
 
     #[test]
     fn test_bytes_take_u8() {
-        let mut buffer = Bytes::new(&[0x01, 0x02, 0x03]);
+        let buffer = Bytes::new(&[0x01, 0x02, 0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x01);
         assert_eq!(buffer.take_u8().unwrap(), 0x02);
         assert_eq!(buffer.remaining(), [0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x03);
         assert_eq!(buffer.remaining(), []);
-        assert_eq!(buffer.position, 3);
+        assert_eq!(buffer.get_position(), 3);
         assert_eq!(buffer.take_u8().is_err(), true);
     }
 
     #[test]
     fn test_bytes_take() {
-        let mut buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
+        let buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);
         assert_eq!(buffer.remaining(), &[0x05]);
         assert_eq!(buffer.take_bytes(2).is_err(), true);
         assert_eq!(buffer.take_bytes(1).unwrap(), &[0x05]);
-        assert_eq!(buffer.position, 5);
+        assert_eq!(buffer.get_position(), 5);
     }
 }
