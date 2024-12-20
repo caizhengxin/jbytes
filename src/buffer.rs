@@ -9,7 +9,7 @@ use crate::{
 };
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Buffer {
     data: Vec<u8>,
     position: usize,
@@ -19,10 +19,10 @@ pub struct Buffer {
 impl Buffer {
     /// Creates a buffer struct type.
     #[inline]
-    pub fn new(data: Vec<u8>) -> Self {
+    pub fn new() -> Self {
         Self {
             position: 0,
-            data,
+            data: Vec::new(),
         }
     }
 
@@ -36,6 +36,13 @@ impl Buffer {
     #[inline]
     pub fn set_position(&mut self, position: usize) {
         self.position = position;
+    }
+}
+
+
+impl From<Vec<u8>> for Buffer {
+    fn from(value: Vec<u8>) -> Self {
+        Self { data: value, position: 0 }
     }
 }
 
@@ -150,7 +157,7 @@ mod tests {
     #[cfg(feature = "std")]
     #[test]
     fn test_buffer_read_write() {
-        let mut buffer = Buffer::new(b"Hello, world!".to_vec());
+        let mut buffer = Buffer::from(b"Hello, world!".to_vec());
 
         // Read Data
         let mut read_buf = [0; 5];
@@ -176,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_buffer_set_position() {
-        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.get_position(), 0);
         buffer.advance(3);
         assert_eq!(buffer.get_position(), 3);
@@ -195,7 +202,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u8() {
-        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03]);
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x01);
         assert_eq!(buffer.take_u8().unwrap(), 0x02);
         assert_eq!(buffer.remaining(), [0x03]);
@@ -206,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u16() {
-        let mut buffer = Buffer::new(vec![0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x04]);
+        let mut buffer = Buffer::from(vec![0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x04]);
         assert_eq!(buffer.take_u16().unwrap(), 0x0001);
         assert_eq!(buffer.take_be_u16().unwrap(), 0x0002);
         assert_eq!(buffer.take_le_u16().unwrap(), 0x0300);
@@ -218,7 +225,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u24() {
-        let mut buffer = Buffer::new(vec![
+        let mut buffer = Buffer::from(vec![
             0x00, 0x00, 0x01,
             0x00, 0x00, 0x02,
             0x00, 0x00, 0x03,
@@ -235,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u32() {
-        let mut buffer = Buffer::new(vec![
+        let mut buffer = Buffer::from(vec![
             0x00, 0x00, 0x00, 0x01,
             0x00, 0x00, 0x00, 0x02,
             0x00, 0x00, 0x00, 0x03,
@@ -252,7 +259,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u64() {
-        let mut buffer = Buffer::new(vec![
+        let mut buffer = Buffer::from(vec![
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
@@ -269,7 +276,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_u128() {
-        let mut buffer = Buffer::new(vec![
+        let mut buffer = Buffer::from(vec![
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
@@ -286,7 +293,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_uint() {
-        let mut buffer = Buffer::new(vec![
+        let mut buffer = Buffer::from(vec![
             0x00, 0x00, 0x00, 0x00, 0x01,
             0x00, 0x00, 0x00, 0x00, 0x02,
             0x00, 0x00, 0x00, 0x00, 0x03,
@@ -303,7 +310,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_bytes() {
-        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x01, 0x02]);
         assert_eq!(buffer.take_bytes(2).unwrap(), &[0x03, 0x04]);
         assert_eq!(buffer.remaining(), &[0x05]);
@@ -314,7 +321,7 @@ mod tests {
 
     #[test]
     fn test_buffer_take_array() {
-        let mut buffer = Buffer::new(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
         assert_eq!(buffer.take_array::<2>().unwrap(), [0x01, 0x02]);
         assert_eq!(buffer.take_array::<2>().unwrap(), [0x03, 0x04]);
         assert_eq!(buffer.remaining(), &[0x05]);
@@ -325,7 +332,7 @@ mod tests {
 
     #[test]
     fn test_buffer_push() {
-        let mut buffer = Buffer::new(vec![]);
+        let mut buffer = Buffer::new();
         buffer.push_u8(0x02).unwrap();
         buffer.push_u16(0x03).unwrap();
         buffer.push_u24(0x04).unwrap();

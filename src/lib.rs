@@ -43,14 +43,14 @@ pub use encode::{ByteEncode, BorrowByteEncode};
 
 
 #[inline]
-pub fn decode<I: BufRead, T: ByteDecode>(input: &mut I) -> JResult<T> {
-    T::decode_inner(input, None, None)
+pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: I) -> JResult<T> {
+    T::decode_inner(&Bytes::new(input), None, None)
 }
 
 
 #[inline]
 pub fn encode<T: ByteEncode>(t: T) -> JResult<Buffer> {
-    let mut buf = Buffer::new(Vec::new());
+    let mut buf = Buffer::new();
 
     t.encode_inner(&mut buf, None, None)?;
 
