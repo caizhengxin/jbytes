@@ -8,14 +8,14 @@ use crate::{
 macro_rules! impls_tuple {
     ($($t:ident),+) => {
         #[allow(non_camel_case_types)]
-        impl<'de, $($t: ByteDecode<'de>,)+> ByteDecode<'de> for ($($t,)+)
+        impl<$($t: ByteDecode,)+> ByteDecode for ($($t,)+)
         {
-            fn decode<T: BufRead>(input: &'de T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+            fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
                 where 
                     Self: Sized
             {
                 $(
-                    let $t = $t::decode(input, cattr, fattr)?;
+                    let $t = $t::decode_inner(input, cattr, fattr)?;
                 )*
         
                 Ok(($($t,)+))
@@ -23,20 +23,20 @@ macro_rules! impls_tuple {
         }
 
 
-        // #[allow(non_camel_case_types)]
-        // impl<'de, $($t: BorrowByteDecode<'de>,)+> BorrowByteDecode<'de> for ($($t,)+)
-        // {
-        //     fn decode<'da: 'de, T: BufRead>(input: &'da T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
-        //         where 
-        //             Self: Sized
-        //     {
-        //         $(
-        //             let $t = $t::decode(input, cattr, fattr)?;
-        //         )*
+        #[allow(non_camel_case_types)]
+        impl<'de, $($t: BorrowByteDecode<'de>,)+> BorrowByteDecode<'de> for ($($t,)+)
+        {
+            fn decode_inner<'da: 'de, T: BufRead>(input: &'da T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+                where 
+                    Self: Sized
+            {
+                $(
+                    let $t = $t::decode_inner(input, cattr, fattr)?;
+                )*
         
-        //         Ok(($($t,)+))
-        //     }
-        // }
+                Ok(($($t,)+))
+            }
+        }
     };
 
     () => {
