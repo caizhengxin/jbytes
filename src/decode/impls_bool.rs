@@ -27,3 +27,30 @@ impl<'de> BorrowByteDecode<'de> for bool {
         input.take_bool()
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        Bytes, BufRead, ByteDecode,
+    };
+
+    #[test]
+    fn test_decode_bool() {
+        let bytes = Bytes::new([0x00, 0x01]);
+        assert_eq!(bool::decode_inner(&bytes, None, None).unwrap(), false);
+        assert_eq!(bytes.remaining_len(), 1);
+
+        let bytes = Bytes::new([0x01, 0x01]);
+        assert_eq!(bool::decode_inner(&bytes, None, None).unwrap(), true);
+        assert_eq!(bytes.remaining_len(), 1);
+
+        let bytes = Bytes::new([0x10, 0x01]);
+        assert_eq!(bool::decode_inner(&bytes, None, None).unwrap(), true);
+        assert_eq!(bytes.remaining_len(), 1);
+
+        let bytes = Bytes::new([0xff, 0x01]);
+        assert_eq!(bool::decode_inner(&bytes, None, None).unwrap(), true);
+        assert_eq!(bytes.remaining_len(), 1);
+    }
+}

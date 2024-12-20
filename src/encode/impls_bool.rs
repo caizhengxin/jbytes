@@ -23,3 +23,22 @@ impl BorrowByteEncode for bool {
         input.push_bool(*self)
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        Buffer, ByteEncode,
+    };
+
+    #[test]
+    fn test_encode_bool() {
+        let mut buffer = Buffer::new();
+        false.encode_inner(&mut buffer, None, None).unwrap();
+        assert_eq!(*buffer, vec![0x00]);
+
+        let mut buffer = Buffer::new();
+        true.encode_inner(&mut buffer, None, None).unwrap();
+        assert_eq!(*buffer, vec![0x01]);
+    }
+}
