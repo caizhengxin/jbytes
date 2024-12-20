@@ -1,4 +1,5 @@
 mod impls_bool;
+mod impls_float;
 mod impls_bytes;
 mod impls_tuple;
 
@@ -9,8 +10,31 @@ use crate::{
 };
 
 
+/// This is bytes decoding trait. 
+/// 
+/// # Example
+/// 
+/// ```no_test
+/// use jbytes::{
+///     JResult, BufRead,
+///     ByteDecode, BorrowByteDecode,
+///     ContainerAttrModifiers, FieldAttrModifiers,
+/// };
+/// 
+/// 
+/// impl ByteDecode for bool {
+///     fn decode_inner<T: BufRead>(input: &T, _cattr: Option<&ContainerAttrModifiers>,
+///                                            _fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+///     where 
+///         Self: Sized
+///     {
+///         input.take_bool()
+///     }
+/// }
+/// ```
 pub trait ByteDecode {
-    fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+    fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>,
+                                           fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
@@ -25,13 +49,37 @@ pub trait ByteDecode {
 }
 
 
+/// This is bytes decoding trait of borrow type.
+/// 
+/// # Example
+/// 
+/// ```no_test
+/// use jbytes::{
+///     JResult, BufRead,
+///     ByteDecode, BorrowByteDecode,
+///     ContainerAttrModifiers, FieldAttrModifiers,
+/// };
+/// 
+/// 
+/// impl<'de> BorrowByteDecode<'de> for bool {
+///     fn decode_inner<'da: 'de, T: BufRead>(input: &'da T, _cattr: Option<&ContainerAttrModifiers>,
+///                                                          _fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+///     where 
+///         Self: Sized
+///     {
+///         input.take_bool()
+///     }
+/// }
+/// ```
 pub trait BorrowByteDecode<'de> {
-    fn decode_inner<'da: 'de, T: BufRead>(input: &'da T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+    fn decode_inner<T: BufRead>(input: &'de T, cattr: Option<&ContainerAttrModifiers>,
+                                fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
 
-    fn decode<'da: 'de, T: BufRead>(input: &'da T) -> JResult<Self>
+    #[inline]
+    fn decode<T: BufRead>(input: &'de T) -> JResult<Self>
     where 
         Self: Sized
     {

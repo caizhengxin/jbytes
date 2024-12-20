@@ -10,7 +10,9 @@ macro_rules! impls_tuple {
         #[allow(non_camel_case_types)]
         impl<$($t: ByteDecode,)+> ByteDecode for ($($t,)+)
         {
-            fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+            #[inline]
+            fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>,
+                                        fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
                 where 
                     Self: Sized
             {
@@ -26,7 +28,9 @@ macro_rules! impls_tuple {
         #[allow(non_camel_case_types)]
         impl<'de, $($t: BorrowByteDecode<'de>,)+> BorrowByteDecode<'de> for ($($t,)+)
         {
-            fn decode_inner<'da: 'de, T: BufRead>(input: &'da T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
+            #[inline]
+            fn decode_inner<T: BufRead>(input: &'de T, cattr: Option<&ContainerAttrModifiers>,
+                                        fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
                 where 
                     Self: Sized
             {
