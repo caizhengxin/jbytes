@@ -55,11 +55,7 @@ impl<'de> BorrowByteDecode<'de> for f64 {
     where 
         Self: Sized
     {
-        if get_byteorder(cattr, fattr) == ByteOrder::Be {
-            return input.take_be_f64();
-        } 
-
-        input.take_le_f64()
+        ByteDecode::decode_inner(input, cattr, fattr)
     }
 }
 
