@@ -1,5 +1,7 @@
 mod impls_bool;
+mod impls_int;
 mod impls_float;
+mod impls_tuple;
 
 // use crate::std::*;
 use crate::{
