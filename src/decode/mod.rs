@@ -4,6 +4,7 @@ mod impls_float;
 mod impls_bytes;
 mod impls_tuple;
 mod impls_array;
+mod impls_vec;
 mod impls_other;
 mod impls_option;
 

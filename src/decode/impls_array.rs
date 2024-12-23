@@ -17,8 +17,8 @@ impl<T: ByteDecode, const N: usize> ByteDecode for [T; N] {
 
         let ptr = unsafe { &mut *array.as_mut_ptr() };
 
-        for i in 0..N {
-            ptr[i] = T::decode_inner(input, cattr, fattr)?;
+        for value in ptr {
+            *value = T::decode_inner(input, cattr, fattr)?;
         }
 
         Ok(unsafe { array.assume_init() })
@@ -37,8 +37,8 @@ impl<'de, T: BorrowByteDecode<'de>, const N: usize> BorrowByteDecode<'de> for [T
 
         let ptr = unsafe { &mut *array.as_mut_ptr() };
 
-        for i in 0..N {
-            ptr[i] = T::decode_inner(input, cattr, fattr)?;
+        for value in ptr {
+            *value = T::decode_inner(input, cattr, fattr)?;
         }
 
         Ok(unsafe { array.assume_init() })

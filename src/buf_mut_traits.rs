@@ -98,7 +98,7 @@ pub trait BufReadMut {
     /// Reads a bool from `self`.
     #[inline]
     fn take_bool(&mut self) -> JResult<bool> {
-        Ok(if self.take_bytes(1)?[0] != 0 { true } else { false })
+        Ok(self.take_bytes(1)?[0] != 0)
     }
 
     /// Reads an unsigned 8 bit integer from `self`.
