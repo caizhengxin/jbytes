@@ -7,20 +7,20 @@ use crate::{
 
 impl ByteEncode for bool {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
-        input.push_bool(*self)
+        buffer.push_bool(*self)
     }
 }
 
 
 impl BorrowByteEncode for bool {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
-        input.push_bool(*self)
+        buffer.push_bool(*self)
     }
 }
 
