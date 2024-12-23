@@ -20,11 +20,17 @@ impl<T: ByteEncode, const N: usize> ByteEncode for [T; N] {
 }
 
 
-impl<T: BorrowByteEncode + ByteEncode, const N: usize> BorrowByteEncode for [T; N] {
+impl<T: BorrowByteEncode, const N: usize> BorrowByteEncode for [T; N] {
     #[inline]
     fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
-        ByteEncode::encode_inner(self, buffer, cattr, fattr)
+        let mut nbytes = 0;
+
+        for value in self {
+            nbytes += T::encode_inner(&value, buffer, cattr, fattr)?;
+        }
+
+        Ok(nbytes)
     }
 }
 

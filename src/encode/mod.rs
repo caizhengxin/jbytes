@@ -3,6 +3,8 @@ mod impls_int;
 mod impls_float;
 mod impls_tuple;
 mod impls_array;
+mod impls_other;
+mod impls_option;
 
 // use crate::std::*;
 use crate::{
@@ -24,7 +26,7 @@ use crate::{
 /// 
 /// 
 /// impl ByteEncode for bool {
-///     fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+///     fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
 ///                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
 ///     {
 ///         buffer.push_bool(*self)
@@ -32,11 +34,11 @@ use crate::{
 /// }
 /// ```
 pub trait ByteEncode {
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 
     #[inline]
-    fn encode<T: BufWriteMut>(&self, buffer: &mut T) -> JResult<usize> {
+    fn encode<B: BufWriteMut>(&self, buffer: &mut B) -> JResult<usize> {
         self.encode_inner(buffer, None, None)
     }
 }
@@ -55,7 +57,7 @@ pub trait ByteEncode {
 /// 
 /// 
 /// impl BorrowByteEncode for bool {
-///     fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+///     fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
 ///                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
 ///     {
 ///         buffer.push_bool(*self)
@@ -63,11 +65,11 @@ pub trait ByteEncode {
 /// }
 /// ```
 pub trait BorrowByteEncode {
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 
     #[inline]
-    fn encode<T: BufWriteMut>(&self, buffer: &mut T) -> JResult<usize> {
+    fn encode<B: BufWriteMut>(&self, buffer: &mut B) -> JResult<usize> {
         self.encode_inner(buffer, None, None)
     }
 }
