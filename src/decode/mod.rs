@@ -4,6 +4,8 @@ mod impls_float;
 mod impls_bytes;
 mod impls_tuple;
 mod impls_array;
+mod impls_other;
+mod impls_option;
 
 use crate::{
     JResult,
@@ -25,7 +27,7 @@ use crate::{
 /// 
 /// 
 /// impl ByteDecode for bool {
-///     fn decode_inner<T: BufRead>(input: &T, _cattr: Option<&ContainerAttrModifiers>,
+///     fn decode_inner<I: BufRead>(input: &I, _cattr: Option<&ContainerAttrModifiers>,
 ///                                            _fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
 ///     where 
 ///         Self: Sized
@@ -35,14 +37,14 @@ use crate::{
 /// }
 /// ```
 pub trait ByteDecode {
-    fn decode_inner<T: BufRead>(input: &T, cattr: Option<&ContainerAttrModifiers>,
+    fn decode_inner<I: BufRead>(input: &I, cattr: Option<&ContainerAttrModifiers>,
                                            fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
 
     #[inline]
-    fn decode<T: BufRead>(input: &T) -> JResult<Self>
+    fn decode<I: BufRead>(input: &I) -> JResult<Self>
     where 
         Self: Sized
     {
@@ -64,7 +66,7 @@ pub trait ByteDecode {
 /// 
 /// 
 /// impl<'de> BorrowByteDecode<'de> for bool {
-///     fn decode_inner<'da: 'de, T: BufRead>(input: &'da T, _cattr: Option<&ContainerAttrModifiers>,
+///     fn decode_inner<I: BufRead>(input: &'de I, _cattr: Option<&ContainerAttrModifiers>,
 ///                                                          _fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
 ///     where 
 ///         Self: Sized
@@ -74,14 +76,14 @@ pub trait ByteDecode {
 /// }
 /// ```
 pub trait BorrowByteDecode<'de> {
-    fn decode_inner<T: BufRead>(input: &'de T, cattr: Option<&ContainerAttrModifiers>,
+    fn decode_inner<I: BufRead>(input: &'de I, cattr: Option<&ContainerAttrModifiers>,
                                 fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     ;
 
     #[inline]
-    fn decode<T: BufRead>(input: &'de T) -> JResult<Self>
+    fn decode<I: BufRead>(input: &'de I) -> JResult<Self>
     where 
         Self: Sized
     {
