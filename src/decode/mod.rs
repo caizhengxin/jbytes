@@ -1,4 +1,5 @@
 mod impls_bool;
+mod impls_int;
 mod impls_float;
 mod impls_bytes;
 mod impls_tuple;
