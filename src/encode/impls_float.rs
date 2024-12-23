@@ -8,53 +8,52 @@ use crate::{
 
 impl ByteEncode for f32 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         if get_byteorder(cattr, fattr) == ByteOrder::Be {
-            return input.push_be_f32(*self);
+            return buffer.push_be_f32(*self);
         }
 
-        input.push_le_f32(*self)
+        buffer.push_le_f32(*self)
     }
 }
 
 
 impl BorrowByteEncode for f32 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
-        ByteEncode::encode_inner(self, input, cattr, fattr)
+        ByteEncode::encode_inner(self, buffer, cattr, fattr)
     }
 }
 
 
 impl ByteEncode for f64 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         if get_byteorder(cattr, fattr) == ByteOrder::Be {
-            return input.push_be_f64(*self);
+            return buffer.push_be_f64(*self);
         }
 
-        input.push_le_f64(*self)
+        buffer.push_le_f64(*self)
     }
 }
 
 
 impl BorrowByteEncode for f64 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
-        ByteEncode::encode_inner(self, input, cattr, fattr)
+        ByteEncode::encode_inner(self, buffer, cattr, fattr)
     }
 }
 
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,
         ContainerAttrModifiers, FieldAttrModifiers,

@@ -12,7 +12,7 @@ macro_rules! impls_int_encode {
     ($type:ident, $be_func:tt, $le_func:tt) => {
         impl ByteEncode for $type {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
+            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
                 let value;
                 let byteorder = get_byteorder(cattr, fattr);
                 let length = if let Some(fr) = fattr { fr.length } else { None };
@@ -20,21 +20,21 @@ macro_rules! impls_int_encode {
 
                 if let Some(length) = length {
                     if mem::size_of_val(self).checked_sub(length).is_none() {
-                        return Err(make_error(input.get_position(), ErrorKind::InvalidByteLength));
+                        return Err(make_error(buffer.get_position(), ErrorKind::InvalidByteLength));
                     }
 
                     if byteorder == ByteOrder::Be {
-                        value = input.push_be_uint(*self as usize, length)?;
+                        value = buffer.push_be_uint(*self as usize, length)?;
                     }
                     else {
-                        value = input.push_le_uint(*self as usize, length)?;
+                        value = buffer.push_le_uint(*self as usize, length)?;
                     }
                 }
                 else if byteorder == ByteOrder::Be {
-                    value = input.$be_func(*self)?;
+                    value = buffer.$be_func(*self)?;
                 }
                 else {
-                    value = input.$le_func(*self)?;
+                    value = buffer.$le_func(*self)?;
                 }
 
 
@@ -45,11 +45,11 @@ macro_rules! impls_int_encode {
 
         impl BorrowByteEncode for $type {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, input: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
+            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
                 where 
                     Self: Sized
             {
-                ByteEncode::encode_inner(self, input, cattr, fattr)
+                ByteEncode::encode_inner(self, buffer, cattr, fattr)
             }
         }
     };

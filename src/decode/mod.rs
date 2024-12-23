@@ -3,6 +3,7 @@ mod impls_int;
 mod impls_float;
 mod impls_bytes;
 mod impls_tuple;
+mod impls_array;
 
 use crate::{
     JResult,
