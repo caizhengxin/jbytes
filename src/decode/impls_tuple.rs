@@ -62,13 +62,34 @@ impls_tuple!();
 
 #[cfg(test)]
 mod tests {
-    // use crate::{
-    //     Bytes, BufRead, ByteDecode, ByteOrder,
-    //     ContainerAttrModifiers, FieldAttrModifiers,
-    // };
+    use crate::{
+        Bytes, BufRead, ByteDecode, ByteOrder,
+        ContainerAttrModifiers, FieldAttrModifiers,
+    };
 
-    // #[test]
-    // fn test_decode_tuple() {
+    #[test]
+    fn test_decode_tuple() {
+        let bytes = Bytes::new([0x00, 0x01, 0x00, 0x02]);
+        let value: (u8, u8, u16) = ByteDecode::decode(&bytes).unwrap();
+        assert_eq!(value, (0x00, 0x01, 0x0002));
+        assert_eq!(bytes.remaining_len(), 0);
 
-    // }
+        let cattr = ContainerAttrModifiers {
+            byteorder: Some(ByteOrder::Le),
+            ..Default::default()
+        };
+        let bytes = Bytes::new([0x00, 0x01, 0x00, 0x02]);
+        let value: (u16, u16) = ByteDecode::decode_inner(&bytes, Some(&cattr), None).unwrap();
+        assert_eq!(value, (0x0100, 0x0200));
+        assert_eq!(bytes.remaining_len(), 0);
+
+        let fattr = FieldAttrModifiers {
+            byteorder: Some(ByteOrder::Be),
+            ..Default::default()
+        };
+        let bytes = Bytes::new([0x00, 0x01, 0x00, 0x02]);
+        let value: (u16, u16) = ByteDecode::decode_inner(&bytes, Some(&cattr), Some(&fattr)).unwrap();
+        assert_eq!(value, (0x0001, 0x0002));
+        assert_eq!(bytes.remaining_len(), 0);
+    }
 }
