@@ -40,6 +40,13 @@ impl Buffer {
 }
 
 
+impl Default for Buffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 impl From<Vec<u8>> for Buffer {
     fn from(value: Vec<u8>) -> Self {
         Self { data: value, position: 0 }
