@@ -39,6 +39,7 @@ pub struct FieldAttrModifiers<'a> {
     pub bits: Option<usize>,
     pub bits_start: bool,
     pub byte_count: Option<usize>,
+    pub remaining: bool,
 
     // key value
     pub key: Option<&'a [u8]>,
