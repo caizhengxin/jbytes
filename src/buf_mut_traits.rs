@@ -128,7 +128,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 8 bit integer from `self`, exactly like the `[take_u8]` function.
     #[inline]
-    fn take_u8_byteorder(&mut self, _byteorder: ByteOrder) -> JResult<u8> {
+    fn take_byteorder_u8(&mut self, _byteorder: ByteOrder) -> JResult<u8> {
         self.take_u8()
     }
 
@@ -158,7 +158,7 @@ pub trait BufReadMut {
 
     /// Reads a signed 8 bit integer from `self`, exactly like the `[take_i8]` function.
     #[inline]
-    fn take_i8_byteorder(&mut self, _byteorder: ByteOrder) -> JResult<i8> {
+    fn take_byteorder_i8(&mut self, _byteorder: ByteOrder) -> JResult<i8> {
         self.take_i8()
     }
 
@@ -188,7 +188,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 16 bit integer from `self`.
     #[inline]
-    fn take_u16_byteorder(&mut self, byteorder: ByteOrder) -> JResult<u16> {
+    fn take_byteorder_u16(&mut self, byteorder: ByteOrder) -> JResult<u16> {
         match byteorder {
             ByteOrder::Be => self.take_be_u16(),
             ByteOrder::Le => self.take_le_u16(),
@@ -221,7 +221,7 @@ pub trait BufReadMut {
 
     /// Reads a signed 16 bit integer from `self`.
     #[inline]
-    fn take_i16_byteorder(&mut self, byteorder: ByteOrder) -> JResult<i16> {
+    fn take_byteorder_i16(&mut self, byteorder: ByteOrder) -> JResult<i16> {
         match byteorder {
             ByteOrder::Be => self.take_be_i16(),
             ByteOrder::Le => self.take_le_i16(),
@@ -258,7 +258,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 24 bit integer from `self`.
     #[inline]
-    fn take_u24_byteorder(&mut self, byteorder: ByteOrder) -> JResult<u32> {
+    fn take_byteorder_u24(&mut self, byteorder: ByteOrder) -> JResult<u32> {
         match byteorder {
             ByteOrder::Be => self.take_be_u24(),
             ByteOrder::Le => self.take_le_u24(),
@@ -291,7 +291,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 32 bit integer from `self`.
     #[inline]
-    fn take_u32_byteorder(&mut self, byteorder: ByteOrder) -> JResult<u32> {
+    fn take_byteorder_u32(&mut self, byteorder: ByteOrder) -> JResult<u32> {
         match byteorder {
             ByteOrder::Be => self.take_be_u32(),
             ByteOrder::Le => self.take_le_u32(),
@@ -324,7 +324,7 @@ pub trait BufReadMut {
 
     /// Reads a signed 32 bit integer from `self`.
     #[inline]
-    fn take_i32_byteorder(&mut self, byteorder: ByteOrder) -> JResult<i32> {
+    fn take_byteorder_i32(&mut self, byteorder: ByteOrder) -> JResult<i32> {
         match byteorder {
             ByteOrder::Be => self.take_be_i32(),
             ByteOrder::Le => self.take_le_i32(),
@@ -357,7 +357,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 64 bit integer from `self`.
     #[inline]
-    fn take_u64_byteorder(&mut self, byteorder: ByteOrder) -> JResult<u64> {
+    fn take_byteorder_u64(&mut self, byteorder: ByteOrder) -> JResult<u64> {
         match byteorder {
             ByteOrder::Be => self.take_be_u64(),
             ByteOrder::Le => self.take_le_u64(),
@@ -390,7 +390,7 @@ pub trait BufReadMut {
 
     /// Reads a signed 64 bit integer from `self`.
     #[inline]
-    fn take_i64_byteorder(&mut self, byteorder: ByteOrder) -> JResult<i64> {
+    fn take_byteorder_i64(&mut self, byteorder: ByteOrder) -> JResult<i64> {
         match byteorder {
             ByteOrder::Be => self.take_be_i64(),
             ByteOrder::Le => self.take_le_i64(),
@@ -423,7 +423,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned 128 bit integer from `self`.
     #[inline]
-    fn take_u128_byteorder(&mut self, byteorder: ByteOrder) -> JResult<u128> {
+    fn take_byteorder_u128(&mut self, byteorder: ByteOrder) -> JResult<u128> {
         match byteorder {
             ByteOrder::Be => self.take_be_u128(),
             ByteOrder::Le => self.take_le_u128(),
@@ -456,7 +456,7 @@ pub trait BufReadMut {
 
     /// Reads a signed 128 bit integer from `self`.
     #[inline]
-    fn take_i128_byteorder(&mut self, byteorder: ByteOrder) -> JResult<i128> {
+    fn take_byteorder_i128(&mut self, byteorder: ByteOrder) -> JResult<i128> {
         match byteorder {
             ByteOrder::Be => self.take_be_i128(),
             ByteOrder::Le => self.take_le_i128(),
@@ -489,7 +489,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned size bit integer from `self`.
     #[inline]
-    fn take_usize_byteorder(&mut self, byteorder: ByteOrder) -> JResult<usize> {
+    fn take_byteorder_usize(&mut self, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
             ByteOrder::Be => self.take_be_usize(),
             ByteOrder::Le => self.take_le_usize(),
@@ -522,7 +522,7 @@ pub trait BufReadMut {
 
     /// Reads a signed size bit integer from `self`.
     #[inline]
-    fn take_isize_byteorder(&mut self, byteorder: ByteOrder) -> JResult<isize> {
+    fn take_byteorder_isize(&mut self, byteorder: ByteOrder) -> JResult<isize> {
         match byteorder {
             ByteOrder::Be => self.take_be_isize(),
             ByteOrder::Le => self.take_le_isize(),
@@ -559,7 +559,7 @@ pub trait BufReadMut {
 
     /// Reads an unsigned n-byte integer from `self`.
     #[inline]
-    fn take_uint_byteorder(&mut self, byteorder: ByteOrder) -> JResult<usize> {
+    fn take_byteorder_uint(&mut self, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
             ByteOrder::Be => self.take_be_usize(),
             ByteOrder::Le => self.take_le_usize(),
@@ -596,7 +596,7 @@ pub trait BufReadMut {
 
     /// Reads a signed n-byte integer from `self`.
     #[inline]
-    fn take_int_byteorder(&mut self, byteorder: ByteOrder) -> JResult<isize> {
+    fn take_byteorder_int(&mut self, byteorder: ByteOrder) -> JResult<isize> {
         match byteorder {
             ByteOrder::Be => self.take_be_isize(),
             ByteOrder::Le => self.take_le_isize(),
@@ -734,6 +734,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push_u8(value)
     }
 
+    /// Writes an unsigned 8 bit integer to `self`, exactly like the `[push_u8]` function.
+    #[inline]
+    fn push_byteorder_u8(&mut self, value: u8, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u8(value),
+            ByteOrder::Le => self.push_le_u8(value),
+        }
+    }
+
     /// Writes a signed 8 bit integer to `self`.
     #[inline]
     fn push_i8(&mut self, value: i8) -> JResult<usize> {
@@ -756,6 +765,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_i8(&mut self, value: i8) -> JResult<usize> {
         self.push_i8(value)
+    }
+
+    /// Writes a signed 8 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i8(&mut self, value: i8, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i8(value),
+            ByteOrder::Le => self.push_le_i8(value),
+        }
     }
 
     /// Writes an unsigned 16 bit integer to `self` in big-endian byte order.
@@ -782,6 +800,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes an unsigned 16 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u16(&mut self, value: u16, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u16(value),
+            ByteOrder::Le => self.push_le_u16(value),
+        }
+    }
+
     /// Writes a signed 16 bit integer to `self` in big-endian byte order.
     #[inline]
     fn push_i16(&mut self, value: i16) -> JResult<usize> {
@@ -804,6 +831,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_i16(&mut self, value: i16) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed 16 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i16(&mut self, value: i16, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i16(value),
+            ByteOrder::Le => self.push_le_i16(value),
+        }
     }
 
     /// Writes an unsigned 24 bit integer to `self` in big-endian byte order.
@@ -834,6 +870,15 @@ pub trait BufWriteMut: BufReadMut {
         }
     }
 
+    /// Writes an unsigned 24 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u24(&mut self, value: u32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u24(value),
+            ByteOrder::Le => self.push_le_u24(value),
+        }
+    }
+
     /// Writes an unsigned 32 bit integer to `self` in big-endian byte order.
     #[inline]
     fn push_u32(&mut self, value: u32) -> JResult<usize> {
@@ -856,6 +901,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_u32(&mut self, value: u32) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 32 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u32(&mut self, value: u32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u32(value),
+            ByteOrder::Le => self.push_le_u32(value),
+        }
     }
 
     /// Writes a signed 32 bit integer to `self` in big-endian byte order.
@@ -882,6 +936,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes a signed 32 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i32(&mut self, value: i32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i32(value),
+            ByteOrder::Le => self.push_le_i32(value),
+        }
+    }
+
     /// Writes an unsigned 64 bit integer to `self` in big-endian byte order.
     #[inline]
     fn push_u64(&mut self, value: u64) -> JResult<usize> {
@@ -904,6 +967,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_u64(&mut self, value: u64) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 64 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u64(&mut self, value: u64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u64(value),
+            ByteOrder::Le => self.push_le_u64(value),
+        }
     }
 
     /// Writes a signed 64 bit integer to `self` in big-endian byte order.
@@ -930,6 +1002,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes a signed 64 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i64(&mut self, value: i64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i64(value),
+            ByteOrder::Le => self.push_le_i64(value),
+        }
+    }
+
     /// Writes an unsigned 128 bit integer to `self` in big-endian byte order.
     #[inline]
     fn push_u128(&mut self, value: u128) -> JResult<usize> {
@@ -952,6 +1033,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_u128(&mut self, value: u128) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 128 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u128(&mut self, value: u128, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u128(value),
+            ByteOrder::Le => self.push_le_u128(value),
+        }
     }
 
     /// Writes a signed 128 bit integer to `self` in big-endian byte order.
@@ -978,6 +1068,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes a signed 128 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i128(&mut self, value: i128, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i128(value),
+            ByteOrder::Le => self.push_le_i128(value),
+        }
+    }
+
     /// Writes an unsigned size integer to `self` in big-endian byte order.
     #[inline]
     fn push_usize(&mut self, value: usize) -> JResult<usize> {
@@ -1002,6 +1101,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes an unsigned usize integer to `self`.
+    #[inline]
+    fn push_byteorder_usize(&mut self, value: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_usize(value),
+            ByteOrder::Le => self.push_le_usize(value),
+        }
+    }
+
     /// Writes a signed size integer to `self` in big-endian byte order.
     #[inline]
     fn push_isize(&mut self, value: isize) -> JResult<usize> {
@@ -1024,6 +1132,15 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_isize(&mut self, value: isize) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed usize integer to `self`.
+    #[inline]
+    fn push_byteorder_isize(&mut self, value: isize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_isize(value),
+            ByteOrder::Le => self.push_le_isize(value),
+        }
     }
 
     /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
@@ -1065,6 +1182,15 @@ pub trait BufWriteMut: BufReadMut {
         }
     }
 
+    /// Writes an unsigned n-byte integer to `self`.
+    #[inline]
+    fn push_byteorder_uint(&mut self, value: usize, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_uint(value, nbytes),
+            ByteOrder::Le => self.push_le_uint(value, nbytes),
+        }
+    }
+
     /// Writes a signed n-byte integer to `self` in big-endian byte order.
     #[inline]
     fn push_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
@@ -1093,6 +1219,15 @@ pub trait BufWriteMut: BufReadMut {
         }
     }
 
+    /// Writes a signed n-byte integer to `self`.
+    #[inline]
+    fn push_byteorder_int(&mut self, value: isize, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_int(value, nbytes),
+            ByteOrder::Le => self.push_le_int(value, nbytes),
+        }
+    }
+
     /// Writes an IEEE754 single-precision (4 bytes) floating point number to `self` in big-endian byte order.
     #[inline]
     fn push_f32(&mut self, value: f32) -> JResult<usize> {
@@ -1117,6 +1252,15 @@ pub trait BufWriteMut: BufReadMut {
         self.push(value.to_ne_bytes())
     }
 
+    /// Writes an IEEE754 double-precision (4 bytes) floating point number to `self`.
+    #[inline]
+    fn push_byteorder_f32(&mut self, value: f32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_f32(value),
+            ByteOrder::Le => self.push_le_f32(value),
+        }
+    }
+
     /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self` in big-endian byte order.
     #[inline]
     fn push_f64(&mut self, value: f64) -> JResult<usize> {
@@ -1139,5 +1283,14 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_ne_f64(&mut self, value: f64) -> JResult<usize> {
         self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self`.
+    #[inline]
+    fn push_byteorder_f64(&mut self, value: f64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_f64(value),
+            ByteOrder::Le => self.push_le_f64(value),
+        }
     }
 }
