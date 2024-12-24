@@ -1,3 +1,5 @@
+use memchr::memmem;
+use aho_corasick::AhoCorasick;
 use crate::{
     JResult, ErrorKind, make_error,
     BufWriteMut, ByteOrder,
@@ -636,6 +638,72 @@ pub trait BufRead {
             ByteOrder::Be => self.take_be_f64(),
             ByteOrder::Le => self.take_le_f64(),
         }
+    }
+
+    // Finds a substring in a byte stream
+    #[inline]
+    fn find_subsequence<I: AsRef<[u8]>>(&mut self, needle: I) -> JResult<&[u8]> {
+        let position = self.get_position();
+
+        if let Some(subposition) = memmem::find(self.remaining(), needle.as_ref()) {
+            self.advance(subposition + needle.as_ref().len());
+            return Ok(&self.get_data()[position..position + subposition]);
+        }
+
+        Err(make_error(position, ErrorKind::Fail))
+    }
+
+    // Finds a substring in a byte stream
+    #[inline]
+    fn find_subsequence_needle<I: AsRef<[u8]>>(&mut self, needle: I, include_needle: bool) -> JResult<&[u8]> {
+        let position = self.get_position();
+
+        if let Some(subposition) = memmem::find(self.remaining(), needle.as_ref()) {
+            let subposition = if include_needle { subposition + needle.as_ref().len() } else { subposition };
+            self.advance(subposition);
+            return Ok(&self.get_data()[position..position + subposition]);
+        }
+
+        Err(make_error(position, ErrorKind::Fail))
+    }
+
+    // Finds a substring in a byte stream
+    #[inline]
+    fn find_subsequences<I, P>(&mut self, needle: I) -> JResult<&[u8]>
+    where
+        I: IntoIterator<Item = P>,
+        P: AsRef<[u8]>,
+    {
+        let position = self.get_position();
+
+        if let Ok(ac) = AhoCorasick::new(needle) {
+            if let Some(mt) = ac.find(self.remaining()) {
+                self.advance(mt.end());
+                return Ok(&self.get_data()[position..position + mt.start()]);
+            }
+        }
+
+        Err(make_error(position, ErrorKind::Fail))
+    }
+
+    // Finds a substring in a byte stream, include needle
+    #[inline]
+    fn find_subsequences_needle<I, P>(&mut self, needle: I, include_needle: bool) -> JResult<&[u8]>
+    where
+        I: IntoIterator<Item = P>,
+        P: AsRef<[u8]>,
+    {
+        let position = self.get_position();
+
+        if let Ok(ac) = AhoCorasick::new(needle) {
+            if let Some(mt) = ac.find(self.remaining()) {
+                let subposition = if include_needle { mt.end()} else { mt.start() };
+                self.advance(subposition);
+                return Ok(&self.get_data()[position..position + subposition]);
+            }
+        }
+
+        Err(make_error(position, ErrorKind::Fail))
     }
 }
 

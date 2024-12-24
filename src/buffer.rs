@@ -372,4 +372,38 @@ mod tests {
             0x08, 0x09,
         ]);
     }
+
+    #[test]
+    fn test_buffer_subsequence() {
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequence(&[0x03, 0x04]).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.remaining_len(), 1);
+
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequence_needle(&[0x03, 0x04], false).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.remaining_len(), 3);
+
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequence_needle(&[0x03, 0x04], true).unwrap(), &[0x01, 0x02, 0x03, 0x04]);
+        assert_eq!(buffer.remaining_len(), 1);
+    }
+
+    #[test]
+    fn test_buffer_subsequences() {
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequences(&[&[0x03, 0x04], &[0x04, 0x05]]).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.remaining_len(), 1);
+
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequences(&[&[0x04, 0x04], &[0x04, 0x05]]).unwrap(), &[0x01, 0x02, 0x03]);
+        assert_eq!(buffer.remaining_len(), 0);
+
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequences_needle(&[&[0x03, 0x04], &[0x04, 0x05]], false).unwrap(), &[0x01, 0x02]);
+        assert_eq!(buffer.remaining_len(), 3);
+
+        let mut buffer = Buffer::from(vec![0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.find_subsequences_needle(&[&[0x03, 0x04], &[0x04, 0x05]], true).unwrap(), &[0x01, 0x02, 0x03, 0x04]);
+        assert_eq!(buffer.remaining_len(), 1);
+    }
 }
