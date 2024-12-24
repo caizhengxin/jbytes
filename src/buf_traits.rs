@@ -642,7 +642,7 @@ pub trait BufRead {
 
     // Finds a substring in a byte stream
     #[inline]
-    fn find_subsequence<I: AsRef<[u8]>>(&mut self, needle: I) -> JResult<&[u8]> {
+    fn find_subsequence<I: AsRef<[u8]>>(&self, needle: I) -> JResult<&[u8]> {
         let position = self.get_position();
 
         if let Some(subposition) = memmem::find(self.remaining(), needle.as_ref()) {
@@ -655,7 +655,7 @@ pub trait BufRead {
 
     // Finds a substring in a byte stream
     #[inline]
-    fn find_subsequence_needle<I: AsRef<[u8]>>(&mut self, needle: I, include_needle: bool) -> JResult<&[u8]> {
+    fn find_subsequence_needle<I: AsRef<[u8]>>(&self, needle: I, include_needle: bool) -> JResult<&[u8]> {
         let position = self.get_position();
 
         if let Some(subposition) = memmem::find(self.remaining(), needle.as_ref()) {
@@ -669,7 +669,7 @@ pub trait BufRead {
 
     // Finds a substring in a byte stream
     #[inline]
-    fn find_subsequences<I, P>(&mut self, needle: I) -> JResult<&[u8]>
+    fn find_subsequences<I, P>(&self, needle: I) -> JResult<&[u8]>
     where
         I: IntoIterator<Item = P>,
         P: AsRef<[u8]>,
@@ -688,7 +688,7 @@ pub trait BufRead {
 
     // Finds a substring in a byte stream, include needle
     #[inline]
-    fn find_subsequences_needle<I, P>(&mut self, needle: I, include_needle: bool) -> JResult<&[u8]>
+    fn find_subsequences_needle<I, P>(&self, needle: I, include_needle: bool) -> JResult<&[u8]>
     where
         I: IntoIterator<Item = P>,
         P: AsRef<[u8]>,
