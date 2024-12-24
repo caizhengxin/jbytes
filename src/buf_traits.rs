@@ -97,7 +97,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 8 bit integer from `self`, exactly like the `[take_u8]` function.
     #[inline]
-    fn take_u8_byteorder(&self, _byteorder: ByteOrder) -> JResult<u8> {
+    fn take_byteorder_u8(&self, _byteorder: ByteOrder) -> JResult<u8> {
         self.take_u8()
     }
 
@@ -127,7 +127,7 @@ pub trait BufRead {
 
     /// Reads a signed 8 bit integer from `self`, exactly like the `[take_i8]` function.
     #[inline]
-    fn take_i8_byteorder(&self, _byteorder: ByteOrder) -> JResult<i8> {
+    fn take_byteorder_i8(&self, _byteorder: ByteOrder) -> JResult<i8> {
         self.take_i8()
     }
 
@@ -157,7 +157,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 16 bit integer from `self`.
     #[inline]
-    fn take_u16_byteorder(&self, byteorder: ByteOrder) -> JResult<u16> {
+    fn take_byteorder_u16(&self, byteorder: ByteOrder) -> JResult<u16> {
         match byteorder {
             ByteOrder::Be => self.take_be_u16(),
             ByteOrder::Le => self.take_le_u16(),
@@ -190,7 +190,7 @@ pub trait BufRead {
 
     /// Reads a signed 16 bit integer from `self`.
     #[inline]
-    fn take_i16_byteorder(&self, byteorder: ByteOrder) -> JResult<i16> {
+    fn take_byteorder_i16(&self, byteorder: ByteOrder) -> JResult<i16> {
         match byteorder {
             ByteOrder::Be => self.take_be_i16(),
             ByteOrder::Le => self.take_le_i16(),
@@ -227,7 +227,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 24 bit integer from `self`.
     #[inline]
-    fn take_u24_byteorder(&self, byteorder: ByteOrder) -> JResult<u32> {
+    fn take_byteorder_u24(&self, byteorder: ByteOrder) -> JResult<u32> {
         match byteorder {
             ByteOrder::Be => self.take_be_u24(),
             ByteOrder::Le => self.take_le_u24(),
@@ -260,7 +260,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 32 bit integer from `self`.
     #[inline]
-    fn take_u32_byteorder(&self, byteorder: ByteOrder) -> JResult<u32> {
+    fn take_byteorder_u32(&self, byteorder: ByteOrder) -> JResult<u32> {
         match byteorder {
             ByteOrder::Be => self.take_be_u32(),
             ByteOrder::Le => self.take_le_u32(),
@@ -293,7 +293,7 @@ pub trait BufRead {
 
     /// Reads a signed 32 bit integer from `self`.
     #[inline]
-    fn take_i32_byteorder(&self, byteorder: ByteOrder) -> JResult<i32> {
+    fn take_byteorder_i32(&self, byteorder: ByteOrder) -> JResult<i32> {
         match byteorder {
             ByteOrder::Be => self.take_be_i32(),
             ByteOrder::Le => self.take_le_i32(),
@@ -326,7 +326,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 64 bit integer from `self`.
     #[inline]
-    fn take_u64_byteorder(&self, byteorder: ByteOrder) -> JResult<u64> {
+    fn take_byteorder_u64(&self, byteorder: ByteOrder) -> JResult<u64> {
         match byteorder {
             ByteOrder::Be => self.take_be_u64(),
             ByteOrder::Le => self.take_le_u64(),
@@ -359,7 +359,7 @@ pub trait BufRead {
 
     /// Reads a signed 64 bit integer from `self`.
     #[inline]
-    fn take_i64_byteorder(&self, byteorder: ByteOrder) -> JResult<i64> {
+    fn take_byteorder_i64(&self, byteorder: ByteOrder) -> JResult<i64> {
         match byteorder {
             ByteOrder::Be => self.take_be_i64(),
             ByteOrder::Le => self.take_le_i64(),
@@ -392,7 +392,7 @@ pub trait BufRead {
 
     /// Reads an unsigned 128 bit integer from `self`.
     #[inline]
-    fn take_u128_byteorder(&self, byteorder: ByteOrder) -> JResult<u128> {
+    fn take_byteorder_u128(&self, byteorder: ByteOrder) -> JResult<u128> {
         match byteorder {
             ByteOrder::Be => self.take_be_u128(),
             ByteOrder::Le => self.take_le_u128(),
@@ -425,7 +425,7 @@ pub trait BufRead {
 
     /// Reads a signed 128 bit integer from `self`.
     #[inline]
-    fn take_i128_byteorder(&self, byteorder: ByteOrder) -> JResult<i128> {
+    fn take_byteorder_i128(&self, byteorder: ByteOrder) -> JResult<i128> {
         match byteorder {
             ByteOrder::Be => self.take_be_i128(),
             ByteOrder::Le => self.take_le_i128(),
@@ -458,7 +458,7 @@ pub trait BufRead {
 
     /// Reads an unsigned size bit integer from `self`.
     #[inline]
-    fn take_usize_byteorder(&self, byteorder: ByteOrder) -> JResult<usize> {
+    fn take_byteorder_usize(&self, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
             ByteOrder::Be => self.take_be_usize(),
             ByteOrder::Le => self.take_le_usize(),
@@ -491,7 +491,7 @@ pub trait BufRead {
 
     /// Reads a signed size bit integer from `self`.
     #[inline]
-    fn take_isize_byteorder(&self, byteorder: ByteOrder) -> JResult<isize> {
+    fn take_byteorder_isize(&self, byteorder: ByteOrder) -> JResult<isize> {
         match byteorder {
             ByteOrder::Be => self.take_be_isize(),
             ByteOrder::Le => self.take_le_isize(),
@@ -528,10 +528,10 @@ pub trait BufRead {
 
     /// Reads an unsigned n-byte integer from `self`.
     #[inline]
-    fn take_uint_byteorder(&self, byteorder: ByteOrder) -> JResult<usize> {
+    fn take_byteorder_uint(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
-            ByteOrder::Be => self.take_be_usize(),
-            ByteOrder::Le => self.take_le_usize(),
+            ByteOrder::Be => self.take_be_uint(nbytes),
+            ByteOrder::Le => self.take_le_uint(nbytes),
         }
     }
 
@@ -565,10 +565,10 @@ pub trait BufRead {
 
     /// Reads a signed n-byte integer from `self`.
     #[inline]
-    fn take_int_byteorder(&self, byteorder: ByteOrder) -> JResult<isize> {
+    fn take_byteorder_int(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<isize> {
         match byteorder {
-            ByteOrder::Be => self.take_be_isize(),
-            ByteOrder::Le => self.take_le_isize(),
+            ByteOrder::Be => self.take_be_int(nbytes),
+            ByteOrder::Le => self.take_le_int(nbytes),
         }
     }
 
