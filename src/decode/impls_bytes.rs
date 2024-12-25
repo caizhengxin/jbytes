@@ -7,7 +7,7 @@ use crate::{
 
 
 #[inline]
-pub(crate) fn find_subsequence<'da, 'db, T: BufRead>(input: &'da T, cattr: Option<&'db ContainerAttrModifiers>, fattr: Option<&'db FieldAttrModifiers>) -> JResult<&'da [u8]> {
+pub(super) fn find_subsequence<'da, 'db, T: BufRead>(input: &'da T, cattr: Option<&'db ContainerAttrModifiers>, fattr: Option<&'db FieldAttrModifiers>) -> JResult<&'da [u8]> {
     let value;
 
     if let Some(fr) = fattr {

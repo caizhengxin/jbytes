@@ -73,6 +73,15 @@ pub trait BufRead {
         Ok(self.take_bytes(1)?[0] != 0)
     }
 
+    /// Reads a byte from `self`.
+    #[inline]
+    fn take_char(&self) -> JResult<char> {
+        match char::from_u32(self.take_bytes(1)?[0].into()) {
+            Some(v) => Ok(v),
+            None => Err(make_error(self.get_position(), ErrorKind::Fail))
+        }
+    }
+
     /// Reads an unsigned 8 bit integer from `self`.
     #[inline]
     fn take_u8(&self) -> JResult<u8> {
