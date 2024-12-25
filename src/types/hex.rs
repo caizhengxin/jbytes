@@ -1,4 +1,5 @@
 use core::{
+    fmt,
     ops,
     str, str::FromStr,
 };
@@ -117,9 +118,9 @@ impl FromStr for HexString {
 }
 
 
-impl ToString for HexString {
-    fn to_string(&self) -> String {
-        self.to_hex_lowercase()
+impl fmt::Display for HexString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_hex_lowercase())
     }
 }
 

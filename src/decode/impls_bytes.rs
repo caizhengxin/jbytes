@@ -28,7 +28,7 @@ pub(super) fn find_subsequence<'da, 'db, T: BufRead>(input: &'da T, cattr: Optio
             value = input.take_bytes(input.take_byteorder_uint(byte_count, get_byteorder(cattr, fattr))? as usize)?;
         }
         else if fr.linend {
-            value = input.find_subsequences(&["\r\n", "\n", "\x00"])?;
+            value = input.find_subsequences(["\r\n", "\n", "\x00"])?;
         }
         else if let Some(linend_value) = fr.linend_value {
             value = input.find_subsequence(linend_value)?;

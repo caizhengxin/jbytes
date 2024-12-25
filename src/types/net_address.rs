@@ -1,6 +1,7 @@
 use core::{
     net::{Ipv4Addr, Ipv6Addr},
     str::FromStr,
+    fmt,
 };
 #[cfg(feature = "serde")]
 use serde::{Serialize, Serializer, Deserialize, Deserializer, de::Error as DeError};
@@ -28,27 +29,27 @@ pub enum NetAddress {
 impl NetAddress {
     #[inline]
     pub fn is_ipv4(&self) -> bool {
-        if let Self::V4(_) = self {true} else {false}
+        matches!(self, Self::V4(_))
     }
 
     #[inline]
     pub fn is_ipv6(&self) -> bool {
-        if let Self::V6(_) = self {true} else {false}
+        matches!(self, Self::V6(_))
     }
 
     #[inline]
     pub fn is_mac(&self) -> bool {
-        if let Self::Mac(_) = self {true} else {false}
+        matches!(self, Self::Mac(_))
     }
 
     #[inline]
     pub fn is_usize(&self) -> bool {
-        if let Self::Usize(_) = self {true} else {false}
+        matches!(self, Self::Usize(_))
     }
 
     // #[inline]
     // pub fn is_string(&self) -> bool {
-    //     if let Self::String(_) = self {true} else {false}
+    //     matches!(self, Self::String(_))
     // }
 
     #[inline]
@@ -112,15 +113,15 @@ impl FromStr for NetAddress {
 }
 
 
-impl ToString for NetAddress {
-    fn to_string(&self) -> String {
+impl fmt::Display for NetAddress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::V4(v) => v.to_string(),
-            Self::V6(v) => v.to_string(),
-            Self::Usize(v) => v.to_string(),
-            Self::Mac(v) => v.to_string(),
-            // Self::String(v) => v.to_string(),
-        }
+            Self::V4(v) => write!(f, "{v}"),
+            Self::V6(v) => write!(f, "{v}"),
+            Self::Usize(v) => write!(f, "{v}"),
+            Self::Mac(v) => write!(f, "{v}"),
+            // Self::String(v) => write!(f, "{v}"),
+        }   
     }
 }
 
