@@ -1,7 +1,7 @@
 #[cfg(not(feature = "std"))]
-use thiserror_no_std::Error as ThisError;
+pub use thiserror_no_std::Error as ThisError;
 #[cfg(feature = "std")]
-use thiserror::Error as ThisError;
+pub use thiserror::Error as ThisError;
 use crate::std::fmt;
 
 
