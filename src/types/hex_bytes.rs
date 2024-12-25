@@ -1,6 +1,6 @@
 use core::{
     ops,
-    // fmt,
+    fmt,
     // str::FromStr,
 };
 #[cfg(feature = "serde")]
@@ -46,9 +46,9 @@ impl<'a> HexBytes<'a> {
 }
 
 
-impl<'a> ToString for HexBytes<'a> {
-    fn to_string(&self) -> String {
-        self.to_hex_lowercase()
+impl<'a> fmt::Display for HexBytes<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_hex_lowercase())
     }
 }
 

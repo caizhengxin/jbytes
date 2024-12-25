@@ -15,7 +15,7 @@ pub enum MacAddressParseError {
 }
 
 
-#[derive(PartialEq, Eq, Clone, Copy, Default, Hash)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Default, Hash)]
 pub struct MacAddress([u8; 6]);
 
 
@@ -127,18 +127,11 @@ impl FromStr for MacAddress {
 }
 
 
-impl ToString for MacAddress {
-    fn to_string(&self) -> String {
+impl fmt::Display for MacAddress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mac = self.0;
 
-        format!("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
-    }
-}
-
-
-impl fmt::Debug for MacAddress {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "\"{}\"", self.to_string())
+        write!(f, "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])        
     }
 }
 
