@@ -12,11 +12,16 @@ readme = "README.md"
 # https://crates.io/category_slugs
 categories = [
     "development-tools",
+    "encoding",
+    "parser-implementations",
+    "no-std",
 ]
 keywords = [
     "byte",
     "bytes",
     "jbytes",
+    "serialization",
+    "parse",
 ]
 license = "MIT OR Apache-2.0"
 include = [
@@ -26,6 +31,7 @@ include = [
     "LICENSE*",
     "../README.md",
 ]
+rust-version = "1.56"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -33,4 +39,7 @@ include = [
 proc-macro = true
 
 [dependencies]
-virtue = "0.0"
+virtue = "0"
+syn = { version="2", features=["full", "fold", "extra-traits"] }
+quote = "1"
+proc-macro2 = "1"

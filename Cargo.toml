@@ -50,6 +50,7 @@ std = [
 derive = ["jbytes_derive"]
 full = [
     "serde",
+    "jbytes_derive",
 ]
 
 [dependencies]
