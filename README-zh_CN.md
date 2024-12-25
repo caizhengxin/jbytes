@@ -6,14 +6,14 @@
 
 ```toml
 [dependencies]
-jppe = { version="1.1.1", features = ["derive"] }
+jbytes = { version="0.1.0", features = ["derive"] }
 ```
 
 Or
 
 ```toml
 [dependencies]
-jppe = { version="1.1.1", features = ["derive", "serde"] }
+jbytes = { version="0.1.0", features = ["derive", "serde"] }
 ```
 
 ## 数据类型
@@ -23,7 +23,9 @@ jppe = { version="1.1.1", features = ["derive", "serde"] }
 - [x] `bool`
 - [x] `char`
 - [x] `f32/f64`
-- [x] `String`、`&str`、`&[u8]`
+- [x] `String`
+- [x] `&str`
+- [x] `&[u8]`
 - [x] `array[T; N]`
 - [x] `tuple`
 - [x] `Vec<T>`
@@ -34,9 +36,9 @@ jppe = { version="1.1.1", features = ["derive", "serde"] }
 - [ ] `HashMap`
 - [ ] `HashSet`
 - [ ] `MacAddress`
-- [ ] `std::net::Ipv4Addr`
-- [ ] `std::net::Ipv6Addr`
-- [ ] `std::net::IpAddr`
+- [x] `std::net::Ipv4Addr`
+- [x] `std::net::Ipv6Addr`
+- [x] `std::net::IpAddr`
 - [ ] `NetAddress`
 - [ ] `HexString`
 - [ ] `DateTime`
