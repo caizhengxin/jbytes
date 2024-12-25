@@ -9,6 +9,7 @@ mod impls_array;
 mod impls_vec;
 mod impls_other;
 mod impls_option;
+mod impls_ipaddress;
 
 use crate::{
     JResult,
