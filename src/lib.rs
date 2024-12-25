@@ -11,7 +11,7 @@ extern crate alloc;
 extern crate jbytes_derive;
 
 #[cfg(feature = "jbytes_derive")]
-pub use jbytes_derive::ByteDecode;
+pub use jbytes_derive::{ByteDecode, ByteDecode, BorrowByteDecode, BorrowByteEncode};
 
 
 pub mod errors;
