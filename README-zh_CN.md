@@ -67,10 +67,11 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 主要用于修饰struct/enum里面某个字段内容
 
 - [x] `byteorder=<"BE"|"LE">`: 这是struct/enum类型局部字段字节序，BE(大端字节序)/LE(小端字节序), eg: `#[jppe(byteorder="LE")]`
-- [x] `length=<num|variable>`: 数据长度, 支持`int/&str/String/&[u8]`类型, eg: [length_example](./tests/test_modifier_length.rs).
-- [x] `offset=<num|variable>`: 字节流偏移，表示跳过几个字节.
-- [x] `full=<int>`: 主要用于encode填充值, 默认为0, 常常用于offset偏移之后进行encode编码填充.
-- [x] `untake`: 表示解析内容, 但是不取走字节, 后面的解析任然可以读取该字节.
+- [x] `length=<num|variable>`: 表示读取数据的长度, 支持`int/&str/String/&[u8]/Vec`类型, eg: [length example](./tests/test_modifier_length.rs)。
+- [x] `offset=<num|variable>`: 表示从当前位置向前前进n个位置，实现数据流的位置偏移，eg: [offset example](./tests/test_modifier_offset.rs)。
+- [x] `full=<int>`: 用于encode填充值, 默认为0, 常常用于offset偏移之后进行encode编码填充, eg: [full example](./tests/test_modifier_full.rs。
+- [x] `untake`: 表示读取数据不移动位置，后续可以继续从该位置读取数据，eg: [untake example](./tests/test_modifier_untake.rs)。
+
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
 - [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split_example](./tests/test_type_hashmap.rs)

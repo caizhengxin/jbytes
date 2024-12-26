@@ -14,6 +14,12 @@ pub trait BufRead {
     /// Get the internal data of the `self`.
     fn get_data(&self) -> &'_ [u8];
 
+    /// Set the internal cursor of the `self`.
+    fn set_position(&self, position: usize);
+
+    /// Reset the internal cursor of the `self`.
+    fn reset_position(&self);
+
     /// Advance the internal cursor of the `self`.
     fn advance(&self, nbytes: usize);
 

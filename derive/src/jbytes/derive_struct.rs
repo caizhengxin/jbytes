@@ -128,12 +128,26 @@ impl DeriveStruct {
     pub fn generate_borrow_decode(&self, generator: &mut Generator) -> Result<()> {
         let crate_name = "jbytes::BorrowByteDecode";
 
-        generator
-            .impl_for_with_lifetimes("BorrowByteDecode", ["de"])
+        let mut impl_for = if let Some(lifetimes) = &self.lifetimes {
+            generator
+            .impl_for(format!("{crate_name}{lifetimes}"))    
+        }
+        else {
+            generator
+            .impl_for_with_lifetimes(crate_name, ["de"])
+        };
+
+        let lifetimes = if let Some(lifetimes) = &self.lifetimes {
+            lifetimes.trim_start_matches('<').trim_end_matches('>')
+        }
+        else { 
+            "de"
+        };
+
+        impl_for
             .generate_fn("decode_inner")
             .with_generic_deps("I", ["jbytes::BufRead"])
-            .with_lifetime("db")
-            .with_arg("input", "&'de I")
+            .with_arg("input", format!("&{} I", lifetimes))
             .with_arg("cattr", "Option<&jbytes::ContainerAttrModifiers>")
             .with_arg("fattr", "Option<&jbytes::FieldAttrModifiers>")
             .with_return_type("jbytes::JResult<Self>")
