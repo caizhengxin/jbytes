@@ -17,7 +17,7 @@ impl<T: ByteEncode> ByteEncode for Vec<T> {
 
         if let Some(fr) = fattr {
             if let Some(byte_count) = fr.byte_count {
-                nbytes += buffer.push_byteorder_uint(data_len, byte_count, byteorder)?;
+                nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
             }
             else if fr.count.is_some() { }
             else if fr.try_count.is_some() { }
@@ -48,7 +48,7 @@ impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
 
         if let Some(fr) = fattr {
             if let Some(byte_count) = fr.byte_count {
-                nbytes += buffer.push_byteorder_uint(data_len, byte_count, byteorder)?;
+                nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
             }
             else if fr.count.is_some() { }
             else if fr.try_count.is_some() { }

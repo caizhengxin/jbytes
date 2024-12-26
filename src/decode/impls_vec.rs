@@ -27,7 +27,7 @@ impl<T: ByteDecode> ByteDecode for Vec<T> {
             } else if let Some(count) = fr.try_count {
                 count
             } else if let Some(byte_count) = fr.byte_count {
-                input.take_byteorder_uint(byte_count, byteorder)?
+                input.take_byteorder_uint(byte_count, byteorder)? as usize
             } else {
                 input.take_u8()? as usize
             };
@@ -74,7 +74,7 @@ impl<'de, T: BorrowByteDecode<'de>> BorrowByteDecode<'de> for Vec<T> {
             } else if let Some(count) = fr.try_count {
                 count
             } else if let Some(byte_count) = fr.byte_count {
-                input.take_byteorder_uint(byte_count, byteorder)?
+                input.take_byteorder_uint(byte_count, byteorder)? as usize
             } else {
                 input.take_u8()? as usize
             };

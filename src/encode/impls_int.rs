@@ -24,10 +24,10 @@ macro_rules! impls_int_encode {
                     }
 
                     if byteorder == ByteOrder::Be {
-                        value = buffer.push_be_uint(*self as usize, length)?;
+                        value = buffer.push_be_uint(*self as u64, length)?;
                     }
                     else {
-                        value = buffer.push_le_uint(*self as usize, length)?;
+                        value = buffer.push_le_uint(*self as u64, length)?;
                     }
                 }
                 else if byteorder == ByteOrder::Be {

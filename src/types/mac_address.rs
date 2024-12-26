@@ -15,72 +15,74 @@ pub enum MacAddressParseError {
 }
 
 
+/// This is a Ethernet MacAddress type.
+/// 
+/// # Example
+/// 
+/// ```
+/// use core::str::FromStr;
+/// use jbytes::types::MacAddress;
+/// assert_eq!(MacAddress::from_str("aa:bb:cc:dd:ee:ff").unwrap().to_bits(), 0xaabbccddeeff);
+/// assert_eq!(MacAddress::from_bits(0xaabbccddeeff).to_string(), "aa:bb:cc:dd:ee:ff");
+/// ```
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Default, Hash)]
 pub struct MacAddress([u8; 6]);
 
 
 impl MacAddress {
+    // Constructs a new MacAddress.
     #[inline]
     pub const fn new(v: [u8; 6]) -> Self {
         Self(v)
     }
 
+    /// Returns a unsigned integer.
     #[inline]
     pub fn to_bits(&self) -> u64 {
-        let mut value: u64 = 0;
-
-        for v in self.0 {
-            value = (value << 8) + v as u64;
-        }
-
-        value
+        let mut buf = [0; 8];
+        buf[2..].clone_from_slice(&self.0);
+        u64::from_be_bytes(buf)
     }
 
+    // Converts to this type from the input type.
     #[inline]
-    pub fn from_bits(v: u64) -> Self {
-        let mut mac = Self::default();
-        let mut v = v;
-
-        for i in 0..6 {
-            mac.0[5 - i] = v as u8;
-            v >>= 8;
-        }
-
-        mac
+    pub fn from_bits(value: u64) -> Self {
+        let value = value.to_be_bytes();
+        let mut buf = [0; 6];
+        buf.clone_from_slice(&value[2..]);
+        
+        Self (buf)
     }
 
+    // Returns [true] if this is a unicast address (xxxxxxx0 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx).
+    #[inline]
+    pub fn is_unicast(&self) -> bool {
+        self.to_bits() & 0x010000000000 == 0x000000000000
+    }
+
+    // Returns [true] if this is a broadcast address (ff:ff:ff:ff:ff:ff).
     #[inline]
     pub fn is_broadcast(&self) -> bool {
-        let mac = self.0;
-
-        if mac[0] == 0xff &&
-           mac[1] == 0xff &&
-           mac[2] == 0xff &&
-           mac[3] == 0xff &&
-           mac[4] == 0xff &&
-           mac[5] == 0xff
-        {
-            return true;
-        }
-
-        false
+        self.to_bits() == 0xffffffffffff
     }
 
+    // Returns [true] if this is a multicast address (xxxxxxx1 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx).
+    #[inline]
+    pub fn is_multicast(&self) -> bool {
+        self.to_bits() & 0x010000000000 == 0x010000000000
+    }
+
+    // Returns [true] if this is a address (00:00:00:00:00:00).
     #[inline]
     pub fn is_zero(&self) -> bool {
-        let mac = self.0;
+        self.to_bits() == 0
+    }
+}
 
-        if mac[0] == 0x00 &&
-           mac[1] == 0x00 &&
-           mac[2] == 0x00 &&
-           mac[3] == 0x00 &&
-           mac[4] == 0x00 &&
-           mac[5] == 0x00
-        {
-            return true;
-        }
 
-        false
+impl From<[u8; 6]> for MacAddress {
+    fn from(value: [u8; 6]) -> Self {
+        Self(value)
     }
 }
 
@@ -169,9 +171,7 @@ mod tests {
 
     #[test]
     fn test_parse_mac_address() {
-        let mac_str = "aa:bb:cc:dd:ee:ff";
-        let mac = MacAddress::from_str(mac_str).unwrap();
-        assert_eq!(mac.to_string(), mac_str);
+        assert_eq!(MacAddress::from_str("aa:bb:cc:dd:ee:ff").unwrap().to_string(), "aa:bb:cc:dd:ee:ff");
 
         assert_eq!(MacAddress::from_str("").is_ok(), false);
         assert_eq!(MacAddress::from_str(":").is_ok(), false);
@@ -180,12 +180,28 @@ mod tests {
         assert_eq!(MacAddress::from_str("aa:bb:cc:dd:ee:ff:").is_ok(), false);
         assert_eq!(MacAddress::from_str("aa:bb:cc:dd:ee:fff").is_ok(), false);
 
+        // Unicast address
+        assert_eq!(MacAddress::from_str("01:aa:bb:cc:dd").unwrap().is_unicast(), false);
+        assert_eq!(MacAddress::from_str("00:aa:bb:cc:dd").unwrap().is_unicast(), true);
+        assert_eq!(MacAddress::from_str("0c:73:eb:92:53:f0").unwrap().is_unicast(), true);
+        // Broadcast address
         assert_eq!(MacAddress::from_str("ff:ff:ff:ff:ff:ff").unwrap().is_broadcast(), true);
         assert_eq!(MacAddress::from_str("ff:ff:ff:ff:ff:ef").unwrap().is_broadcast(), false);
+        // Multicast address
+        assert_eq!(MacAddress::from_str("01:aa:bb:cc:dd").unwrap().is_multicast(), true);
+        assert_eq!(MacAddress::from_str("00:aa:bb:cc:dd").unwrap().is_multicast(), false);
+
         assert_eq!(MacAddress::from_str("ff:ff:ff:ff:ff:ef").unwrap().is_zero(), false);
         assert_eq!(MacAddress::from_str("00:00:00:00:00:00").unwrap().is_zero(), true);
 
-        assert_eq!(MacAddress::from_str("00:00:00:00:00:00").unwrap().to_bits(), 0);
+        // From
+        assert_eq!(MacAddress::from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06]).to_string(), "01:02:03:04:05:06");
+
+        // from_bits
+        assert_eq!(MacAddress::from_bits(0xaabbccddeeff).to_string(), "aa:bb:cc:dd:ee:ff");
+
+        // to_bits
+        assert_eq!(MacAddress::from_str("aa:bb:cc:dd:ee:ff").unwrap().to_bits(), 0xaabbccddeeff);
     }
 
     #[cfg(feature = "serde")]

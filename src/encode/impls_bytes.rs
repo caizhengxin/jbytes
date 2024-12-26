@@ -18,7 +18,7 @@ pub(super) fn encode_inner<B: BufWriteMut>(buffer: &mut B, cattr: Option<&Contai
             r_nbytes += buffer.push_u8(length as u8)?;
         }
         else if let Some(byte_count) = fr.byte_count {
-            r_nbytes += buffer.push_byteorder_uint(data.len(), byte_count, get_byteorder(cattr, fattr))?;
+            r_nbytes += buffer.push_byteorder_uint(data.len() as u64, byte_count, get_byteorder(cattr, fattr))?;
         }
         else if fr.linend_value.is_some() {
             linend_value = fr.linend_value;
