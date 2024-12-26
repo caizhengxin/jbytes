@@ -2,8 +2,9 @@ use crate::{
     JResult, BufRead,
     ByteDecode, BorrowByteDecode,
     ContainerAttrModifiers, FieldAttrModifiers,
-    get_byteorder,
+    // get_byteorder,
 };
+use super::get_count_and_try_count;
 
 
 impl<T: ByteDecode> ByteDecode for Vec<T> {
@@ -15,28 +16,10 @@ impl<T: ByteDecode> ByteDecode for Vec<T> {
         I: BufRead,
     {
         let mut value_list = Vec::new();
-        let byteorder = get_byteorder(cattr, fattr);
-        let count;
-        let mut try_count = None;
+        let (count, try_count) = get_count_and_try_count(input, cattr, fattr)?;
 
-        if let Some(fr) = fattr {
-            try_count = fr.try_count;
-
-            count = if let Some(count) = fr.count {
-                count
-            } else if let Some(count) = fr.try_count {
-                count
-            } else if let Some(byte_count) = fr.byte_count {
-                input.take_byteorder_uint(byte_count, byteorder)? as usize
-            } else {
-                input.take_u8()? as usize
-            };
-        } else {
-            count = input.take_u8()? as usize;
-        }
-
-        if try_count.is_some() {
-            for _i in 0..count {
+        if let Some(try_count) = try_count {
+            for _i in 0..try_count {
                 match T::decode_inner(input, cattr, fattr) {
                     Ok(value) => value_list.push(value),
                     Err(_e) => break,
@@ -62,28 +45,10 @@ impl<'de, T: BorrowByteDecode<'de>> BorrowByteDecode<'de> for Vec<T> {
         Self: Sized
     {
         let mut value_list = Vec::new();
-        let byteorder = get_byteorder(cattr, fattr);
-        let count;
-        let mut try_count = None;
+        let (count, try_count) = get_count_and_try_count(input, cattr, fattr)?;
 
-        if let Some(fr) = fattr {
-            try_count = fr.try_count;
-
-            count = if let Some(count) = fr.count {
-                count
-            } else if let Some(count) = fr.try_count {
-                count
-            } else if let Some(byte_count) = fr.byte_count {
-                input.take_byteorder_uint(byte_count, byteorder)? as usize
-            } else {
-                input.take_u8()? as usize
-            };
-        } else {
-            count = input.take_u8()? as usize;
-        }
-
-        if try_count.is_some() {
-            for _i in 0..count {
+        if let Some(try_count) = try_count {
+            for _i in 0..try_count {
                 match T::decode_inner(input, cattr, fattr) {
                     Ok(value) => value_list.push(value),
                     Err(_e) => break,
@@ -157,19 +122,19 @@ mod tests {
         assert_eq!(Vec::<u16>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), vec![0x0001, 0x0002]);
         assert_eq!(bytes.remaining_len(), 0);
 
-        // test `byte_count` example
+        // test `byte_count_outside` example
         let bytes = Bytes::new([0x00, 0x02, 0x00, 0x01, 0x00, 0x02]);
         let fattr = FieldAttrModifiers {
-            byte_count: Some(2),
+            byte_count_outside: Some(2),
             ..Default::default()
         };
         assert_eq!(Vec::<u16>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), vec![0x0001, 0x0002]);
         assert_eq!(bytes.remaining_len(), 0);
 
-        // test `byte_count` little-endian example
+        // test `byte_count_outside` little-endian example
         let bytes = Bytes::new([0x02, 0x00, 0x01, 0x00, 0x02, 0x00]);
         let fattr = FieldAttrModifiers {
-            byte_count: Some(2),
+            byte_count_outside: Some(2),
             byteorder: Some(ByteOrder::Le),
             ..Default::default()
         };

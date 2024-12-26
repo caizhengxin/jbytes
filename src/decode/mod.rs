@@ -7,6 +7,8 @@ mod impls_bytes;
 mod impls_tuple;
 mod impls_array;
 mod impls_vec;
+#[cfg(feature = "std")]
+mod impls_hashset;
 mod impls_other;
 mod impls_option;
 mod impls_ipaddress;
@@ -95,4 +97,32 @@ pub trait BorrowByteDecode<'de> {
     {
         Self::decode_inner(input, None, None)
     }
+}
+
+
+#[inline]
+fn get_count_and_try_count<I: BufRead>(input: &I, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<(usize, Option<usize>)>
+{
+    let mut count = 0;
+    let mut try_count = None;
+
+    if let Some(fr) = fattr {
+        if let Some(count_tmp) = fr.count {
+            count = count_tmp;
+        }
+        else if let Some(_) = fr.try_count {
+            try_count = fr.try_count;
+        } else if let Some(byte_count) = fr.byte_count_outside {
+            count = input.take_byteorder_uint(byte_count, crate::get_byteorder(cattr, fattr))? as usize;
+        }
+        else {
+            // default: take 1 byte
+            count = input.take_u8()? as usize;
+        }
+    } else {
+        // default: take 1 byte
+        count = input.take_u8()? as usize;
+    }
+
+    Ok((count, try_count))
 }

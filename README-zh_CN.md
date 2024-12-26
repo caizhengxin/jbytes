@@ -35,11 +35,11 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `PhantomData`
 - [ ] `HashMap`
 - [ ] `HashSet`
-- [ ] `MacAddress`
+- [x] `MacAddress`
 - [x] `std::net::Ipv4Addr`
 - [x] `std::net::Ipv6Addr`
 - [x] `std::net::IpAddr`
-- [ ] `NetAddress`
+- [x] `NetAddress`
 - [ ] `HexString`
 - [ ] `DateTime`
 - [ ] `Bit`
@@ -69,7 +69,6 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `byteorder=<"BE"|"LE">`: 这是struct/enum类型局部字段字节序，BE(大端字节序)/LE(小端字节序), eg: `#[jppe(byteorder="LE")]`
 - [x] `length=<num|variable>`: 数据长度, 支持`int/&str/String/&[u8]`类型, eg: [length_example](./tests/test_modifier_length.rs).
 - [x] `offset=<num|variable>`: 字节流偏移，表示跳过几个字节.
-- [x] `count==<num|variable>`: 数据条目数量, 支持`Vec/HashMap`类型.
 - [x] `full=<int>`: 主要用于encode填充值, 默认为0, 常常用于offset偏移之后进行encode编码填充.
 - [x] `untake`: 表示解析内容, 但是不取走字节, 后面的解析任然可以读取该字节.
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
@@ -87,12 +86,17 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
   + [x] `String/&str/&[u8]`: 提前取n个字节映射长度, eg: [byte_count](./tests/test_modifier_byte_count.rs).
   + [x] `HexString/HexBytes`: 提前取n个字节映射长度, eg: [byte_count](./tests/test_modifier_byte_count.rs).
   + [x] `Enum`: 提前取n个字节映射枚举索引, eg: [enum_byte_count](./tests/test_type_enum_byte_count.rs).
-  + [x] `Vec<T>`
 - [x] `skip`: 数据类型需要实现`Default`trait.
 - [x] `skip_encode`: 跳过encode函数.
 - [x] `skip_decode`: 数据类型需要实现`Default`trait.
 - [ ] `check_value`：主要用于检查结果是否正常, 异常会返回错误
 - [x] `default`: eg: [default example](./crates/jdefault-rs/tests/test_jppe.rs)
+
+> 容器类型修饰符，比如：Vec/HashMap/HashSet等
+
+- [x] `count=<num|variable>`: 表示容器数据数量, 支持`Vec/HashMap/HashSet`类型。
+- [x] `try_count`: 表示容器数据数量, 如果不足，不会返回解析错误，支持`Vec/HashMap/HashSet`类型。
+- [x] `byte_count_outside`：类似`byte_count`，该修饰符应用`Vec/HashMap/HashSet`类型。
 
 > enum branch
 
