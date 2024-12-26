@@ -22,54 +22,51 @@ pub enum NetAddress {
     V6(Ipv6Addr),
     Mac(MacAddress),
     Usize(usize),
-    // String(String),
 }
 
 
 impl NetAddress {
+    /// Returns [true] if this is a ipv4 address.
     #[inline]
     pub fn is_ipv4(&self) -> bool {
         matches!(self, Self::V4(_))
     }
 
+    /// Returns [true] if this is a ipv6 address.
     #[inline]
     pub fn is_ipv6(&self) -> bool {
         matches!(self, Self::V6(_))
     }
 
+    /// Returns [true] if this is a mac address.
     #[inline]
     pub fn is_mac(&self) -> bool {
         matches!(self, Self::Mac(_))
     }
 
+    /// Returns [true] if this is a integer address.
     #[inline]
     pub fn is_usize(&self) -> bool {
         matches!(self, Self::Usize(_))
     }
 
-    // #[inline]
-    // pub fn is_string(&self) -> bool {
-    //     matches!(self, Self::String(_))
-    // }
-
+    /// Returns [true] if this is a broadcast address.
     #[inline]
     pub fn is_broadcast(&self) -> bool {
         match self {
-    
-            Self::V4(v) => v.is_broadcast(),
-    
-            Self::Mac(v) => v.is_broadcast(),
+            Self::V4(addr) => addr.is_broadcast(),
+            Self::Mac(addr) => addr.is_broadcast(),
             _ => false,
         }
     }
 
+    /// Returns [true] if this is a multicast address.
     #[inline]
     pub fn is_multicast(&self) -> bool {
         match self {
-    
-            Self::V4(v) => v.is_multicast(),
-    
-            Self::V6(v) => v.is_multicast(),
+            Self::V4(addr) => addr.is_multicast(),
+            Self::V6(addr) => addr.is_multicast(),
+            Self::Mac(addr) => addr.is_multicast(),
             _ => false,
         }
     }
@@ -85,6 +82,7 @@ impl Default for NetAddress {
 
 impl FromStr for NetAddress {
     type Err = NetAddressParseError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains(':') {
             // Ipv6
@@ -106,8 +104,6 @@ impl FromStr for NetAddress {
             return Ok(Self::Usize(v));
         }
 
-        // Ok(Self::String(s.to_string()))
-
         Err(Self::Err::InvalidAddress(s.to_string()))
     }
 }
@@ -120,7 +116,6 @@ impl fmt::Display for NetAddress {
             Self::V6(v) => write!(f, "{v}"),
             Self::Usize(v) => write!(f, "{v}"),
             Self::Mac(v) => write!(f, "{v}"),
-            // Self::String(v) => write!(f, "{v}"),
         }   
     }
 }
