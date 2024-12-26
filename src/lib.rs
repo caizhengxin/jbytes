@@ -56,3 +56,13 @@ pub fn encode<T: ByteEncode>(t: T) -> JResult<Buffer> {
 
     Ok(buf)
 }
+
+
+#[inline]
+pub fn encode_borrow<T: BorrowByteEncode>(t: T) -> JResult<Buffer> {
+    let mut buf = Buffer::new();
+
+    t.encode_inner(&mut buf, None, None)?;
+
+    Ok(buf)
+}

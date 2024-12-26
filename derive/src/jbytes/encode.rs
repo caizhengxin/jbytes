@@ -7,14 +7,10 @@ use super::attribute::{FieldAttributes, ContainerAttributes};
 pub fn generate_encode_body2(fn_body: &mut StreamBuilder, attributes: &FieldAttributes, is_self: bool) -> Result<()> {
     // offset and full
     if let Some(offset) = &attributes.offset {
-        let mut full = "0x00".to_string();
-
-        if let Some(full_tmp) = &attributes.full {
-            full = full_tmp.to_string();
-        }
+        let full_value = if let Some(full_tmp) = &attributes.full { full_tmp.to_string() } else { "0x00".to_string() };
 
         fn_body.push_parsed(format!("
-            for i in 0..{} {{ input.push({full}); }}
+            for i in 0..{} {{ buffer.push_u8({full_value})?; }}
         ", offset.to_code2(is_self, false)))?;
     }
 

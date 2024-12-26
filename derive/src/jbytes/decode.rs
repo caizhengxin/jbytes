@@ -8,7 +8,7 @@ use super::parse::AttrValue;
 pub fn generate_decode_body2(fn_body: &mut StreamBuilder, attributes: &FieldAttributes) -> Result<()> {
     // offset
     if let Some(offset) = &attributes.offset {
-        fn_body.push_parsed(format!("let (input, _) = jbytes::input_take(input, ({}) as usize)?;", offset.to_string()))?;
+        fn_body.push_parsed(format!("input.advance(({}) as usize);", offset.to_string()))?;
     }
 
     Ok(())
@@ -50,10 +50,12 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
     }
     else {
         // untake
-        let untake = if attributes.untake { "_" } else { "input" };
+        if attributes.untake {
+            fn_body.push_parsed("let position = input.get_position();")?;
+        }
 
         if let Some(if_expr) = &attributes.if_expr {
-            fn_body.push_parsed(format!("let ({untake}, {name}): (&[u8], {rtype}) = if {if_expr} {{ 
+            fn_body.push_parsed(format!("let ({name}): (&[u8], {rtype}) = if {if_expr} {{ 
                 let (input, value) = {crate_name}::decode(input, cattr_new, fattr_new)?;
                 (input, Some(value))
             }} else {{ (input, None) }};"))?;
@@ -61,6 +63,10 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
         else {
             fn_body.push_parsed(format!("let {name}: {rtype} = {crate_name}::decode_inner(input, cattr_new, fattr_new)?;"))?;
         }
+
+        if attributes.untake {
+            fn_body.push_parsed("input.set_position(position);")?;
+        }    
 
         // value expr
         if let Some(value_expr) = &attributes.value_decode {

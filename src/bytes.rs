@@ -17,18 +17,6 @@ impl<T> Bytes<T> {
     pub fn new(data: T) -> Self {
         Self { data, position: Cell::new(0) }
     }
-
-    /// Reset the internal cursor of the `self`.
-    #[inline]
-    pub fn reset_position(&mut self) {
-        self.position = Cell::new(0);
-    }
-
-    /// Set the internal cursor of the `self`.
-    #[inline]
-    pub fn set_position(&mut self, position: usize) {
-        self.position = Cell::new(position);
-    }
 }
 
 
@@ -53,6 +41,16 @@ where
     #[inline]
     fn get_data(&self) -> &'_ [u8] {
         self.data.as_ref()
+    }
+
+    #[inline]
+    fn set_position(&self, position: usize) {
+        self.position.set(position);
+    }
+
+    #[inline]
+    fn reset_position(&self) {
+        self.position.set(0)
     }
 
     #[inline]
