@@ -27,9 +27,6 @@ pub struct FieldAttrModifiers<'a> {
     pub offset: Option<usize>,
     // string/stream/.. length
     pub length: Option<usize>,
-    // list/vec/.. count
-    pub count: Option<usize>,
-    pub try_count: Option<usize>,
     // byte stream byteorder
     pub byteorder: Option<ByteOrder>,
     // Unmoved byte stream
@@ -40,6 +37,11 @@ pub struct FieldAttrModifiers<'a> {
     pub bits_start: bool,
     pub byte_count: Option<usize>,
     pub remaining: bool,
+
+    // list/vec/..
+    pub count: Option<usize>,
+    pub try_count: Option<usize>,
+    pub byte_count_outside: Option<usize>,
 
     // key value
     pub key: Option<&'a [u8]>,

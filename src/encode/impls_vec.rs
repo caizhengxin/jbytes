@@ -16,7 +16,7 @@ impl<T: ByteEncode> ByteEncode for Vec<T> {
         let mut nbytes = 0;
 
         if let Some(fr) = fattr {
-            if let Some(byte_count) = fr.byte_count {
+            if let Some(byte_count) = fr.byte_count_outside {
                 nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
             }
             else if fr.count.is_some() { }
@@ -47,7 +47,7 @@ impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
         let mut nbytes = 0;
 
         if let Some(fr) = fattr {
-            if let Some(byte_count) = fr.byte_count {
+            if let Some(byte_count) = fr.byte_count_outside {
                 nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
             }
             else if fr.count.is_some() { }
@@ -111,19 +111,19 @@ mod tests {
         assert_eq!(vec![0x0001_u16, 0x0002].encode_inner(&mut buffer, None, Some(&fattr)).unwrap(), 4);
         assert_eq!(*buffer, vec![0x00, 0x01, 0x00, 0x02]);
 
-        // test `byte_count` example
+        // test `byte_count_outside` example
         let mut buffer = Buffer::new();
         let fattr = FieldAttrModifiers {
-            byte_count: Some(2),
+            byte_count_outside: Some(2),
             ..Default::default()
         };
         assert_eq!(vec![0x0001_u16, 0x0002].encode_inner(&mut buffer, None, Some(&fattr)).unwrap(), 6);
         assert_eq!(*buffer, vec![0x00, 0x02, 0x00, 0x01, 0x00, 0x02]);
 
-        // test `byte_count` little-endian example
+        // test `byte_count_outside` little-endian example
         let mut buffer = Buffer::new();
         let fattr = FieldAttrModifiers {
-            byte_count: Some(2),
+            byte_count_outside: Some(2),
             byteorder: Some(ByteOrder::Le),
             ..Default::default()
         };
