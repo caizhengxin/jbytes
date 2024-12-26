@@ -155,7 +155,7 @@ impl DeriveEnum {
                         value = (branch) as usize;
                     }
                     else if let Some(byte_count) = fr.byte_count {
-                        value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr, fattr))?;
+                        value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr, fattr))? as usize;
                     }
                     else {
                         value = input.take_u8()? as usize;
@@ -342,7 +342,7 @@ impl DeriveEnum {
                                     if let Some(branch) = fr.branch {{
                                     }}
                                     else if let Some(byte_count) = fr.byte_count {{
-                                        r_nbytes += buffer.push_byteorder_uint({variant_index}, byte_count, jbytes::get_byteorder(cattr, fattr))?;
+                                        r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr, fattr))?;
                                     }}
                                     else {{
                                         {default_byte_count_1byte_code}

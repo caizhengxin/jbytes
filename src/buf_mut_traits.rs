@@ -1223,13 +1223,13 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
+    fn push_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
         self.push_be_uint(value, nbytes)
     }
 
     /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_be_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
+    fn push_be_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
         let start = match mem::size_of_val(&value).checked_sub(nbytes) {
             Some(start) => start,
             None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
@@ -1240,7 +1240,7 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes an unsigned n-byte integer to `self` in little-endian byte order.
     #[inline]
-    fn push_le_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
+    fn push_le_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
         let slice = value.to_le_bytes();
         let slice = match slice.get(..nbytes) {
             Some(slice) => slice,
@@ -1252,7 +1252,7 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes an unsigned n-byte integer to `self` in native-endian byte order.
     #[inline]
-    fn push_ne_uint(&mut self, value: usize, nbytes: usize) -> JResult<usize> {
+    fn push_ne_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
         if cfg!(target_endian = "big") {
             self.push_be_uint(value, nbytes)
         } else {
@@ -1262,7 +1262,7 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes an unsigned n-byte integer to `self`.
     #[inline]
-    fn push_byteorder_uint(&mut self, value: usize, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+    fn push_byteorder_uint(&mut self, value: u64, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
             ByteOrder::Be => self.push_be_uint(value, nbytes),
             ByteOrder::Le => self.push_le_uint(value, nbytes),
@@ -1271,25 +1271,25 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes a signed n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
-        self.push_uint(value as usize, nbytes)
+    fn push_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_uint(value as u64, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in big-endian byte order.
     #[inline]
-    fn push_be_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
-        self.push_be_uint(value as usize, nbytes)
+    fn push_be_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_be_uint(value as u64, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in little-endian byte order.
     #[inline]
-    fn push_le_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
-        self.push_le_uint(value as usize, nbytes)
+    fn push_le_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_le_uint(value as u64, nbytes)
     }
 
     /// Writes a signed n-byte integer to `self` in native-endian byte order.
     #[inline]
-    fn push_ne_int(&mut self, value: isize, nbytes: usize) -> JResult<usize> {
+    fn push_ne_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
         if cfg!(target_endian = "big") {
             self.push_be_int(value, nbytes)
         } else {
@@ -1299,7 +1299,7 @@ pub trait BufWriteMut: BufReadMut {
 
     /// Writes a signed n-byte integer to `self`.
     #[inline]
-    fn push_byteorder_int(&mut self, value: isize, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+    fn push_byteorder_int(&mut self, value: i64, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
         match byteorder {
             ByteOrder::Be => self.push_be_int(value, nbytes),
             ByteOrder::Le => self.push_le_int(value, nbytes),

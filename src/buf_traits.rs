@@ -511,25 +511,25 @@ pub trait BufRead {
 
     /// Reads an unsigned n-byte integer from `self` in big-endian byte order.
     #[inline]
-    fn take_uint(&self, nbytes: usize) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_be_bytes, nbytes);
+    fn take_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_take_bytes!(self, u64::from_be_bytes, nbytes);
     }
 
     /// Reads an unsigned n-byte integer from `self` in big-endian byte order.
     #[inline]
-    fn take_be_uint(&self, nbytes: usize) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_be_bytes, nbytes);
+    fn take_be_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_take_bytes!(self, u64::from_be_bytes, nbytes);
     }
 
     /// Reads an unsigned n-byte integer from `self` in little-endian byte order.
     #[inline]
-    fn take_le_uint(&self, nbytes: usize) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_le_bytes, nbytes);
+    fn take_le_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_take_bytes!(self, u64::from_le_bytes, nbytes);
     }
 
     /// Reads an unsigned n-byte integer from `self` in native-endian byte order.
     #[inline]
-    fn take_ne_uint(&self, nbytes: usize) -> JResult<usize> {
+    fn take_ne_uint(&self, nbytes: usize) -> JResult<u64> {
         if cfg!(target_endian = "big") {
             self.take_be_uint(nbytes)
         } else {
@@ -539,7 +539,7 @@ pub trait BufRead {
 
     /// Reads an unsigned n-byte integer from `self`.
     #[inline]
-    fn take_byteorder_uint(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+    fn take_byteorder_uint(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<u64> {
         match byteorder {
             ByteOrder::Be => self.take_be_uint(nbytes),
             ByteOrder::Le => self.take_le_uint(nbytes),
@@ -548,25 +548,25 @@ pub trait BufRead {
 
     /// Reads a signed n-byte integer from `self` in big-endian byte order.
     #[inline]
-    fn take_int(&self, nbytes: usize) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_be_bytes, nbytes);
+    fn take_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_take_bytes!(self, i64::from_be_bytes, nbytes);
     }
 
     /// Reads a signed n-byte integer from `self` in big-endian byte order.
     #[inline]
-    fn take_be_int(&self, nbytes: usize) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_be_bytes, nbytes);
+    fn take_be_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_take_bytes!(self, i64::from_be_bytes, nbytes);
     }
 
     /// Reads a signed n-byte integer from `self` in little-endian byte order.
     #[inline]
-    fn take_le_int(&self, nbytes: usize) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_le_bytes, nbytes);
+    fn take_le_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_take_bytes!(self, i64::from_le_bytes, nbytes);
     }
 
     /// Reads a signed n-byte integer from `self` in native-endian byte order.
     #[inline]
-    fn take_ne_int(&self, nbytes: usize) -> JResult<isize> {
+    fn take_ne_int(&self, nbytes: usize) -> JResult<i64> {
         if cfg!(target_endian = "big") {
             self.take_be_int(nbytes)
         } else {
@@ -576,7 +576,7 @@ pub trait BufRead {
 
     /// Reads a signed n-byte integer from `self`.
     #[inline]
-    fn take_byteorder_int(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<isize> {
+    fn take_byteorder_int(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<i64> {
         match byteorder {
             ByteOrder::Be => self.take_be_int(nbytes),
             ByteOrder::Le => self.take_le_int(nbytes),
