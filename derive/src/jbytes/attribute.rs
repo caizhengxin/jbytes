@@ -121,7 +121,6 @@ pub struct FieldAttributes {
 
     // branch
     pub branch: Option<AttrValue>,
-    pub branch_option: Option<AttrValue>,
     pub branch_bits: Option<String>,
     pub branch_bits_value: Option<String>,
     pub branch_range: Option<String>,
@@ -158,10 +157,7 @@ impl FieldAttributes {
 
         let count = self.count.to_code(is_self, is_deref);
         let try_count = self.try_count.to_code(is_self, is_deref);
-        let mut branch = self.branch.to_code(is_self, is_deref);
-        if let Some(branch_option) = &self.branch_option {
-            branch = branch_option.to_code(is_self, is_deref, false);
-        }
+        let branch = self.branch.to_code(is_self, is_deref);
         let key = self.key.to_code(false, false);
         let split = self.split.to_code(false, false);
         let linend = self.linend.to_code(false, false);
@@ -230,7 +226,6 @@ impl FromAttribute for FieldAttributes {
                         "split" => result.split = Some(AttrValue::parse_bytes(&val)?),
                         "linend" | "end_with" => result.linend = Some(AttrValue::parse_bytes(&val)?),
                         "branch" => result.branch = Some(AttrValue::parse_usize(&val)?),
-                        "branch_option" => result.branch_option = Some(AttrValue::parse_option_string(&val)?),
                         "branch_range" => result.branch_range = Some(parse_value_string(&val)?),
                         "branch_value" => result.branch_value = Some(parse_value_string(&val)?),
                         "branch_bits" => result.branch_bits = Some(parse_value_string(&val)?),

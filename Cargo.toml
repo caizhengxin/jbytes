@@ -21,6 +21,7 @@ keywords = [
 license = "MIT OR Apache-2.0"
 include = [
     "src/*",
+    "tests/*",
     "benches/*",
     "examples/*",
     "Cargo.toml",

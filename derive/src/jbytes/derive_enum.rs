@@ -131,25 +131,25 @@ impl DeriveEnum {
 
         // match value {
         //     0 => {
-        //         return Ok((input, Self::V0));
+        //         return Ok(Self::V0);
         //     },
         //     1 => {
         //         let v0: u8 = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
-        //         return Ok((input, Self::V1(v0)));
+        //         return Ok(Self::V1(v0));
         //     },
         //     2 => {
         //         let v0: u8 = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
         //         let v1: u8 = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
-        //         return Ok((input, Self::V2(v0, v1)));
+        //         return Ok(Self::V2(v0, v1));
         //     },
         //     3 => {
         //         let v0: (u8, u16) = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
-        //         return Ok((input, Self::V3(v0)));
+        //         return Ok(Self::V3(v0));
         //     },
         //     4 => {
         //         let a: u8 = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
         //         let b: u16 = ByteDecode::decode(input, Some(&cattr), Some(&fattr));
-        //         return Ok((input, Self::V4 { a, b }));
+        //         return Ok(Self::V4 { a, b });
         //     },
         //     _ => {
 
@@ -157,7 +157,7 @@ impl DeriveEnum {
         // }
 
         if self.variants.is_empty() {
-            fn_body.push_parsed("Ok((input, Self {{}}))")?;
+            fn_body.push_parsed("Ok(Self {{}})")?;
         }
         else {
             let code = "
@@ -431,21 +431,33 @@ impl<'a> Iterator for EnumVariantIterator<'a> {
         // let mut idx = self.idx;
         let variant = self.variants.get(self.idx)?;
 
-        if let Some(value) = &variant.value {
+        let val_string = if let Some(value) = &variant.value {
             // Literal
-            let val_string = value.to_string();
+            Some(value.to_string())
+        } else if let Ok(Some(attributes)) = variant.attributes.get_attribute::<FieldAttributes>() {
+            if attributes.branch_range.is_some() {
+                attributes.branch_range
+            }
+            else if attributes.branch_value.is_some() {
+                attributes.branch_value
+            }
+            else {
+                None
+            }
+        } else { None };
 
+        if let Some(val_string) = val_string {
             if val_string.starts_with("0x") {
                 self.curruent_idx = usize::from_str_radix(&val_string[2..], 16).unwrap();
             }
+            else if let Some(offset) = val_string.find("..=") {
+                self.curruent_idx = val_string[offset + 3..].parse::<usize>().unwrap();
+            }
+            else if let Some(offset) = val_string.find("..") {
+                self.curruent_idx = val_string[offset + 2..].parse::<usize>().unwrap();
+            }
             else {
                 self.curruent_idx = val_string.parse::<usize>().unwrap();
-            }
-        }
-
-        if let Ok(Some(attributes)) = variant.attributes.get_attribute::<FieldAttributes>() {
-            if let Some(branch_value) = attributes.branch_value {
-                self.curruent_idx = branch_value.parse::<usize>().unwrap();
             }    
         }
 
