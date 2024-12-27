@@ -55,10 +55,9 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
         }
 
         if let Some(if_expr) = &attributes.if_expr {
-            fn_body.push_parsed(format!("let ({name}): (&[u8], {rtype}) = if {if_expr} {{ 
-                let (input, value) = {crate_name}::decode(input, cattr_new, fattr_new)?;
-                (input, Some(value))
-            }} else {{ (input, None) }};"))?;
+            fn_body.push_parsed(format!("let {name}: {rtype} = if {if_expr} {{ 
+                {crate_name}::decode_inner(input, cattr_new, fattr_new)?
+            }} else {{ None }};"))?;
         }
         else {
             fn_body.push_parsed(format!("let {name}: {rtype} = {crate_name}::decode_inner(input, cattr_new, fattr_new)?;"))?;
