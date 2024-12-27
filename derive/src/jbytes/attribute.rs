@@ -103,6 +103,7 @@ pub struct FieldAttributes {
     pub bits: Option<AttrValue>,
     pub bits_start: bool,
     pub byte_count: Option<AttrValue>,
+    pub byte_count_outside: Option<AttrValue>,
     pub default_value: Option<String>,
     pub default_bool: bool,
 
@@ -167,12 +168,13 @@ impl FieldAttributes {
         let bits = self.bits.to_code(is_self, is_deref);
         let bits_start = self.bits_start;
         let byte_count = self.byte_count.to_code(is_self, is_deref);
+        let byte_count_outside = self.byte_count_outside.to_code(is_self, is_deref);
 
         if self.is_use {
             let value = format!("let fattr_new = jbytes::FieldAttrModifiers {{
                 byteorder: {byteorder}, branch: {branch}, length: {length}, count: {count}, try_count: {try_count},
                 split: {split}, linend_value: {linend}, bits: {bits}, bits_start: {bits_start},
-                key: {key}, byte_count: {byte_count},
+                key: {key}, byte_count: {byte_count}, byte_count_outside: {byte_count_outside},
                 ..Default::default()}}; let fattr_new = Some(&fattr_new);");
 
             if value.contains(": Some(") || value.contains(": true") || value.contains("if let Some(") {
@@ -234,6 +236,7 @@ impl FromAttribute for FieldAttributes {
                         "branch_bits" => result.branch_bits = Some(parse_value_string(&val)?),
                         "branch_bits_value" => result.branch_bits_value = Some(parse_value_string(&val)?),
                         "byte_count" | "byte_size" => result.byte_count = Some(AttrValue::parse_usize(&val)?),
+                        "byte_count_outside" | "byte_size_outside" => result.byte_count_outside = Some(AttrValue::parse_usize(&val)?),
                         "default_value" | "default" => result.default_value = Some(parse_value_string(&val)?),
 
                         "bits" => result.bits = Some(AttrValue::parse_usize(&val)?),

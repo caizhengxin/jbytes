@@ -36,16 +36,16 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
     }
     else if attributes.from_str_bool {
         fn_body.push_parsed(format!("
-        let (input, {name}) = BorrowByteDecode::decode(input, cattr_new, fattr_new)?;
+        let {name} = jbytes::BorrowByteDecode::decode_inner(input, cattr_new, fattr_new)?;
         let {name} = if let Ok(value) = {rtype}::from_str({name}) {{value}} else {{ 
-            return Err(jbytes::make_error(input, jbytes::ErrorKind::Fail {{ offset: input.len() }}));
+            return Err(jbytes::make_error(input.get_position(), jbytes::ErrorKind::Fail));
          }};"))?;
     }
     else if let Some(from_str) = &attributes.from_str {
         fn_body.push_parsed(format!("
-        let (input, {name}) = BorrowByteDecode::decode(input, cattr_new, fattr_new)?;
+        let {name} = jbytes::BorrowByteDecode::decode_inner(input, cattr_new, fattr_new)?;
         let {name} = if let Ok(value) = {from_str}::from_str({name}) {{value}} else {{ 
-            return Err(jbytes::make_error(input, jbytes::ErrorKind::Fail {{ offset: input.len() }}));
+            return Err(jbytes::make_error(input.get_position(), jbytes::ErrorKind::Fail));
          }};"))?;
     }
     else {
