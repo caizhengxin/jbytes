@@ -14,8 +14,7 @@ pub(super) fn encode_inner<B: BufWriteMut>(buffer: &mut B, cattr: Option<&Contai
 
     // key and split
     if let Some(fr) = fattr {
-        if let Some(length) = fr.length {
-            r_nbytes += buffer.push_u8(length as u8)?;
+        if let Some(_length) = fr.length {
         }
         else if let Some(byte_count) = fr.byte_count {
             r_nbytes += buffer.push_byteorder_uint(data.len() as u64, byte_count, get_byteorder(cattr, fattr))?;

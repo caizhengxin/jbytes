@@ -50,12 +50,26 @@ impl DeriveEnum {
     pub fn generate_borrow_decode(&self, generator: &mut Generator) -> Result<()> {
         let crate_name = "jbytes::BorrowByteDecode";
 
-        generator
-            .impl_for_with_lifetimes("BorrowByteDecode", ["de"])
+        let mut impl_for = if let Some(lifetimes) = &self.lifetimes {
+            generator
+            .impl_for(format!("{crate_name}{lifetimes}"))    
+        }
+        else {
+            generator
+            .impl_for_with_lifetimes(crate_name, ["de"])
+        };
+
+        let lifetimes = if let Some(lifetimes) = &self.lifetimes {
+            lifetimes.trim_start_matches('<').trim_end_matches('>')
+        }
+        else { 
+            "'de"
+        };
+
+        impl_for
             .generate_fn("decode_inner")
             .with_generic_deps("I", ["jbytes::BufRead"])
-            .with_lifetime("db")
-            .with_arg("input", "&'de I")
+            .with_arg("input", format!("&{} I", lifetimes))
             .with_arg("cattr", "Option<&jbytes::ContainerAttrModifiers>")
             .with_arg("fattr", "Option<&jbytes::FieldAttrModifiers>")
             .with_return_type("jbytes::JResult<Self>")
@@ -148,7 +162,6 @@ impl DeriveEnum {
         else {
             let code = "
                 let value;
-                let mut input = input;
 
                 if let Some(fr) = fattr {
                     if let Some(branch) = fr.branch {
@@ -336,10 +349,12 @@ impl DeriveEnum {
 
                         variant_case.group(Delimiter::Brace, |variant_body| {
                             variant_body.push_parsed(attributes.to_code(true, false))?;
+                            
                             let default_byte_count_1byte_code = if self.attributes.byte_count_disable { "".to_string() } else { format!("r_nbytes += buffer.push_u8({variant_index} as u8)?;")};
                             let code = format!("        
                                 if let Some(fr) = fattr {{
-                                    if let Some(branch) = fr.branch {{
+                                    if let Some(_branch) = fr.branch {{
+                                        // This is a placeholder condition
                                     }}
                                     else if let Some(byte_count) = fr.byte_count {{
                                         r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr, fattr))?;
@@ -364,7 +379,7 @@ impl DeriveEnum {
                                             attributes.get_variable_name = self.attributes.get_variable_name.clone();
 
                                             if attributes.is_use {
-                                                variant_body.push_parsed(attributes.to_code(false, false))?;
+                                                variant_body.push_parsed(attributes.to_code(false, true))?;
                                             }
 
                                             generate_encode_body(variant_body, &attributes, crate_name, &ident.to_string(), false)?;
