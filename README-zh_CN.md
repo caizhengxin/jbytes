@@ -66,33 +66,28 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 
 主要用于修饰struct/enum里面某个字段内容
 
-- [x] `byteorder=<"BE"|"LE"|variable(BE=0,LE=1)>`: 表示字节序，BE(大端字节序)/LE(小端字节序), eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
-- [x] `length=<num|variable>`: 表示读取数据的长度, 支持`int/&str/String/&[u8]/Vec`类型, eg: [length example](./tests/test_modifier_length.rs)。
+- [x] `byteorder=<"BE"|"LE"|variable(BE=0,LE=1)>`: 表示字节序，BE(大端字节序)/LE(小端字节序)，eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
+- [x] `length=<num|variable>`: 表示读取数据的长度，支持`int/&str/String/&[u8]/Vec`类型，eg: [length example](./tests/test_modifier_length.rs)。
 - [x] `offset=<num|variable>`: 表示从当前位置向前前进n个位置，实现数据流的位置偏移，eg: [offset example](./tests/test_modifier_offset.rs)。
-- [x] `full=<int>`: 用于encode填充值, 默认为0, 常常用于offset偏移之后进行encode编码填充, eg: [full example](./tests/test_modifier_full.rs。
+- [x] `full=<int>`: 表示用于`encode`编码填充值, 默认为0, 常常用于offset偏移之后进行`encode`编码填充, eg: [full example](./tests/test_modifier_full.rs)。
+- [x] `byte_count=<1..8>`: 表示取几个字节转成整型，代表后续需要读取的字节流长度，eg：[byte_count example](./tests/test_modifier_bytecount.rs)。
 - [x] `untake`: 表示读取数据不移动位置，后续可以继续从该位置读取数据，eg: [untake example](./tests/test_modifier_untake.rs)。
+- [x] `encode_value`: value处理表达式，eg: [encode_value example](./tests/test_modifier_value.rs)。
+- [x] `decode_value`: value处理表达式，eg: [decode_value example](./tests/test_modifier_value.rs)。
+- [x] `variable_name`: 指定整型类型缓存变量，并通过`get_variable_name`修饰符在其他`Struct/Enum`使用，eg: [variable_name example](./tests/test_modifier_variable_name.rs)。
+- [x] `skip`: 表示跳过该字段的`encode/decode`函数，类型需要实现`Default`trait，eg：[skip example](./tests/test_modifier_skip.rs)。
+- [x] `skip_encode`: 表示跳过该字段的`encode`函数，eg：[skip example](./tests/test_modifier_skip.rs)。
+- [x] `skip_decode`: 表示跳过该字段的`decode`函数，类型需要实现`Default`trait，eg：[skip example](./tests/test_modifier_skip.rs)。
+- [x] `if_expr=<bool expr>`: 指定`if`条件表达式，支持`Option<T>`类型，eg: [if_expr example](./tests/test_modifier_if_expr.rs)。
+- [x] `encode_with`: 自定义encode函数，eg: [with example](./tests/test_modifier_with.rs)。
+- [x] `decode_with`: 自定义decode函数，eg: [with example](./tests/test_modifier_with.rs)。
+- [x] `with`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with_1.rs)。
+- [x] `with_args`: 自定义encode/decode函数参数，eg: [with example](./tests/test_modifier_with_args.rs)。
 
 
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
 - [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split_example](./tests/test_type_hashmap.rs)
-- [x] `if_expr <bool expr>`: 指定if表达式, 支持`Option<T>`类型, eg: [if_expr_example](./tests/test_modifier_if_expr.rs).
-
-- [x] `encode_with`: 自定义encode函数, eg: [with example](./tests/test_modifier_with.rs).
-- [x] `decode_with`: 自定义decode函数, eg: [with example](./tests/test_modifier_with.rs).
-- [x] `with`: 自定义encode/decode函数, eg: [with example](./tests/test_modifier_with_1.rs).
-- [x] `with_args`: 自定义encode/decode函数参数, eg: [with example](./tests/test_modifier_with_args.rs).
-
-- [x] `encode_value`: value处理表达式, eg: `#[jppe(encode_value="length * 2")]`.
-- [x] `decode_value`: value处理表达式, eg: `#[jppe(decode_value="length / 2")]`.
-- [x] `variable_name`: 指定整型类型缓存变量, eg: [variable_name_example](./tests/test_modifier_variable_name.rs).
-- [x] `byte_count=<1|2|4|8>`: 指定`byte_count`字节数量, 会取走对应字节映射数字, 常常用于下面类型:
-  + [x] `String/&str/&[u8]`: 提前取n个字节映射长度, eg: [byte_count](./tests/test_modifier_byte_count.rs).
-  + [x] `HexString/HexBytes`: 提前取n个字节映射长度, eg: [byte_count](./tests/test_modifier_byte_count.rs).
-  + [x] `Enum`: 提前取n个字节映射枚举索引, eg: [enum_byte_count](./tests/test_type_enum_byte_count.rs).
-- [x] `skip`: 数据类型需要实现`Default`trait.
-- [x] `skip_encode`: 跳过encode函数.
-- [x] `skip_decode`: 数据类型需要实现`Default`trait.
 - [ ] `check_value`：主要用于检查结果是否正常, 异常会返回错误
 - [x] `default`: eg: [default example](./crates/jdefault-rs/tests/test_jppe.rs)
 
