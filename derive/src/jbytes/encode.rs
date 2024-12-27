@@ -26,11 +26,11 @@ pub fn generate_encode_body(fn_body: &mut StreamBuilder, attributes: &FieldAttri
     let with_args = if let Some(value) = &attributes.with_args {format!("{self_arg}{value}")} else { "".to_string() };
 
     if let Some(func) = &attributes.with_encode {
-        fn_body.push_parsed(format!("{func}(buffer, cattr_new, fattr_new, {der_arg}{self_arg}{field}, {with_args});"))?;
+        fn_body.push_parsed(format!("r_nbytes += {func}(buffer, cattr_new, fattr_new, {der_arg}{self_arg}{field}, {with_args})?;"))?;
         return Ok(());
     }
     else if let Some(func) = &attributes.with {
-        fn_body.push_parsed(format!("{func}::encode(buffer, cattr_new, fattr_new, {der_arg}{self_arg}{field}, {with_args});"))?;
+        fn_body.push_parsed(format!("r_nbytes += {func}::encode(buffer, cattr_new, fattr_new, {der_arg}{self_arg}{field}, {with_args})?;"))?;
         return Ok(());
     }
     else if attributes.skip || attributes.skip_encode {

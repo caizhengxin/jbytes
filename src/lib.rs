@@ -42,6 +42,23 @@ pub use encode::{ByteEncode, BorrowByteEncode};
 // use crate::std::*;
 
 
+pub mod prelude {
+    pub use crate::buffer::Buffer;
+    pub use crate::bytes::Bytes;
+    pub use crate::buf_mut_traits::{BufReadMut, BufWriteMut};
+    pub use crate::buf_traits::{BufRead, BufWrite};
+    pub use crate::errors::{JResult, ErrorKind, make_error};
+    
+    pub use crate::modifiers::{ContainerAttrModifiers, FieldAttrModifiers,  get_byteorder};
+    pub use crate::byteorder::ByteOrder;
+    pub use crate::decode::{ByteDecode, BorrowByteDecode};
+    pub use crate::encode::{ByteEncode, BorrowByteEncode};
+
+    #[cfg(feature = "jbytes_derive")]
+    pub use jbytes_derive::{ByteDecode, ByteDecode, BorrowByteDecode, BorrowByteEncode};    
+}
+
+
 #[inline]
 pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: I) -> JResult<T> {
     T::decode_inner(&Bytes::new(input), None, None)

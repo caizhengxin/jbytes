@@ -1,6 +1,8 @@
 use crate::std::*;
-use jkcenum::{JkcEnum, errors::FromStrParseError};
-// use jkcenum::errors::FromStrParseError;
+use jkcenum::{
+    JkcEnum, FromInt,
+    errors::{FromStrParseError, FromIntParseError},
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -20,5 +22,9 @@ pub enum ByteOrder {
 impl ByteOrder {
     pub fn parse(value: &str) -> Result<Self, FromStrParseError> {
         Self::from_str(value)
+    }
+
+    pub fn parse_int(value: isize) -> Result<Self, FromIntParseError> {
+        Self::from_int(value)
     }
 }
