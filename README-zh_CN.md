@@ -52,10 +52,10 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 
 > 通用修饰符
 
-- [x] `byteorder=<"BE"|"LE">`: 这是struct/enum类型全局字节序，BE(大端字节序)/LE(小端字节序), eg: `#[jppe(byteorder="LE")]`.
-- [x] `encode_with`: 自定义encode函数, eg: [with_encode_example](./tests/test_modifier_with.rs).
-- [x] `decode_with`: 自定义decode函数, eg: [with_decode_example](./tests/test_modifier_with.rs).
-- [x] `with`: 自定义encode/decode函数, eg: [with_encode_example](./tests/test_modifier_with.rs).
+- [x] `byteorder=<"BE"|"LE">`: 表示字节序，BE(大端字节序)/LE(小端字节序), eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
+- [x] `encode_with=<func>`: 自定义encode函数, eg: [with example](./tests/test_modifier_with2.rs).
+- [x] `decode_with=<func>`: 自定义decode函数, eg: [with example](./tests/test_modifier_with2.rs).
+- [x] `with`: 自定义encode/decode函数, eg: [with example](./tests/test_modifier_with2_1.rs).
 - [x] `get_variable_name`: 获取缓存变量, 必须配合`variable_name`使用，可以用于不用struct或enum类型传递, eg: [variable_name_example](./tests/test_modifier_variable_name.rs).
 
 > 枚举分支修饰符
@@ -66,20 +66,23 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 
 主要用于修饰struct/enum里面某个字段内容
 
-- [x] `byteorder=<"BE"|"LE">`: 这是struct/enum类型局部字段字节序，BE(大端字节序)/LE(小端字节序), eg: `#[jppe(byteorder="LE")]`
+- [x] `byteorder=<"BE"|"LE"|variable(BE=0,LE=1)>`: 表示字节序，BE(大端字节序)/LE(小端字节序), eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
 - [x] `length=<num|variable>`: 表示读取数据的长度, 支持`int/&str/String/&[u8]/Vec`类型, eg: [length example](./tests/test_modifier_length.rs)。
 - [x] `offset=<num|variable>`: 表示从当前位置向前前进n个位置，实现数据流的位置偏移，eg: [offset example](./tests/test_modifier_offset.rs)。
 - [x] `full=<int>`: 用于encode填充值, 默认为0, 常常用于offset偏移之后进行encode编码填充, eg: [full example](./tests/test_modifier_full.rs。
 - [x] `untake`: 表示读取数据不移动位置，后续可以继续从该位置读取数据，eg: [untake example](./tests/test_modifier_untake.rs)。
 
+
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
 - [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split_example](./tests/test_type_hashmap.rs)
 - [x] `if_expr <bool expr>`: 指定if表达式, 支持`Option<T>`类型, eg: [if_expr_example](./tests/test_modifier_if_expr.rs).
-- [x] `encode_with`: 自定义encode函数, eg: [with_example](./tests/test_modifier_with.rs).
-- [x] `decode_with`: 自定义decode函数, eg: [with_example](./tests/test_modifier_with.rs).
-- [x] `with`: 自定义encode/decode函数, eg: [with_example](./tests/test_modifier_with.rs).
-- [x] `with_args`: 自定义encode/decode函数参数, eg: [with_args_example](./tests/test_modifier_with_args.rs).
+
+- [x] `encode_with`: 自定义encode函数, eg: [with example](./tests/test_modifier_with.rs).
+- [x] `decode_with`: 自定义decode函数, eg: [with example](./tests/test_modifier_with.rs).
+- [x] `with`: 自定义encode/decode函数, eg: [with example](./tests/test_modifier_with_1.rs).
+- [x] `with_args`: 自定义encode/decode函数参数, eg: [with example](./tests/test_modifier_with_args.rs).
+
 - [x] `encode_value`: value处理表达式, eg: `#[jppe(encode_value="length * 2")]`.
 - [x] `decode_value`: value处理表达式, eg: `#[jppe(decode_value="length / 2")]`.
 - [x] `variable_name`: 指定整型类型缓存变量, eg: [variable_name_example](./tests/test_modifier_variable_name.rs).

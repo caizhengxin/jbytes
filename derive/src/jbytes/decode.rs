@@ -23,11 +23,11 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
     generate_decode_body2(fn_body, attributes)?;
 
     if let Some(func) = &attributes.with_decode {
-        fn_body.push_parsed(format!("let (input, {name}): (&[u8], {rtype}) = {func}(input, cattr_new, fattr_new, {with_args})?;"))?;
+        fn_body.push_parsed(format!("let {name}: {rtype} = {func}(input, cattr_new, fattr_new, {with_args})?;"))?;
         // return Ok(());
     }
     else if let Some(func) = &attributes.with {
-        fn_body.push_parsed(format!("let (input, {name}): (&[u8], {rtype}) = {func}::decode(input, cattr_new, fattr_new, {with_args})?;"))?;
+        fn_body.push_parsed(format!("let {name}: {rtype} = {func}::decode(input, cattr_new, fattr_new, {with_args})?;"))?;
         // return Ok(());
     }
     else if attributes.skip || attributes.skip_decode {

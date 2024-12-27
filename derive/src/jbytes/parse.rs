@@ -127,7 +127,7 @@ impl AttrValue {
 
         let code = match self {
             Self::String(v) => format!("jbytes::ByteOrder::parse({v:?}).unwrap()"),
-            Self::Var(v) => format!("jbytes::ByteOrder::from_int({self_arg}{v} as isize).unwrap()"),
+            Self::Var(v) => format!("jbytes::ByteOrder::parse_int({self_arg}{v} as isize).unwrap()"),
             _ => "".to_string(),
         };
 

@@ -260,11 +260,11 @@ impl DeriveEnum {
                 fn_body.push_parsed("let mut r_nbytes = 0;")?;
 
                 if let Some(func) = &self.attributes.with_encode {
-                    fn_body.push_parsed(format!("{func}(buffer, cattr, fattr, self)"))?;
+                    fn_body.push_parsed(format!("r_nbytes += {func}(buffer, cattr, fattr, self)?;"))?;
                     return Ok(());
                 }
                 else if let Some(func) = &self.attributes.with {
-                    fn_body.push_parsed(format!("{func}::encode(buffer, cattr, fattr, self)"))?;
+                    fn_body.push_parsed(format!("r_nbytes += {func}::encode(buffer, cattr, fattr, self)?;"))?;
                     return Ok(());
                 }
 
