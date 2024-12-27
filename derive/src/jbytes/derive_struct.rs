@@ -141,7 +141,7 @@ impl DeriveStruct {
             lifetimes.trim_start_matches('<').trim_end_matches('>')
         }
         else { 
-            "de"
+            "'de"
         };
 
         impl_for

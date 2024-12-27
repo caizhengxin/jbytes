@@ -90,7 +90,7 @@ impl AttrValue {
             Self::String(v) => format!("{deref_arg}{self_arg}{is_string}{v}{is_string}.into()"),
             Self::Bytes(v) => format!("{deref_arg}{self_arg}{is_string}{v}{is_string}"),
             Self::Var(v) => format!("({deref_arg}{self_arg}{is_string}{v}{is_string}) as usize"),
-            Self::Usize(v) => format!("({deref_arg}{v}) as usize"),
+            Self::Usize(v) => format!("{v} as usize"),
             Self::Option(v) => format!("if let Some(v) = {deref_arg}{self_arg}{is_string}{v} {{Some(v as usize)}} else {{None}}"),
             Self::List(v) =>  {
                 let value = v.iter().map(|v| format!("{}", v.to_code(is_self, is_deref, true))).collect::<Vec<String>>().join(", ");
