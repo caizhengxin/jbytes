@@ -52,11 +52,11 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 
 > 通用修饰符
 
-- [x] `byteorder=<"BE"|"LE">`: 表示字节序，BE(大端字节序)/LE(小端字节序), eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
-- [x] `encode_with=<func>`: 自定义encode函数, eg: [with example](./tests/test_modifier_with2.rs).
-- [x] `decode_with=<func>`: 自定义decode函数, eg: [with example](./tests/test_modifier_with2.rs).
-- [x] `with`: 自定义encode/decode函数, eg: [with example](./tests/test_modifier_with2_1.rs).
-- [x] `get_variable_name`: 获取缓存变量, 必须配合`variable_name`使用，可以用于不用struct或enum类型传递, eg: [variable_name_example](./tests/test_modifier_variable_name.rs).
+- [x] `byteorder=<"BE"|"LE">`: 表示字节序，BE(大端字节序)/LE(小端字节序)，eg: [byteorder example](./tests/test_modifier_byteorder.rs)。
+- [x] `encode_with=<func>`: 自定义encode函数，eg: [encode_with example](./tests/test_modifier_with2.rs)。
+- [x] `decode_with=<func>`: 自定义decode函数，eg: [decode_with example](./tests/test_modifier_with2.rs)。
+- [x] `with=<mod>`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with2_1.rs)。
+- [x] `get_variable_name=<variable>`: 获取缓存变量, 必须配合`variable_name`使用，可以用于不同struct或enum类型传递, eg: [variable_name_example](./tests/test_modifier_variable_name.rs)。
 
 > 枚举分支修饰符
 
@@ -76,26 +76,26 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `decode_value`: value处理表达式，eg: [decode_value example](./tests/test_modifier_value.rs)。
 - [x] `variable_name`: 指定整型类型缓存变量，并通过`get_variable_name`修饰符在其他`Struct/Enum`使用，eg: [variable_name example](./tests/test_modifier_variable_name.rs)。
 - [x] `skip`: 表示跳过该字段的`encode/decode`函数，类型需要实现`Default`trait，eg：[skip example](./tests/test_modifier_skip.rs)。
-- [x] `skip_encode`: 表示跳过该字段的`encode`函数，eg：[skip example](./tests/test_modifier_skip.rs)。
-- [x] `skip_decode`: 表示跳过该字段的`decode`函数，类型需要实现`Default`trait，eg：[skip example](./tests/test_modifier_skip.rs)。
+- [x] `skip_encode`: 表示跳过该字段的`encode`函数，eg：[skip_encode example](./tests/test_modifier_skip.rs)。
+- [x] `skip_decode`: 表示跳过该字段的`decode`函数，类型需要实现`Default`trait，eg：[skip_decode example](./tests/test_modifier_skip.rs)。
 - [x] `if_expr=<bool expr>`: 指定`if`条件表达式，支持`Option<T>`类型，eg: [if_expr example](./tests/test_modifier_if_expr.rs)。
-- [x] `encode_with`: 自定义encode函数，eg: [with example](./tests/test_modifier_with.rs)。
-- [x] `decode_with`: 自定义decode函数，eg: [with example](./tests/test_modifier_with.rs)。
+- [x] `encode_with`: 自定义encode函数，eg: [encode_with example](./tests/test_modifier_with.rs)。
+- [x] `decode_with`: 自定义decode函数，eg: [decode_with example](./tests/test_modifier_with.rs)。
 - [x] `with`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with_1.rs)。
-- [x] `with_args`: 自定义encode/decode函数参数，eg: [with example](./tests/test_modifier_with_args.rs)。
+- [x] `with_args`: 自定义encode/decode函数参数，eg: [with_args example](./tests/test_modifier_with_args.rs)。
 
 
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
 - [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
-- [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split_example](./tests/test_type_hashmap.rs)
+- [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split example](./tests/test_type_hashmap.rs)
 - [ ] `check_value`：主要用于检查结果是否正常, 异常会返回错误
 - [x] `default`: eg: [default example](./crates/jdefault-rs/tests/test_jppe.rs)
 
 > 容器类型修饰符，比如：Vec/HashMap/HashSet等
 
-- [x] `count=<num|variable>`: 表示容器数据数量, 支持`Vec/HashMap/HashSet`类型。
-- [x] `try_count`: 表示容器数据数量, 如果不足，不会返回解析错误，支持`Vec/HashMap/HashSet`类型。
-- [x] `byte_count_outside`：类似`byte_count`，该修饰符应用`Vec/HashMap/HashSet`类型。
+- [x] `count=<num|variable>`: 表示容器元素数量，支持`Vec/HashMap/HashSet`类型，eg：[count example](./tests/test_modifier_count.rs)。
+- [x] `try_count=<num|variable>`: 表示容器元素数量, 如果不足，不会返回解析错误，支持`Vec/HashMap/HashSet`类型，eg：[try_count example](./tests/test_modifier_try_count.rs)。
+- [x] `byte_count_outside=<1..8>`：表示容器元素数量，类似`byte_count`，该修饰符应用`Vec/HashMap/HashSet`等类型，eg：[byte_count_outside example](./tests/test_modifier_bytecount_outside.rs)。
 
 > enum branch
 
