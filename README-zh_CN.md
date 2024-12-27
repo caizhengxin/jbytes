@@ -102,6 +102,5 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `branch`: 指定枚举(Enum)类型分支条件，eg: [branch example](./tests/test_modifier_branch.rs)。
 - [x] `branch_value`: 指定枚举(Enum)分支判断条件, eg: [branch_value example](./tests/test_type_modifier_branch_value.rs)
 - [x] `branch_range`: 指定枚举(Enum)分支判断条件范围, eg: [branch_range example](./tests/test_type_modifier_branch_range.rs)
-- [x] `branch_default`: 指定枚举(Enum)类型默认值, eg: [branch_default example](./tests/test_modifier_branch.rs)
-
-- [x] `branch_bits`: 指定枚举(Enum)分支判断条件, eg: [branch_bits example](./tests/test_type_enum_bits.rs)
+- [x] `branch_bits`: 指定枚举(Enum)分支判断条件, eg: [branch_bits example](./tests/test_type_modifier_branch_bits.rs)
+- [x] `branch_default`: 指定枚举(Enum)类型默认值, eg: [branch_default example](./tests/test_modifier_branch_default.rs)
