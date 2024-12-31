@@ -8,7 +8,7 @@ fn custom_with_decode<I: BufRead>(input: &I, _cattr: Option<&ContainerAttrModifi
 }
 
 
-fn custom_with_encode<B: BufWriteMut>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &u32, count: u8) -> JResult<usize> {
+fn custom_with_encode<B: BufWrite>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &u32, count: u8) -> JResult<usize> {
     buffer.push_uint(*value as u64, count.into())
 }
 

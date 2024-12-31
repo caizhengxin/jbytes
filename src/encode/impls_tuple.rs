@@ -1,5 +1,5 @@
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
     // ByteOrder, get_byteorder,
@@ -12,7 +12,7 @@ macro_rules! impls_tuple {
         impl<$($t: ByteEncode,)+> ByteEncode for ($($t,)+)
         {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
+            fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
             {
                 let ($($t,)*) = self;
                 let mut nbytes_count = 0;
@@ -30,7 +30,7 @@ macro_rules! impls_tuple {
         impl<$($t: BorrowByteEncode,)+> BorrowByteEncode for ($($t,)+)
         {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
+            fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
             {
                 let ($($t,)*) = self;
                 let mut nbytes_count = 0;

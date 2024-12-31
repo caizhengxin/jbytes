@@ -1,13 +1,13 @@
 use crate::{
     types::NetAddress,
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ContainerAttrModifiers, FieldAttrModifiers,
 };
 
 
 impl crate::ByteEncode for NetAddress {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         match self {
             Self::V4(addr) => addr.encode_inner(buffer, cattr, fattr),
@@ -21,7 +21,7 @@ impl crate::ByteEncode for NetAddress {
 
 impl crate::BorrowByteEncode for NetAddress {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         match self {
             Self::V4(addr) => addr.encode_inner(buffer, cattr, fattr),

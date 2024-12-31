@@ -1,5 +1,5 @@
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
     ByteOrder, get_byteorder,
@@ -8,7 +8,7 @@ use crate::{
 
 impl ByteEncode for f32 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         if get_byteorder(cattr, fattr) == ByteOrder::Be {
@@ -22,7 +22,7 @@ impl ByteEncode for f32 {
 
 impl BorrowByteEncode for f32 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         ByteEncode::encode_inner(self, buffer, cattr, fattr)
     }
@@ -31,7 +31,7 @@ impl BorrowByteEncode for f32 {
 
 impl ByteEncode for f64 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         if get_byteorder(cattr, fattr) == ByteOrder::Be {
@@ -45,7 +45,7 @@ impl ByteEncode for f64 {
 
 impl BorrowByteEncode for f64 {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         ByteEncode::encode_inner(self, buffer, cattr, fattr)
     }

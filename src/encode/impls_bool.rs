@@ -1,5 +1,5 @@
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
 };
@@ -7,7 +7,7 @@ use crate::{
 
 impl ByteEncode for bool {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         buffer.push_bool(*self)
@@ -17,7 +17,7 @@ impl ByteEncode for bool {
 
 impl BorrowByteEncode for bool {
     #[inline]
-    fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<T: BufWrite>(&self, buffer: &mut T, _cattr: Option<&ContainerAttrModifiers>,
                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
     {
         buffer.push_bool(*self)

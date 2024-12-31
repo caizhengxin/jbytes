@@ -21,7 +21,7 @@ mod custom_with {
     }
 
 
-    pub fn encode<B: BufWriteMut>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &WithExample) -> JResult<usize> {
+    pub fn encode<B: BufWrite>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &WithExample) -> JResult<usize> {
         let mut r_nbytes = match value.key {
             1 => buffer.push_bytes(b"get")?,
             2 => buffer.push_bytes(b"put")?,

@@ -250,7 +250,7 @@ impl DeriveEnum {
         generator
             .impl_for(crate_name)
             .generate_fn("encode_inner")
-            .with_generic_deps("B", ["jbytes::BufWriteMut"])
+            .with_generic_deps("B", ["jbytes::BufWrite"])
             .with_self_arg(FnSelfArg::RefSelf)
             .with_arg("buffer", "&mut B")
             .with_arg("cattr", "Option<&jbytes::ContainerAttrModifiers>")

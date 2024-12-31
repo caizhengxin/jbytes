@@ -1,6 +1,6 @@
 #![allow(clippy::if_same_then_else)]
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
     get_byteorder,
@@ -9,7 +9,7 @@ use crate::{
 
 impl<T: ByteEncode> ByteEncode for Vec<T> {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         let data_len = self.len();
         let byteorder = get_byteorder(cattr, fattr);
@@ -40,7 +40,7 @@ impl<T: ByteEncode> ByteEncode for Vec<T> {
 
 impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         let data_len = self.len();
         let byteorder = get_byteorder(cattr, fattr);

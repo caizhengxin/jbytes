@@ -1,51 +1,63 @@
 use core::mem;
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
-    ByteOrder, get_byteorder,
+    get_byteorder,
     ErrorKind, make_error,
 };
 
 
 macro_rules! impls_int_encode {
-    ($type:ident, $be_func:tt, $le_func:tt) => {
+    ($type:ident, $func:tt) => {
         impl ByteEncode for $type {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
-                let value;
+            fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
+                let r_nbytes;
+                let mut value = *self;
                 let byteorder = get_byteorder(cattr, fattr);
                 let length = if let Some(fr) = fattr { fr.length } else { None };
                 
+                if let Some(fr) = fattr {
+                    if let Some(bits) = fr.bits {
+                        let mut bits = bits as $type;
+                                                
+                        for _i in 0..$type::BITS {
+                            if bits & 0x01 == 0 {
+                                value <<= 1;
+                                bits >>= 1;
+                            }
+                        }
+
+                        if !fr.bits_start {
+                            let byte = ($type::BITS / 8) as usize;
+                            buffer.set_position(buffer.get_position() - byte);
+                            let prev_bits = buffer.take_byteorder_uint(byte, byteorder)?;
+                            buffer.set_position(buffer.get_position() - byte);
+                            value |= prev_bits as $type;
+                        }
+                    }
+                }
 
                 if let Some(length) = length {
                     if mem::size_of_val(self).checked_sub(length).is_none() {
                         return Err(make_error(buffer.get_position(), ErrorKind::InvalidByteLength));
                     }
 
-                    if byteorder == ByteOrder::Be {
-                        value = buffer.push_be_uint(*self as u64, length)?;
-                    }
-                    else {
-                        value = buffer.push_le_uint(*self as u64, length)?;
-                    }
-                }
-                else if byteorder == ByteOrder::Be {
-                    value = buffer.$be_func(*self)?;
+                    r_nbytes = buffer.push_byteorder_uint(value as u64, length, byteorder)?;
                 }
                 else {
-                    value = buffer.$le_func(*self)?;
+                    r_nbytes = buffer.$func(value, byteorder)?;
                 }
 
-
-                Ok(value)            
+                Ok(r_nbytes)            
             }
         }        
 
 
         impl BorrowByteEncode for $type {
             #[inline]
-            fn encode_inner<T: BufWriteMut>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
+            fn encode_inner<T: BufWrite>(&self, buffer: &mut T, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
                 where 
                     Self: Sized
             {
@@ -54,19 +66,19 @@ macro_rules! impls_int_encode {
         }
     };
     () => {
-        impls_int_encode!(u8, push_u8, push_u8);
-        impls_int_encode!(u16, push_be_u16, push_le_u16);
-        impls_int_encode!(u32, push_be_u32, push_le_u32);
-        impls_int_encode!(u64, push_be_u64, push_le_u64);
-        impls_int_encode!(usize, push_be_usize, push_le_usize);
-        impls_int_encode!(u128, push_be_u128, push_le_u128);
+        impls_int_encode!(u8, push_byteorder_u8);
+        impls_int_encode!(u16, push_byteorder_u16);
+        impls_int_encode!(u32, push_byteorder_u32);
+        impls_int_encode!(u64, push_byteorder_u64);
+        impls_int_encode!(usize, push_byteorder_usize);
+        impls_int_encode!(u128, push_byteorder_u128);
 
-        impls_int_encode!(i8, push_i8, push_i8);
-        impls_int_encode!(i16, push_be_i16, push_le_i16);
-        impls_int_encode!(i32, push_be_i32, push_le_i32);
-        impls_int_encode!(i64, push_be_i64, push_le_i64);
-        impls_int_encode!(isize, push_be_isize, push_le_isize);
-        impls_int_encode!(i128, push_be_i128, push_le_i128);
+        impls_int_encode!(i8, push_byteorder_i8);
+        impls_int_encode!(i16, push_byteorder_i16);
+        impls_int_encode!(i32, push_byteorder_i32);
+        impls_int_encode!(i64, push_byteorder_i64);
+        impls_int_encode!(isize, push_byteorder_isize);
+        impls_int_encode!(i128, push_byteorder_i128);
     }
 }
 

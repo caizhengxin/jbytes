@@ -1,5 +1,5 @@
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
 };
@@ -7,7 +7,7 @@ use crate::{
 
 impl<T: ByteEncode> ByteEncode for Option<T> {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         if let Some(value) = self {
             return value.encode_inner(buffer, cattr, fattr);
@@ -20,7 +20,7 @@ impl<T: ByteEncode> ByteEncode for Option<T> {
 
 impl<T: BorrowByteEncode> BorrowByteEncode for Option<T> {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         if let Some(value) = self {
             return value.encode_inner(buffer, cattr, fattr);
