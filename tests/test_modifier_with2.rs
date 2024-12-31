@@ -16,7 +16,7 @@ fn custom_with_decode<I: BufRead>(input: &I, _cattr: Option<&ContainerAttrModifi
 }
 
 
-fn custom_with_encode<B: BufWriteMut>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &WithExample) -> JResult<usize> {
+fn custom_with_encode<B: BufWrite>(buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>, _fattr: Option<&FieldAttrModifiers>, value: &WithExample) -> JResult<usize> {
     let mut r_nbytes = match value.key {
         1 => buffer.push_bytes(b"get")?,
         2 => buffer.push_bytes(b"put")?,

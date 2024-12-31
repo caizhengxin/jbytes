@@ -1,8 +1,9 @@
+use core::mem;
 use memchr::memmem;
 use aho_corasick::AhoCorasick;
 use crate::{
     JResult, ErrorKind, make_error,
-    BufWriteMut, ByteOrder,
+    ByteOrder,
     macro_take_bytes,
 };
 
@@ -723,5 +724,627 @@ pub trait BufRead {
 }
 
 
-pub trait BufWrite: BufWriteMut {
+pub trait BufWrite: BufRead {
+    /// Returns the n-bytes between the current position and the end of the buffer.
+    fn remaining_mut(&mut self) -> &'_ mut [u8];
+
+    /// Update memory size.
+    fn resize(&mut self, nbytes: usize) -> usize;
+
+    /// Writes `AsRef<[u8]>` to `self`, eg: &[u8]/&str/String/array/vec, etc.
+    fn push<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<usize> {
+        let data = value.as_ref();
+        let data_len = data.len();
+
+        if data_len > self.remaining_len() && self.resize(data_len) == 0 {
+            return Err(make_error(self.get_position(), ErrorKind::PushFail));
+        }
+
+        self.remaining_mut()[..data_len].clone_from_slice(data);
+        self.advance(data_len);
+
+        Ok(data_len)
+    }
+
+    /// Writes bytes(&[u8]) to `self`.
+    #[inline]
+    fn push_bytes(&mut self, value: &[u8]) -> JResult<usize> {
+        self.push(value)
+    }
+
+    /// Writes a char to `self`.
+    #[inline]
+    fn push_char(&mut self, value: char) -> JResult<usize> {
+        self.push([value as u8])
+    }
+
+    /// Writes a bool to `self`.
+    #[inline]
+    fn push_bool(&mut self, value: bool) -> JResult<usize> {
+        self.push([value as u8])
+    }
+
+    /// Writes an unsigned 8 bit integer to `self`.
+    #[inline]
+    fn push_u8(&mut self, value: u8) -> JResult<usize> {
+        self.push([value])
+    }
+
+    /// Writes an unsigned 8 bit integer to `self`, exactly like the `[push_u8]` function.
+    #[inline]
+    fn push_be_u8(&mut self, value: u8) -> JResult<usize> {
+        self.push_u8(value)
+    }
+
+    /// Writes an unsigned 8 bit integer to `self`, exactly like the `[push_u8]` function.
+    #[inline]
+    fn push_le_u8(&mut self, value: u8) -> JResult<usize> {
+        self.push_u8(value)
+    }
+
+    /// Writes an unsigned 8 bit integer to `self`, exactly like the `[push_u8]` function.
+    #[inline]
+    fn push_ne_u8(&mut self, value: u8) -> JResult<usize> {
+        self.push_u8(value)
+    }
+
+    /// Writes an unsigned 8 bit integer to `self`, exactly like the `[push_u8]` function.
+    #[inline]
+    fn push_byteorder_u8(&mut self, value: u8, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u8(value),
+            ByteOrder::Le => self.push_le_u8(value),
+        }
+    }
+
+    /// Writes a signed 8 bit integer to `self`.
+    #[inline]
+    fn push_i8(&mut self, value: i8) -> JResult<usize> {
+        self.push([value as u8])
+    }
+
+    /// Writes a signed 8 bit integer to `self`, exactly like the `[push_i8]` function.
+    #[inline]
+    fn push_be_i8(&mut self, value: i8) -> JResult<usize> {
+        self.push_i8(value)
+    }
+
+    /// Writes a signed 8 bit integer to `self`, exactly like the `[push_i8]` function.
+    #[inline]
+    fn push_le_i8(&mut self, value: i8) -> JResult<usize> {
+        self.push_i8(value)
+    }
+
+    /// Writes a signed 8 bit integer to `self`, exactly like the `[push_i8]` function.
+    #[inline]
+    fn push_ne_i8(&mut self, value: i8) -> JResult<usize> {
+        self.push_i8(value)
+    }
+
+    /// Writes a signed 8 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i8(&mut self, value: i8, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i8(value),
+            ByteOrder::Le => self.push_le_i8(value),
+        }
+    }
+
+    /// Writes an unsigned 16 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_u16(&mut self, value: u16) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 16 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_u16(&mut self, value: u16) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 16 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_u16(&mut self, value: u16) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an unsigned 16 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_u16(&mut self, value: u16) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 16 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u16(&mut self, value: u16, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u16(value),
+            ByteOrder::Le => self.push_le_u16(value),
+        }
+    }
+
+    /// Writes a signed 16 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_i16(&mut self, value: i16) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 16 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_i16(&mut self, value: i16) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 16 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_i16(&mut self, value: i16) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes a signed 16 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_i16(&mut self, value: i16) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed 16 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i16(&mut self, value: i16, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i16(value),
+            ByteOrder::Le => self.push_le_i16(value),
+        }
+    }
+
+    /// Writes an unsigned 24 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_u24(&mut self, value: u32) -> JResult<usize> {
+        self.push(&value.to_be_bytes()[1..])
+    }
+
+    /// Writes an unsigned 24 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_u24(&mut self, value: u32) -> JResult<usize> {
+        self.push(&value.to_be_bytes()[1..])
+    }
+
+    /// Writes an unsigned 24 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_u24(&mut self, value: u32) -> JResult<usize> {
+        self.push(&value.to_le_bytes()[..3])
+    }
+
+    /// Writes an unsigned 24 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_u24(&mut self, value: u32) -> JResult<usize> {
+        if cfg!(target_endian = "big") {
+            self.push_be_u24(value)
+        } else {
+            self.push_le_u24(value)
+        }
+    }
+
+    /// Writes an unsigned 24 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u24(&mut self, value: u32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u24(value),
+            ByteOrder::Le => self.push_le_u24(value),
+        }
+    }
+
+    /// Writes an unsigned 32 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_u32(&mut self, value: u32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 32 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_u32(&mut self, value: u32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 32 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_u32(&mut self, value: u32) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an unsigned 32 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_u32(&mut self, value: u32) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 32 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u32(&mut self, value: u32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u32(value),
+            ByteOrder::Le => self.push_le_u32(value),
+        }
+    }
+
+    /// Writes a signed 32 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_i32(&mut self, value: i32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 32 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_i32(&mut self, value: i32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 32 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_i32(&mut self, value: i32) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes a signed 32 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_i32(&mut self, value: i32) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed 32 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i32(&mut self, value: i32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i32(value),
+            ByteOrder::Le => self.push_le_i32(value),
+        }
+    }
+
+    /// Writes an unsigned 64 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_u64(&mut self, value: u64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 64 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_u64(&mut self, value: u64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 64 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_u64(&mut self, value: u64) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an unsigned 64 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_u64(&mut self, value: u64) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 64 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u64(&mut self, value: u64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u64(value),
+            ByteOrder::Le => self.push_le_u64(value),
+        }
+    }
+
+    /// Writes a signed 64 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_i64(&mut self, value: i64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 64 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_i64(&mut self, value: i64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 64 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_i64(&mut self, value: i64) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes a signed 64 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_i64(&mut self, value: i64) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed 64 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i64(&mut self, value: i64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i64(value),
+            ByteOrder::Le => self.push_le_i64(value),
+        }
+    }
+
+    /// Writes an unsigned 128 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_u128(&mut self, value: u128) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 128 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_u128(&mut self, value: u128) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned 128 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_u128(&mut self, value: u128) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an unsigned 128 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_u128(&mut self, value: u128) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned 128 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_u128(&mut self, value: u128, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_u128(value),
+            ByteOrder::Le => self.push_le_u128(value),
+        }
+    }
+
+    /// Writes a signed 128 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_i128(&mut self, value: i128) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 128 bit integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_i128(&mut self, value: i128) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed 128 bit integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_i128(&mut self, value: i128) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes a signed 128 bit integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_i128(&mut self, value: i128) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed 128 bit integer to `self`.
+    #[inline]
+    fn push_byteorder_i128(&mut self, value: i128, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_i128(value),
+            ByteOrder::Le => self.push_le_i128(value),
+        }
+    }
+
+    /// Writes an unsigned size integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_usize(&mut self, value: usize) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned usize integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_usize(&mut self, value: usize) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an unsigned usize integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_usize(&mut self, value: usize) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an unsigned usize integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_usize(&mut self, value: usize) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an unsigned usize integer to `self`.
+    #[inline]
+    fn push_byteorder_usize(&mut self, value: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_usize(value),
+            ByteOrder::Le => self.push_le_usize(value),
+        }
+    }
+
+    /// Writes a signed size integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_isize(&mut self, value: isize) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed usize integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_isize(&mut self, value: isize) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes a signed usize integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_isize(&mut self, value: isize) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes a signed usize integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_isize(&mut self, value: isize) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes a signed usize integer to `self`.
+    #[inline]
+    fn push_byteorder_isize(&mut self, value: isize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_isize(value),
+            ByteOrder::Le => self.push_le_isize(value),
+        }
+    }
+
+    /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+        self.push_be_uint(value, nbytes)
+    }
+
+    /// Writes an unsigned n-byte integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+        let start = match mem::size_of_val(&value).checked_sub(nbytes) {
+            Some(start) => start,
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
+        };
+
+        self.push(&value.to_be_bytes()[start..])
+    }
+
+    /// Writes an unsigned n-byte integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+        let slice = value.to_le_bytes();
+        let slice = match slice.get(..nbytes) {
+            Some(slice) => slice,
+            None => return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength)),
+        };
+
+        self.push(slice)
+    }
+
+    /// Writes an unsigned n-byte integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_uint(&mut self, value: u64, nbytes: usize) -> JResult<usize> {
+        if cfg!(target_endian = "big") {
+            self.push_be_uint(value, nbytes)
+        } else {
+            self.push_le_uint(value, nbytes)
+        }
+    }
+
+    /// Writes an unsigned n-byte integer to `self`.
+    #[inline]
+    fn push_byteorder_uint(&mut self, value: u64, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_uint(value, nbytes),
+            ByteOrder::Le => self.push_le_uint(value, nbytes),
+        }
+    }
+
+    /// Writes a signed n-byte integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_uint(value as u64, nbytes)
+    }
+
+    /// Writes a signed n-byte integer to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_be_uint(value as u64, nbytes)
+    }
+
+    /// Writes a signed n-byte integer to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        self.push_le_uint(value as u64, nbytes)
+    }
+
+    /// Writes a signed n-byte integer to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_int(&mut self, value: i64, nbytes: usize) -> JResult<usize> {
+        if cfg!(target_endian = "big") {
+            self.push_be_int(value, nbytes)
+        } else {
+            self.push_le_int(value, nbytes)
+        }
+    }
+
+    /// Writes a signed n-byte integer to `self`.
+    #[inline]
+    fn push_byteorder_int(&mut self, value: i64, nbytes: usize, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_int(value, nbytes),
+            ByteOrder::Le => self.push_le_int(value, nbytes),
+        }
+    }
+
+    /// Writes an IEEE754 single-precision (4 bytes) floating point number to `self` in big-endian byte order.
+    #[inline]
+    fn push_f32(&mut self, value: f32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an IEEE754 single-precision (4 bytes) floating point number to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_f32(&mut self, value: f32) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an IEEE754 single-precision (4 bytes) floating point number to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_f32(&mut self, value: f32) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an IEEE754 single-precision (4 bytes) floating point number to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_f32(&mut self, value: f32) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (4 bytes) floating point number to `self`.
+    #[inline]
+    fn push_byteorder_f32(&mut self, value: f32, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_f32(value),
+            ByteOrder::Le => self.push_le_f32(value),
+        }
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self` in big-endian byte order.
+    #[inline]
+    fn push_f64(&mut self, value: f64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self` in big-endian byte order.
+    #[inline]
+    fn push_be_f64(&mut self, value: f64) -> JResult<usize> {
+        self.push(value.to_be_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self` in little-endian byte order.
+    #[inline]
+    fn push_le_f64(&mut self, value: f64) -> JResult<usize> {
+        self.push(value.to_le_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self` in native-endian byte order.
+    #[inline]
+    fn push_ne_f64(&mut self, value: f64) -> JResult<usize> {
+        self.push(value.to_ne_bytes())
+    }
+
+    /// Writes an IEEE754 double-precision (8 bytes) floating point number to `self`.
+    #[inline]
+    fn push_byteorder_f64(&mut self, value: f64, byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push_be_f64(value),
+            ByteOrder::Le => self.push_le_f64(value),
+        }
+    }
 }

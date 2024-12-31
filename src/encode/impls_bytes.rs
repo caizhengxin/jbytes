@@ -1,5 +1,5 @@
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
     get_byteorder,
@@ -7,7 +7,7 @@ use crate::{
 
 
 #[inline]
-pub(super) fn encode_inner<B: BufWriteMut>(buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+pub(super) fn encode_inner<B: BufWrite>(buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                             fattr: Option<&FieldAttrModifiers>, data: &[u8]) -> JResult<usize> {
     let mut r_nbytes = 0;
     let mut linend_value = None;
@@ -45,7 +45,7 @@ pub(super) fn encode_inner<B: BufWriteMut>(buffer: &mut B, cattr: Option<&Contai
 
 impl<'de> BorrowByteEncode for &'de [u8] {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         encode_inner(buffer, cattr, fattr, self)
     }

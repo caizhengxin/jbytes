@@ -15,7 +15,7 @@ mod impls_netaddress;
 
 // use crate::std::*;
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ContainerAttrModifiers, FieldAttrModifiers,
 };
 
@@ -26,14 +26,14 @@ use crate::{
 /// 
 /// ```no_test
 /// use jbytes::{
-///     JResult, BufWriteMut,
+///     JResult, BufWrite,
 ///     ByteDecode, BorrowByteDecode,
 ///     ContainerAttrModifiers, FieldAttrModifiers,
 /// };
 /// 
 /// 
 /// impl ByteEncode for bool {
-///     fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
+///     fn encode_inner<B: BufWrite>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
 ///                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
 ///     {
 ///         buffer.push_bool(*self)
@@ -41,11 +41,11 @@ use crate::{
 /// }
 /// ```
 pub trait ByteEncode {
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 
     #[inline]
-    fn encode<B: BufWriteMut>(&self, buffer: &mut B) -> JResult<usize> {
+    fn encode<B: BufWrite>(&self, buffer: &mut B) -> JResult<usize> {
         self.encode_inner(buffer, None, None)
     }
 }
@@ -57,14 +57,14 @@ pub trait ByteEncode {
 /// 
 /// ```no_test
 /// use jbytes::{
-///     JResult, BufWriteMut,
+///     JResult, BufWrite,
 ///     ByteDecode, BorrowByteDecode,
 ///     ContainerAttrModifiers, FieldAttrModifiers,
 /// };
 /// 
 /// 
 /// impl BorrowByteEncode for bool {
-///     fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
+///     fn encode_inner<B: BufWrite>(&self, buffer: &mut B, _cattr: Option<&ContainerAttrModifiers>,
 ///                                                               _fattr: Option<&FieldAttrModifiers>) -> JResult<usize>
 ///     {
 ///         buffer.push_bool(*self)
@@ -72,11 +72,11 @@ pub trait ByteEncode {
 /// }
 /// ```
 pub trait BorrowByteEncode {
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                               fattr: Option<&FieldAttrModifiers>) -> JResult<usize>;
 
     #[inline]
-    fn encode<B: BufWriteMut>(&self, buffer: &mut B) -> JResult<usize> {
+    fn encode<B: BufWrite>(&self, buffer: &mut B) -> JResult<usize> {
         self.encode_inner(buffer, None, None)
     }
 }

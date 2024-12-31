@@ -1,6 +1,6 @@
 use crate::{
     types::MacAddress,
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ContainerAttrModifiers, FieldAttrModifiers,
     get_byteorder,
 };
@@ -8,7 +8,7 @@ use crate::{
 
 impl crate::ByteEncode for MacAddress {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_uint(self.to_bits(), 6, get_byteorder(cattr, fattr))
     }
@@ -17,7 +17,7 @@ impl crate::ByteEncode for MacAddress {
 
 impl crate::BorrowByteEncode for MacAddress {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_uint(self.to_bits(), 6, get_byteorder(cattr, fattr))
     }

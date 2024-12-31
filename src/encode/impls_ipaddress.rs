@@ -1,6 +1,6 @@
 use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use crate::{
-    JResult, BufWriteMut,
+    JResult, BufWrite,
     ContainerAttrModifiers, FieldAttrModifiers,
     get_byteorder,
 };
@@ -8,7 +8,7 @@ use crate::{
 
 impl crate::ByteEncode for Ipv4Addr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_u32(self.to_bits(), get_byteorder(cattr, fattr))
     }
@@ -17,7 +17,7 @@ impl crate::ByteEncode for Ipv4Addr {
 
 impl crate::BorrowByteEncode for Ipv4Addr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_u32(self.to_bits(), get_byteorder(cattr, fattr))
     }
@@ -26,7 +26,7 @@ impl crate::BorrowByteEncode for Ipv4Addr {
 
 impl crate::ByteEncode for Ipv6Addr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_u128(self.to_bits(), get_byteorder(cattr, fattr))
     }
@@ -35,7 +35,7 @@ impl crate::ByteEncode for Ipv6Addr {
 
 impl crate::BorrowByteEncode for Ipv6Addr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         buffer.push_byteorder_u128(self.to_bits(), get_byteorder(cattr, fattr))
     }
@@ -44,7 +44,7 @@ impl crate::BorrowByteEncode for Ipv6Addr {
 
 impl crate::ByteEncode for IpAddr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         match self {
             Self::V4(addr) => addr.encode_inner(buffer, cattr, fattr),
@@ -56,7 +56,7 @@ impl crate::ByteEncode for IpAddr {
 
 impl crate::BorrowByteEncode for IpAddr {
     #[inline]
-    fn encode_inner<B: BufWriteMut>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
+    fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         match self {
             Self::V4(addr) => addr.encode_inner(buffer, cattr, fattr),
