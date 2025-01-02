@@ -1,10 +1,10 @@
-#![allow(clippy::if_same_then_else)]
 use crate::{
     JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
     ContainerAttrModifiers, FieldAttrModifiers,
-    get_byteorder,
+    // get_byteorder,
 };
+use super::push_count_and_try_count;
 
 
 impl<T: ByteEncode> ByteEncode for Vec<T> {
@@ -12,28 +12,15 @@ impl<T: ByteEncode> ByteEncode for Vec<T> {
     fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         let data_len = self.len();
-        let byteorder = get_byteorder(cattr, fattr);
-        let mut nbytes = 0;
+        let mut r_nbytes = 0;
 
-        if let Some(fr) = fattr {
-            if let Some(byte_count) = fr.byte_count_outside {
-                nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
-            }
-            else if fr.count.is_some() { }
-            else if fr.try_count.is_some() { }
-            else {
-                nbytes += buffer.push_u8(data_len as u8)?;
-            }
-        }
-        else {
-            nbytes += buffer.push_u8(data_len as u8)?;
-        }
+        r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
 
         for value in self {
-            nbytes += value.encode_inner(buffer, cattr, fattr)?;
+            r_nbytes += value.encode_inner(buffer, cattr, fattr)?;
         }
 
-        Ok(nbytes)
+        Ok(r_nbytes)
     }
 }
 
@@ -43,28 +30,15 @@ impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
     fn encode_inner<B: BufWrite>(&self, buffer: &mut B, cattr: Option<&ContainerAttrModifiers>,
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         let data_len = self.len();
-        let byteorder = get_byteorder(cattr, fattr);
-        let mut nbytes = 0;
+        let mut r_nbytes = 0;
 
-        if let Some(fr) = fattr {
-            if let Some(byte_count) = fr.byte_count_outside {
-                nbytes += buffer.push_byteorder_uint(data_len as u64, byte_count, byteorder)?;
-            }
-            else if fr.count.is_some() { }
-            else if fr.try_count.is_some() { }
-            else {
-                nbytes += buffer.push_u8(data_len as u8)?;
-            }
-        }
-        else {
-            nbytes += buffer.push_u8(data_len as u8)?;
-        }
+        r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
 
         for value in self {
-            nbytes += value.encode_inner(buffer, cattr, fattr)?;
+            r_nbytes += value.encode_inner(buffer, cattr, fattr)?;
         }
 
-        Ok(nbytes)
+        Ok(r_nbytes)
     }
 }
 
