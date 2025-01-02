@@ -11,15 +11,15 @@ pub(super) fn find_subsequence<'da, 'db, T: BufRead>(input: &'da T, cattr: Optio
     let value;
 
     if let Some(fr) = fattr {
-        // // skip key
-        // if let Some(key) = fr.key {
-        //     _ = input.find_subsequence_needle(key, true)?;
-        // }
+        // skip key
+        if let Some(key) = fr.key {
+            _ = input.find_subsequence_needle(key, true)?;
+        }
 
-        // // skip split
-        // if let Some(split) = fr.split {
-        //     _ = input.find_subsequence_needle(split, true)?;
-        // }
+        // skip split
+        if let Some(split) = fr.split {
+            _ = input.find_subsequence_needle(split, true)?;
+        }
 
         if let Some(length) = fr.length {
             value = input.take_bytes(length)?;

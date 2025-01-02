@@ -71,6 +71,7 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `offset=<num|variable>`: 表示从当前位置向前前进n个位置，实现数据流的位置偏移，eg: [offset example](./tests/test_modifier_offset.rs)。
 - [x] `full=<int>`: 表示用于`encode`编码填充值, 默认为0, 常常用于offset偏移之后进行`encode`编码填充, eg: [full example](./tests/test_modifier_full.rs)。
 - [x] `byte_count=<1..8>`: 表示取几个字节转成整型，代表后续需要读取的字节流长度，eg：[byte_count example](./tests/test_modifier_bytecount.rs)。
+- [x] `remaining`
 - [x] `untake`: 表示读取数据不移动位置，后续可以继续从该位置读取数据，eg: [untake example](./tests/test_modifier_untake.rs)。
 - [x] `encode_value`: value处理表达式，eg: [encode_value example](./tests/test_modifier_value.rs)。
 - [x] `decode_value`: value处理表达式，eg: [decode_value example](./tests/test_modifier_value.rs)。

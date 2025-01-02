@@ -11,32 +11,6 @@ use crate::{
 use super::get_count_and_try_count;
 
 
-#[inline]
-fn hashset_decode<I, T>(input: &I, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<HashSet<T>>
-where
-    I: BufRead,
-    T: crate::ByteDecode + Hash + Eq,
-{
-    let mut hashset = HashSet::new();
-    let (count, try_count) = get_count_and_try_count(input, cattr, fattr)?;
-
-    if let Some(try_count) = try_count {
-        for _ in 0..try_count {
-            match T::decode_inner(input, cattr, fattr) {
-                Ok(value) => hashset.insert(value),
-                Err(_e) => break,
-            };
-        }
-    } else {
-        for _ in 0..count {
-            hashset.insert(T::decode_inner(input, cattr, fattr)?);
-        }    
-    }
-
-    Ok(hashset)
-}
-
-
 impl<T: crate::ByteDecode> crate::ByteDecode for HashSet<T>
 where
     T: crate::ByteDecode + Hash + Eq,
@@ -46,21 +20,53 @@ where
     where 
         Self: Sized
     {
-        hashset_decode(input, cattr, fattr)
+        let mut hashset = HashSet::new();
+        let (count, try_count) = get_count_and_try_count(input, cattr, fattr)?;
+    
+        if let Some(try_count) = try_count {
+            for _ in 0..try_count {
+                match T::decode_inner(input, cattr, fattr) {
+                    Ok(value) => hashset.insert(value),
+                    Err(_e) => break,
+                };
+            }
+        } else {
+            for _ in 0..count {
+                hashset.insert(T::decode_inner(input, cattr, fattr)?);
+            }    
+        }
+    
+        Ok(hashset)
     }
 }
 
 
 impl<'de, T: crate::BorrowByteDecode<'de>> crate::BorrowByteDecode<'de> for HashSet<T>
 where
-    T: crate::ByteDecode + Hash + Eq,
+    T: crate::BorrowByteDecode<'de> + Hash + Eq,
 {
     #[inline]
     fn decode_inner<I: BufRead>(input: &'de I, cattr: Option<&ContainerAttrModifiers>, fattr: Option<&FieldAttrModifiers>) -> JResult<Self>
     where 
         Self: Sized
     {
-        hashset_decode(input, cattr, fattr)
+        let mut hashset = HashSet::new();
+        let (count, try_count) = get_count_and_try_count(input, cattr, fattr)?;
+    
+        if let Some(try_count) = try_count {
+            for _ in 0..try_count {
+                match T::decode_inner(input, cattr, fattr) {
+                    Ok(value) => hashset.insert(value),
+                    Err(_e) => break,
+                };
+            }
+        } else {
+            for _ in 0..count {
+                hashset.insert(T::decode_inner(input, cattr, fattr)?);
+            }    
+        }
+    
+        Ok(hashset)
     }
 }
 

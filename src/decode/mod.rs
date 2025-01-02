@@ -8,6 +8,8 @@ mod impls_tuple;
 mod impls_array;
 mod impls_vec;
 #[cfg(feature = "std")]
+mod impls_hashmap;
+#[cfg(feature = "std")]
 mod impls_hashset;
 mod impls_other;
 mod impls_option;
@@ -110,7 +112,7 @@ fn get_count_and_try_count<I: BufRead>(input: &I, cattr: Option<&ContainerAttrMo
         if let Some(count_tmp) = fr.count {
             count = count_tmp;
         }
-        else if let Some(_) = fr.try_count {
+        else if fr.try_count.is_some() {
             try_count = fr.try_count;
         } else if let Some(byte_count) = fr.byte_count_outside {
             count = input.take_byteorder_uint(byte_count, crate::get_byteorder(cattr, fattr))? as usize;

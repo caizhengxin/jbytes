@@ -12,8 +12,15 @@ pub(super) fn encode_inner<B: BufWrite>(buffer: &mut B, cattr: Option<&Container
     let mut r_nbytes = 0;
     let mut linend_value = None;
 
-    // key and split
     if let Some(fr) = fattr {
+        if let Some(key) = fr.key {
+            r_nbytes += buffer.push(key)?;
+        }
+
+        if let Some(split) = fr.split {
+            r_nbytes += buffer.push(split)?;
+        }
+
         if let Some(_length) = fr.length {
         }
         else if let Some(byte_count) = fr.byte_count {
