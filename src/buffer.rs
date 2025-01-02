@@ -6,13 +6,12 @@ use core::{
 };
 use crate::std::*;
 use crate::{
-    // ByteOrder,
     BufRead, BufWrite,
     // errors::{JResult, make_error, ErrorKind},
 };
 
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Buffer {
     data: Vec<u8>,
     position: Cell<usize>,

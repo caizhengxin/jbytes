@@ -33,8 +33,8 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `Struct`
 - [x] `Enum`
 - [x] `PhantomData`
-- [ ] `HashMap`
-- [ ] `HashSet`
+- [x] `HashMap`
+- [x] `HashSet`
 - [x] `MacAddress`
 - [x] `std::net::Ipv4Addr`
 - [x] `std::net::Ipv6Addr`

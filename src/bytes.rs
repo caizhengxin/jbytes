@@ -60,6 +60,13 @@ where
 }
 
 
+// pub trait ToBytes {
+//     type Target;
+
+//     fn to_bytes(&self) -> Bytes<Self::Target>;
+// }
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
