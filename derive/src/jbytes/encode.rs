@@ -37,10 +37,10 @@ pub fn generate_encode_body(fn_body: &mut StreamBuilder, attributes: &FieldAttri
         return Ok(());
     }
     else if attributes.from_str_bool {
-        fn_body.push_parsed(format!("r_nbytes += String::encode_inner(&{der_arg}{self_arg}{field}.to_string(), buffer, cattr_new, fattr_new)?;"))?;
+        fn_body.push_parsed(format!("r_nbytes += jbytes::BorrowByteEncode::encode_inner({der_arg}{self_arg}{field}.to_string(), buffer, cattr_new, fattr_new)?;"))?;
     }
     else if let Some(_) = &attributes.from_str {
-        fn_body.push_parsed(format!("r_nbytes += String::encode_inner(&{der_arg}{self_arg}{field}.to_string(), buffer, cattr_new, fattr_new)?;"))?;
+        fn_body.push_parsed(format!("r_nbytes += jbytes::BorrowByteEncode::encode_inner({der_arg}{self_arg}{field}.to_string(), buffer, cattr_new, fattr_new)?;"))?;
     }
 
     if attributes.bits.is_some() || !attributes.untake {
