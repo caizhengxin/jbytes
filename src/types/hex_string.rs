@@ -150,9 +150,16 @@ impl FromStr for HexString {
 }
 
 
+impl Default for HexString {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 impl fmt::Display for HexString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", String::from_utf8_lossy(&self.inner).to_string())
+        write!(f, "{}", String::from_utf8_lossy(&self.inner))
     }
 }
 

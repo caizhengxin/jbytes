@@ -1,4 +1,4 @@
-// use jbytes::prelude::*;
+use jbytes::prelude::*;
 use jbytes_derive::{ByteDecode, ByteEncode};
 
 
@@ -37,7 +37,7 @@ fn test_type_int() {
         v6: 0x000006,
     };
 
-    let value: Example = jbytes::decode(input).unwrap();
+    let value: Example = jbytes::decode(&Bytes::new(input)).unwrap();
     assert_eq!(value, mt_value);
     assert_eq!(*jbytes::encode(value).unwrap(), input);
 }
