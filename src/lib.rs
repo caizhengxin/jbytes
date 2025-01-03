@@ -39,9 +39,6 @@ pub use byteorder::ByteOrder;
 pub use decode::{ByteDecode, BorrowByteDecode};
 pub use encode::{ByteEncode, BorrowByteEncode};
 
-// use crate::std::*;
-
-
 pub mod prelude {
     pub use crate::buffer::Buffer;
     pub use crate::bytes::Bytes;
@@ -54,14 +51,22 @@ pub mod prelude {
     pub use crate::decode::{ByteDecode, BorrowByteDecode};
     pub use crate::encode::{ByteEncode, BorrowByteEncode};
 
+    pub use crate::types::{MacAddress, NetAddress, HexString, HexBytes};
+
     #[cfg(feature = "jbytes_derive")]
     pub use jbytes_derive::{ByteDecode, ByteDecode, BorrowByteDecode, BorrowByteEncode};    
 }
 
 
 #[inline]
-pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: I) -> JResult<T> {
-    T::decode_inner(&Bytes::new(input), None, None)
+pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: &Bytes<I>) -> JResult<T> {
+    T::decode_inner(input, None, None)
+}
+
+
+#[inline]
+pub fn decode_borrow<'de, I: AsRef<[u8]>, T: BorrowByteDecode<'de>>(input: &'de Bytes<I>) -> JResult<T> {
+    T::decode_inner(input, None, None)
 }
 
 

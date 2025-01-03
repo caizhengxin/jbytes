@@ -89,6 +89,10 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
 - [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split example](./tests/test_type_hashmap.rs)
+
+- [x] `from_str`
+- [x] `from_str=<type>`
+
 - [ ] `check_value`：主要用于检查结果是否正常, 异常会返回错误
 - [x] `default`: eg: [default example](./crates/jdefault-rs/tests/test_jppe.rs)
 

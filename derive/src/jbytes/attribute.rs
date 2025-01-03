@@ -119,6 +119,8 @@ pub struct FieldAttributes {
     pub split: Option<AttrValue>,
     pub linend: Option<AttrValue>,
 
+    pub remaining: bool,
+
     // branch
     pub branch: Option<AttrValue>,
     pub branch_bits: Option<String>,
@@ -165,12 +167,14 @@ impl FieldAttributes {
         let bits_start = self.bits_start;
         let byte_count = self.byte_count.to_code(is_self, is_deref);
         let byte_count_outside = self.byte_count_outside.to_code(is_self, is_deref);
+        let remaining = self.remaining;
 
         if self.is_use {
             let value = format!("let fattr_new = jbytes::FieldAttrModifiers {{
                 byteorder: {byteorder}, branch: {branch}, length: {length}, count: {count}, try_count: {try_count},
                 split: {split}, linend_value: {linend}, bits: {bits}, bits_start: {bits_start},
                 key: {key}, byte_count: {byte_count}, byte_count_outside: {byte_count_outside},
+                remaining: {remaining},
                 ..Default::default()}}; let fattr_new = Some(&fattr_new);");
 
             if value.contains(": Some(") || value.contains(": true") || value.contains("if let Some(") {
@@ -210,6 +214,7 @@ impl FromAttribute for FieldAttributes {
                         "skip_decode" => result.skip_decode = true,
                         "default" | "default_value" => result.default_bool = true,
                         "from_str" => result.from_str_bool = true,
+                        "remaining" => result.remaining = true,
                         _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
                     }
                 }
