@@ -78,7 +78,7 @@ mod tests {
         assert_eq!(buffer.take_u8().unwrap(), 0x02);
         assert_eq!(buffer.remaining(), [0x03]);
         assert_eq!(buffer.take_u8().unwrap(), 0x03);
-        assert_eq!(buffer.remaining(), []);
+        assert_eq!(buffer.remaining_len(), 0);
         assert_eq!(buffer.get_position(), 3);
         assert_eq!(buffer.take_u8().is_err(), true);
     }

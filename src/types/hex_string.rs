@@ -36,55 +36,54 @@ fn is_hex(value: u8) -> Option<u8> {
 }
 
 
-#[inline]
-fn parse_hex<T: AsRef<[u8]>>(t: T) -> Result<Vec<u8>, HexStringParseError> {
-    let s = t.as_ref();
-
-    if s.len() % 2 != 0 {
-        return Err(HexStringParseError::InvalidHexString(str::from_utf8(s).unwrap_or_default().to_string()));
-    }
-
-    let mut vlist = vec![];
-
-    for v in s.chunks(2) {
-        if let Some(v0) = is_hex(v[0]) {
-            if let Some(v1) = is_hex(v[1]) {
-                vlist.push(v0 << 4 | v1);
-            }
-            else {
-                return Err(HexStringParseError::InvalidHexString(str::from_utf8(s).unwrap_or_default().to_string()));
-            }
-        }
-        else {
-            return Err(HexStringParseError::InvalidHexString(str::from_utf8(s).unwrap_or_default().to_string()));
-        }
-    }
-
-    Ok(vlist)
-}
-
-
 impl HexString {
-    pub fn new<T: AsRef<[u8]>>(t: T) -> Self {
-        Self{ inner: t.as_ref().to_vec() }
+    /// Constructs a new, empty `HexString`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use jbytes::types::HexString;
+    /// 
+    /// let mut hex_string = HexString::new();
+    /// 
+    /// hex_string.push(0x01);
+    /// hex_string.push(0x02);
+    /// ```
+    #[inline]
+    pub fn new() -> Self {
+        Self{ inner: Vec::new() }
     }
 
-    pub fn from_bytes<T: AsRef<[u8]>>(t: T) -> Result<Self, HexStringParseError> {
-        Ok(Self { inner: parse_hex(t)? })
-    }
-
+    /// Appends an element to the back of a collection.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use jbytes::types::HexString;
+    /// 
+    /// let mut hex_string = HexString::new();
+    /// 
+    /// hex_string.push(0x01);
+    /// hex_string.push(0xaf);
+    /// ```
+    #[inline]
     pub fn push(&mut self, c: u8) {
         self.inner.push(c);
     }
 
-    pub fn push_str(&mut self, s: &str) -> Result<(), HexStringParseError> {
-        let value = parse_hex(s)?;
-
-        self.inner.extend(value);
-
-        Ok(())
-    }
-
+    /// Returns the uppercase equivalent of this hex slice, as a new [String].
+    /// 
+    /// # Examples
+    /// 
+    /// Basic usage:
+    /// 
+    /// ```
+    /// use std::str::FromStr;
+    /// use jbytes::types::HexString;
+    /// 
+    /// let value = HexString::from_str("09afAF").unwrap();
+    /// assert_eq!(value.to_hex_lowercase(), "09afaf");
+    /// ```
     pub fn to_hex_lowercase(&self) -> String {
         let mut vstring = String::new();
 
@@ -96,6 +95,19 @@ impl HexString {
         vstring
     }
 
+    /// Returns the uppercase equivalent of this hex slice, as a new [String].
+    /// 
+    /// # Examples
+    /// 
+    /// Basic usage:
+    /// 
+    /// ```
+    /// use std::str::FromStr;
+    /// use jbytes::types::HexString;
+    /// 
+    /// let value = HexString::from_str("09afAF").unwrap();
+    /// assert_eq!(value.to_hex_uppercase(), "09AFAF");
+    /// ```
     pub fn to_hex_uppercase(&self) -> String {
         let mut vstring = String::new();
 
@@ -113,14 +125,41 @@ impl FromStr for HexString {
     type Err = HexStringParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self { inner: parse_hex(s)? })
+        if s.len() % 2 != 0 {
+            return Err(HexStringParseError::InvalidHexString(s.to_string()));
+        }
+    
+        let mut vlist = vec![];
+    
+        for v in s.as_bytes().chunks(2) {
+            if let Some(v0) = is_hex(v[0]) {
+                if let Some(v1) = is_hex(v[1]) {
+                    vlist.push(v0 << 4 | v1);
+                }
+                else {
+                    return Err(HexStringParseError::InvalidHexString(s.to_string()));
+                }
+            }
+            else {
+                return Err(HexStringParseError::InvalidHexString(s.to_string()));
+            }
+        }
+        
+        Ok(Self { inner: vlist })
     }
 }
 
 
 impl fmt::Display for HexString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_hex_lowercase())
+        write!(f, "{}", String::from_utf8_lossy(&self.inner).to_string())
+    }
+}
+
+
+impl From<Vec<u8>> for HexString {
+    fn from(value: Vec<u8>) -> Self {
+        Self { inner: value }
     }
 }
 
@@ -147,7 +186,7 @@ impl Serialize for HexString {
     where
         S: Serializer,
     {
-        serializer.collect_str(&self.to_string())
+        serializer.collect_str(&self.to_hex_lowercase())
     }
 }
 
@@ -165,13 +204,30 @@ impl<'de> Deserialize<'de> for HexString {
 }
 
 
+/// This is a Hex encoding function that converts raw data into a Hex string.
+/// 
+/// # Examples
+/// 
+/// ```
+/// use jbytes::types::hex_string;
+/// assert_eq!(hex_string::encode("jankincai").unwrap(), "6a616e6b696e636169");
+/// ```
 pub fn encode<T: AsRef<[u8]>>(s: T) -> Result<String, HexStringParseError> {
-    Ok(HexString{ inner: s.as_ref().to_vec() }.to_string())
+    Ok(HexString{ inner: s.as_ref().to_vec() }.to_hex_lowercase())
 }
 
 
-pub fn decode<T: AsRef<[u8]>>(s: T) -> Result<String, HexStringParseError> {
-    Ok(String::from_utf8(HexString::from_bytes(s)?.inner).unwrap_or_default())
+/// This is a Hex decoding function that converts a Hex String into ascii string.
+/// 
+/// # Examples
+/// 
+/// ```
+/// use jbytes::types::hex_string;
+/// 
+/// assert_eq!(hex_string::decode("6a616e6b696e636169").unwrap(), "jankincai");
+/// ```
+pub fn decode(s: &str) -> Result<String, HexStringParseError> {
+    Ok(HexString::from_str(s)?.to_string())
 }
 
 
@@ -183,25 +239,24 @@ mod tests {
 
     #[test]
     fn test_hex_string() {
-        assert_eq!(HexString::from_bytes(b"09afAF").unwrap().to_string(), "09afaf");
-        assert_eq!(HexString::from_bytes("09afAF".as_bytes()).unwrap().to_string(), "09afaf");
-        assert_eq!(HexString::from_bytes("09afAF").unwrap().to_string(), "09afaf");
-        assert_eq!(HexString::from_bytes("09afAF".to_string()).unwrap().to_string(), "09afaf");
+        assert_eq!(HexString::from_str("616263").unwrap().to_string(), "abc");
+        assert_eq!(HexString::from_str("09afAF").unwrap().to_hex_lowercase(), "09afaf");
+        assert_eq!(HexString::from_str("09afAF").unwrap().to_hex_uppercase(), "09AFAF");
 
-        assert_eq!(HexString::from_str("09afAF").unwrap().to_string(), "09afaf");
-
+        // error
         assert_eq!(HexString::from_str("0").is_err(), true);
         assert_eq!(HexString::from_str("0g").is_err(), true);
         assert_eq!(HexString::from_str("0G").is_err(), true);
         assert_eq!(HexString::from_str("0z").is_err(), true);
         assert_eq!(HexString::from_str("0Z").is_err(), true);
+        assert_eq!(HexString::from_str("0-").is_err(), true);
 
+        // push
         let mut value = HexString::from_str("09af").unwrap();
         value.push(0x01);
         value.push(0x02);
-        value.push_str("ff").unwrap();
-        assert_eq!(value.push_str("fg").is_err(), true);
-        assert_eq!(value.to_string(), "09af0102ff")
+        value.push(0xff);
+        assert_eq!(value.to_hex_lowercase(), "09af0102ff")
     }
 
     #[test]
@@ -212,10 +267,6 @@ mod tests {
         assert_eq!(encode("jankincai".as_bytes()).unwrap(), "6a616e6b696e636169");
 
         assert_eq!(decode("6a616e6b696e636169").unwrap(), "jankincai");
-        assert_eq!(decode(b"6a616e6b696e636169").unwrap(), "jankincai");
-        assert_eq!(decode("6a616e6b696e636169".to_string()).unwrap(), "jankincai");
-        assert_eq!(decode("6a616e6b696e636169".as_bytes()).unwrap(), "jankincai");
-
         assert_eq!(decode("6a616e6b696e636169fg").is_err(), true);
     }
 

@@ -140,7 +140,7 @@ mod tests {
         };
         let mut buffer = Buffer::new();
         assert_eq!(0x000001_u32.encode_inner(&mut buffer, None, Some(&fattr)).unwrap(), 0);
-        assert_eq!(*buffer, vec![]);
+        assert_eq!(buffer.is_empty(), true);
 
         let fattr = FieldAttrModifiers {
             byteorder: Some(ByteOrder::Le),
@@ -149,6 +149,6 @@ mod tests {
         };
         let mut buffer = Buffer::new();
         assert_eq!(0x000001_u32.encode_inner(&mut buffer, None, Some(&fattr)).is_err(), true);
-        assert_eq!(*buffer, vec![]);
+        assert_eq!(buffer.is_empty(), true);
     }
 }

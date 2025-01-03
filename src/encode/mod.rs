@@ -9,6 +9,7 @@ mod impls_bytes;
 mod impls_vec;
 #[cfg(feature = "std")]
 mod impls_hashmap;
+mod impls_hex;
 mod impls_other;
 mod impls_option;
 mod impls_ipaddress;

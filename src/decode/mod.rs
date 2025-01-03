@@ -11,6 +11,7 @@ mod impls_vec;
 mod impls_hashmap;
 #[cfg(feature = "std")]
 mod impls_hashset;
+mod impls_hex;
 mod impls_other;
 mod impls_option;
 mod impls_ipaddress;

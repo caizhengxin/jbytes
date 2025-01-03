@@ -106,37 +106,37 @@ mod tests {
         assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x00, 0x04, 0x02]);
         assert_eq!(bytes.remaining_len(), 0);
 
-    //     // test key and split
-    //     let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
-    //     let fattr = FieldAttrModifiers {
-    //         key: Some(&[0x00, 0x01]),
-    //         split: Some(&[0x02]),
-    //         linend: true,
-    //         ..Default::default()
-    //     };
-    //     assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x03, 0x04, 0x05]);
-    //     assert_eq!(bytes.remaining_len(), 0);
+        // test key and split
+        let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
+        let fattr = FieldAttrModifiers {
+            key: Some(&[0x00, 0x01]),
+            split: Some(&[0x02]),
+            linend: true,
+            ..Default::default()
+        };
+        assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x03, 0x04, 0x05]);
+        assert_eq!(bytes.remaining_len(), 0);
 
-    //     // test key and split
-    //     let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
-    //     let fattr = FieldAttrModifiers {
-    //         key: Some(&[0x00, 0x01]),
-    //         split: Some(&[0x03]),
-    //         linend: true,
-    //         ..Default::default()
-    //     };
-    //     assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x04, 0x05]);
-    //     assert_eq!(bytes.remaining_len(), 0);
+        // test key and split
+        let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
+        let fattr = FieldAttrModifiers {
+            key: Some(&[0x00, 0x01]),
+            split: Some(&[0x03]),
+            linend: true,
+            ..Default::default()
+        };
+        assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x04, 0x05]);
+        assert_eq!(bytes.remaining_len(), 0);
 
-    //     // test key and split
-    //     let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
-    //     let fattr = FieldAttrModifiers {
-    //         key: Some(&[0x00, 0x01]),
-    //         split: Some(&[0x02]),
-    //         linend_value: Some(&[0x00]),
-    //         ..Default::default()
-    //     };
-    //     assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x03, 0x04, 0x05]);
-    //     assert_eq!(bytes.remaining_len(), 0);
+        // test key and split
+        let bytes = Bytes::new([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00]);
+        let fattr = FieldAttrModifiers {
+            key: Some(&[0x00, 0x01]),
+            split: Some(&[0x02]),
+            linend_value: Some(&[0x00]),
+            ..Default::default()
+        };
+        assert_eq!(<&[u8]>::decode_inner(&bytes, None, Some(&fattr)).unwrap(), &[0x03, 0x04, 0x05]);
+        assert_eq!(bytes.remaining_len(), 0);
     }
 }
