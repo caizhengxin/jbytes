@@ -53,6 +53,8 @@ pub enum ErrorKind {
     InvalidPosition(usize),
     #[error("invalid buffer memory")]
     PushFail,
+    #[error("invalid value ({0})")]
+    InvalidValue(String),
 }
 
 
