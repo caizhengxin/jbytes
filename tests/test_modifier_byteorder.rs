@@ -62,3 +62,27 @@ fn test_byteorder_example3() {
 
     assert_eq!(*jbytes::encode(value).unwrap(), [0x01, 0x00, 0x02]);
 }
+
+
+#[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+pub enum ByteOrderEnumExample1 {
+    #[jbytes(branch_value=1)]
+    Read {
+        a: u16,
+        #[jbytes(byteorder = "LE")] // set little-endian byte order.
+        b: u16,    
+    },
+    #[jbytes(branch_default)]
+    Unknown,
+}
+
+
+#[test]
+fn test_byteorder_enum_example1() {
+    let bytes = Bytes::new([0x01, 0x00, 0x01, 0x00, 0x02]);
+    let value = ByteOrderEnumExample1::Read { a: 0x0001, b: 0x0200};
+    assert_eq!(ByteOrderEnumExample1::decode(&bytes).unwrap(), value);
+    assert_eq!(bytes.remaining_len(), 0);
+
+    assert_eq!(*jbytes::encode(value).unwrap(), [0x01, 0x00, 0x01, 0x00, 0x02]);
+}

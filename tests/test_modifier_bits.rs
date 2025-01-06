@@ -55,3 +55,34 @@ fn test_modifier_bits_example2() {
     // encode
     assert_eq!(*jbytes::encode(value).unwrap(), data);
 }
+
+
+#[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+pub enum BitsEnumExample {
+    #[jbytes(branch_value=1)]
+    Read {
+        #[jbytes(bits_start=0xf0, untake)]
+        version: u8,
+        #[jbytes(bits=0x0f)]
+        length: u8,    
+    },
+    #[jbytes(branch_default)]
+    Unknown,
+}
+
+
+#[test]
+fn test_modifier_bits_enum_example() {
+    // decode
+    let data = b"\x01\x12";
+    let bytes = Bytes::new(data);
+    let value = BitsEnumExample::Read {
+        version: 0x01,
+        length: 0x02,
+    };
+    assert_eq!(BitsEnumExample::decode(&bytes).unwrap(), value);
+    assert_eq!(bytes.remaining_len(), 0);
+
+    // encode
+    assert_eq!(*jbytes::encode(value).unwrap(), data);
+}

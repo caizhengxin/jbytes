@@ -25,3 +25,31 @@ fn test_modifier_key_example() {
     // encode
     assert_eq!(*jbytes::encode(value).unwrap(), b"Version: 1.0.0\r\nHost: 192.168.1.1\r\n");
 }
+
+
+#[derive(Debug, PartialEq, Eq, ByteDecode, ByteEncode)]
+pub enum KeyEnumExample {
+    #[jbytes(branch_value=1)]
+    Http {
+        #[jbytes(key=b"Version: ", linend=b"\r\n")]
+        version: String,
+        #[jbytes(key=b"Host: ", linend=b"\r\n")]
+        host: String,    
+    },
+    #[jbytes(branch_default)]
+    Unknown,
+}
+
+
+#[test]
+fn test_modifier_key_enum_example() {
+    // decode
+    let data = b"\x01Cookie: sssss\r\nVersion: 1.0.0\r\nHeader: jkc\r\nHost: 192.168.1.1\r\nOther: jkc\r\n";
+    let bytes = Bytes::new(data);
+    let value = KeyEnumExample::Http { version: "1.0.0".to_string(), host: "192.168.1.1".to_string() };
+    assert_eq!(KeyEnumExample::decode(&bytes).unwrap(), value);
+    assert_eq!(bytes.remaining(), b"Other: jkc\r\n");
+
+    // encode
+    assert_eq!(*jbytes::encode(value).unwrap(), b"\x01Version: 1.0.0\r\nHost: 192.168.1.1\r\n");
+}
