@@ -1,5 +1,11 @@
 # jbytes
 
+[![Crates.io](https://img.shields.io/crates/v/jbytes)](https://crates.io/crates/jbytes)
+[![Crates.io](https://img.shields.io/crates/d/jbytes)](https://crates.io/crates/jbytes)
+[![License](https://img.shields.io/crates/l/jbytes)](LICENSE-MIT)
+
+这是一个基于Rust实现的字节流结构化序列化/反序列化通用库，可以应用于网络数据包解析、网络数据包组包、网络通信、文件内容解析等，觉得不错的小伙伴们请点个赞👍~
+
 ## 安装
 
 ### Cargo.toml
@@ -9,11 +15,11 @@
 jbytes = { version="0.1.0", features = ["derive"] }
 ```
 
-Or
+no_std:
 
 ```toml
 [dependencies]
-jbytes = { version="0.1.0", features = ["derive", "serde"] }
+jbytes = { version="0.1.0", default-features = false, features = ["derive"] } # default use alloc.
 ```
 
 ## 例子
@@ -66,11 +72,11 @@ pub struct SimpleExample {
 
 
 #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
-#[repr(u8)]
 pub enum SimpleExampleBody {
+    #[jbytes(branch_value=1)]
     Read {
         address: u8,
-    } = 1,                    // 这里表示当前面的`cmd`字段为1，则会进入该分支解析
+    },                        // 这里表示当前面的`cmd`字段为1，则会进入该分支解析
     Write {
         address: u8,
         value: [u8; 3],
@@ -96,13 +102,13 @@ fn main() {
 ### 其他例子
 
 - [TCP通信例子](./examples/socket_example.rs)
-- [以太网解析例子](./examples/packet_ethernet_example.rs)
+- [Ethernet解析例子](./examples/packet_ethernet_example.rs)
 - [IPv4解析例子](./examples/packet_ipv4_example.rs)
 - [TCP解析例子](./examples/packet_tcp_example.rs)
 - [HTTP解析例子](./examples/packet_http_example.rs)
 - [HTTP解析例子2](./examples/packet_http_example_2.rs)
 - [HTTP解析例子3](./examples/packet_http_example_3.rs)
-- [解析例子](./examples/packet_parse_example.rs)：包含Ethernet/IPv4/TCP/UDP
+- [数据包解析例子](./examples/packet_parse_example.rs)：包含Ethernet/IPv4/TCP/UDP
 
 ## 数据类型
 
