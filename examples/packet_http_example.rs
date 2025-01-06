@@ -1,10 +1,15 @@
 
+#[cfg(feature = "std")]
 use std::collections::HashMap;
+#[allow(unused_imports)]
 use jbytes::{BorrowByteDecode, BorrowByteEncode};
+#[allow(unused_imports)]
 use jbytes_derive::{BorrowByteEncode, BorrowByteDecode};
+#[allow(unused_imports)]
 use jbytes::prelude::*;
 
 
+#[cfg(feature = "std")]
 #[derive(Debug, Default, PartialEq, Eq, BorrowByteEncode, BorrowByteDecode)]
 pub struct Http<'a> {
     #[jbytes(linend=b"\x20")]
@@ -18,6 +23,7 @@ pub struct Http<'a> {
 }
 
 
+#[cfg(feature = "std")]
 fn main() {
     let data = b"GET http://www.jankincai.com/ HTTP/1.1\r\nHost: www.jankincai.com\r\nAccept-Encoding: gzip, deflate\r\n";
     let bytes = Bytes::new(data);
@@ -31,4 +37,8 @@ fn main() {
     println!("{buffer:?}");
     // The headers hashmap is out of order and cannot be compared.
     // assert_eq!(*buffer, data);
+}
+
+#[cfg(not(feature = "std"))]
+fn main() {
 }

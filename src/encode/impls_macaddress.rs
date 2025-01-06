@@ -25,6 +25,7 @@ impl crate::BorrowByteEncode for MacAddress {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{Buffer, ByteOrder, BorrowByteEncode};
     use super::*;
 

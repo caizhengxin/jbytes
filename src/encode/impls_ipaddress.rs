@@ -68,6 +68,7 @@ impl crate::BorrowByteEncode for IpAddr {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use core::{
         net::{IpAddr, Ipv4Addr, Ipv6Addr},
         str::FromStr

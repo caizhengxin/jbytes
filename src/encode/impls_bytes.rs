@@ -64,6 +64,7 @@ impl<'de> BorrowByteEncode for &'de [u8] {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode, FieldAttrModifiers,
     };

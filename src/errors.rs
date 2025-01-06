@@ -2,7 +2,7 @@
 pub use thiserror_no_std::Error as ThisError;
 #[cfg(feature = "std")]
 pub use thiserror::Error as ThisError;
-use crate::std::fmt;
+use crate::std::*;
 
 
 pub type JResult<O, E = Error> = Result<O, E>;

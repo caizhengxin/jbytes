@@ -36,6 +36,7 @@ impl<'de> crate::BorrowByteEncode for HexBytes<'de> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode,
     };

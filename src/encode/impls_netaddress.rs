@@ -37,6 +37,7 @@ impl crate::BorrowByteEncode for NetAddress {
 mod tests {
     use core::str::FromStr;
     use core::net::{Ipv4Addr, Ipv6Addr};
+    use crate::std::*;
     use crate::{
         types::MacAddress,
         Buffer, BorrowByteEncode
