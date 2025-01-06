@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use jbytes::{ByteDecode, ByteEncode};
 use jbytes_derive::{ByteDecode, ByteEncode};
-use jbytes::prelude::*;
+// use jbytes::prelude::*;
 
 
 #[derive(Debug, PartialEq, Eq, ByteDecode, ByteEncode)]
@@ -43,7 +43,7 @@ fn test_type_int() {
         v8: 0x0008,
     };
 
-    let value: Example = jbytes::decode(&Bytes::new(input)).unwrap();
+    let value: Example = jbytes::decode(&input).unwrap();
     assert_eq!(value, mt_value);
     assert_eq!(*jbytes::encode(value).unwrap(), input);
 }
@@ -89,7 +89,7 @@ fn test_type_int_with_little_endian() {
         v8: 0x0008,
     };
 
-    let value: LittleEndianExample = jbytes::decode(&Bytes::new(input)).unwrap();
+    let value: LittleEndianExample = jbytes::decode(&input).unwrap();
     assert_eq!(value, mt_value);
     assert_eq!(*jbytes::encode(value).unwrap(), input);
 }

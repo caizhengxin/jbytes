@@ -59,8 +59,8 @@ pub mod prelude {
 
 
 #[inline]
-pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: &Bytes<I>) -> JResult<T> {
-    T::decode_inner(input, None, None)
+pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: &I) -> JResult<T> {
+    T::decode_inner(&Bytes::new(input), None, None)
 }
 
 
