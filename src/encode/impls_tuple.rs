@@ -63,6 +63,7 @@ impls_tuple!();
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,
         ContainerAttrModifiers, FieldAttrModifiers,

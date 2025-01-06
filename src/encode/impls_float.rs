@@ -54,6 +54,7 @@ impl BorrowByteEncode for f64 {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,
         ContainerAttrModifiers, FieldAttrModifiers,

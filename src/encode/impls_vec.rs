@@ -1,3 +1,4 @@
+use crate::std::*;
 use crate::{
     JResult, BufWrite,
     ByteEncode, BorrowByteEncode,
@@ -45,6 +46,7 @@ impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     #[allow(unused_imports)]
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,

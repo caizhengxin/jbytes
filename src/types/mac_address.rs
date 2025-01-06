@@ -3,6 +3,7 @@ use core::{
     fmt,
     str::FromStr,
 };
+use crate::std::*;
 #[cfg(feature = "serde")]
 use serde::{Serialize, Serializer, Deserialize, Deserializer, de::Error as DeError};
 use crate::errors::ThisError;
@@ -164,7 +165,7 @@ impl<'de> Deserialize<'de> for MacAddress {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use crate::std::*;
     #[cfg(feature = "serde")]
     use serde::{Deserialize, Serialize};
     use super::MacAddress;

@@ -1,4 +1,4 @@
-use core::str;
+use crate::std::*;
 use crate::{
     JResult, BufRead,
     ByteDecode, BorrowByteDecode,
@@ -59,6 +59,7 @@ impl<'de> BorrowByteDecode<'de> for &'de str {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Bytes, BufRead, BorrowByteDecode,
         FieldAttrModifiers,

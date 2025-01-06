@@ -3,6 +3,7 @@ use core::{
     str::FromStr,
     fmt,
 };
+use crate::std::*;
 #[cfg(feature = "serde")]
 use serde::{Serialize, Serializer, Deserialize, Deserializer, de::Error as DeError};
 use super::MacAddress;
@@ -147,7 +148,7 @@ impl<'de> Deserialize<'de> for NetAddress {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use crate::std::*;
     #[cfg(feature = "serde")]
     use serde::{Deserialize, Serialize};
     use super::*;

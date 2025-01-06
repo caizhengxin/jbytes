@@ -1,8 +1,9 @@
-
-use std::str::FromStr;
+#[cfg(not(feature = "std"))]
+extern crate alloc;
 use jkcenum::JkcEnum;
 use jbytes_derive::{BorrowByteEncode, BorrowByteDecode};
 use jbytes::prelude::*;
+use jbytes::std::*;
 
 
 #[derive(Debug, Default, PartialEq, Eq, BorrowByteEncode, BorrowByteDecode)]

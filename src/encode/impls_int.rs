@@ -88,6 +88,7 @@ impls_int_encode!();
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,
         ContainerAttrModifiers, FieldAttrModifiers,

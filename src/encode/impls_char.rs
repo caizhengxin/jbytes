@@ -27,6 +27,7 @@ impl BorrowByteEncode for char {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, ByteEncode,
     };

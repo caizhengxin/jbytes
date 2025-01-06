@@ -52,6 +52,7 @@ impl<'de> crate::BorrowByteDecode<'de> for NetAddress {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{BufRead, Bytes, BorrowByteDecode};
     use super::*;
 

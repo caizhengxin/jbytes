@@ -37,6 +37,7 @@ impl<T: BorrowByteEncode, const N: usize> BorrowByteEncode for [T; N] {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{
         Buffer, BorrowByteEncode, ByteOrder,
         ContainerAttrModifiers, FieldAttrModifiers,

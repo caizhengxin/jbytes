@@ -32,6 +32,7 @@ impl<'de> crate::BorrowByteDecode<'de> for MacAddress {
 
 #[cfg(test)]
 mod tests {
+    use crate::std::*;
     use crate::{BufRead, Bytes, ByteOrder, BorrowByteDecode};
     use super::*;
 
