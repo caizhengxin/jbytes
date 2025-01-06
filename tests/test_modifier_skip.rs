@@ -11,7 +11,7 @@ pub struct SkipExample {
 
 
 #[test]
-fn test_modifier_skip() {
+fn test_modifier_skip_example() {
     let bytes = Bytes::new(b"\x00\x01");
     assert_eq!(SkipExample::decode(&bytes).unwrap(), SkipExample { version: 0, command: 1 });
     assert_eq!(bytes.remaining_len(), 0);
@@ -35,4 +35,27 @@ fn test_modifier_skip_example2() {
     assert_eq!(bytes.remaining_len(), 0);
 
     assert_eq!(*jbytes::encode(SkipExample2 { version: 0, command: 1 }).unwrap(), b"\x00\x01");
+}
+
+
+#[derive(Debug, PartialEq, Eq, ByteDecode, ByteEncode)]
+pub enum SkipEnumExample {
+    #[jbytes(branch_value=1)]
+    Read {
+        #[jbytes(skip)]
+        version: u16,
+        command: u16,    
+    },
+    #[jbytes(branch_default)]
+    Unknown
+}
+
+
+#[test]
+fn test_modifier_skip_enum_example() {
+    let bytes = Bytes::new(b"\x01\x00\x01");
+    assert_eq!(SkipEnumExample::decode(&bytes).unwrap(), SkipEnumExample::Read { version: 0, command: 1 });
+    assert_eq!(bytes.remaining_len(), 0);
+
+    assert_eq!(*jbytes::encode(SkipEnumExample::Read { version: 0, command: 1 }).unwrap(), b"\x01\x00\x01");
 }

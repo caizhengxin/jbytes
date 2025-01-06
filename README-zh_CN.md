@@ -18,6 +18,33 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 
 ## 例子
 
+### Bytes例子
+
+```rust
+use jbytes::prelude::*;
+
+
+fn main() {
+    let bytes = Bytes::new(b"\x01\x02\x03");
+    assert_eq!(bytes.take_be_u16().unwrap(), 0x0102);
+    assert_eq!(bytes.take_be_u16().is_err(), true);
+}
+```
+
+### Buffer例子
+
+```rust
+use jbytes::prelude::*;
+
+
+fn main() {
+    let mut buffer = Buffer::new();
+    assert_eq!(buffer.push_be_u16(1).unwrap(), 2);
+    assert_eq!(buffer.push(b"\x01\x02\x03").unwrap(), 3);
+    assert_eq!(*buffer, b"\x00\x01\x01\x02\x03");
+}
+```
+
 ### 简单例子
 
 ```rust
