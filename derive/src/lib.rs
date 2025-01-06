@@ -26,7 +26,7 @@
 //!         address: u8,
 //!         value: [u8; 3],
 //!     },
-//!     #[jbytes(enum_default)]
+//!     #[jbytes(branch_default)]
 //!     Unknown, 
 //! }
 //! 

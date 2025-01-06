@@ -16,6 +16,67 @@ Or
 jbytes = { version="0.1.0", features = ["derive", "serde"] }
 ```
 
+## 例子
+
+### 简单例子
+
+```rust
+use jbytes::{ByteEncode, ByteDecode};
+
+
+#[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+pub struct SimpleExample {
+    pub length: u16,
+    // 这里是指定动态长度，也可以指定固定数值，比如：`#[jbytes(length=3)]`
+    // 还可以不指定`length`, 指定`byte_count=<1..8>`表示提前取走几个字节根据字节序转为长度数值
+    #[jbytes(length="length")]
+    pub value: String,
+    pub cmd: u8,
+    // 这里指定了branch, 表示根据cmd的值进行枚举类型(enum)模式匹配, 同样也可以不指定branch, 指定`byte_count=<1..8>`修饰符
+    #[jbytes(branch="cmd")]
+    pub body: SimpleExampleBody,
+}
+
+
+#[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+#[repr(u8)]
+pub enum SimpleExampleBody {
+    Read {
+        address: u8,
+    } = 1,                    // 这里表示当前面的`cmd`字段为1，则会进入该分支解析
+    Write {
+        address: u8,
+        value: [u8; 3],
+    },                        // 这里如果不指定，默认是递增的关系为2
+    #[jbytes(branch_default)]
+    Unknown,                  // 这里由于指定了默认分支，所以会被映射为`_ => { ... }`, 如果没有指定，Unknown序号为3，其他则会返回解析错误
+}
+
+
+fn main() {
+    let input = b"\x00\x03\x31\x32\x33\x01\x05";
+    let value: SimpleExample = jbytes::decode(input).unwrap();
+    assert_eq!(value, SimpleExample { length: 3, value: "123".to_string(), cmd: 1, body: SimpleExampleBody::Read { address: 5 } });
+    assert_eq!(*jbytes::encode(value).unwrap(), input);
+}
+```
+
+### 默认值例子
+
+```rust
+```
+
+### 其他例子
+
+- [TCP通信例子](./examples/socket_example.rs)
+- [以太网解析例子](./examples/packet_ethernet_example.rs)
+- [IPv4解析例子](./examples/packet_ipv4_example.rs)
+- [TCP解析例子](./examples/packet_tcp_example.rs)
+- [HTTP解析例子](./examples/packet_http_example.rs)
+- [HTTP解析例子2](./examples/packet_http_example_2.rs)
+- [HTTP解析例子3](./examples/packet_http_example_3.rs)
+- [解析例子](./examples/packet_parse_example.rs)：包含Ethernet/IPv4/TCP/UDP
+
 ## 数据类型
 
 - [x] `u8/u16/u32/u64/usize/u128`
@@ -40,7 +101,7 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `std::net::Ipv6Addr`
 - [x] `std::net::IpAddr`
 - [x] `NetAddress`
-- [ ] `HexString`
+- [x] `HexString`
 - [ ] `DateTime`
 - [ ] `Bit`
 
@@ -71,30 +132,26 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 - [x] `offset=<num|variable>`: 表示从当前位置向前前进n个位置，实现数据流的位置偏移，eg: [offset example](./tests/test_modifier_offset.rs)。
 - [x] `full=<int>`: 表示用于`encode`编码填充值, 默认为0, 常常用于offset偏移之后进行`encode`编码填充, eg: [full example](./tests/test_modifier_full.rs)。
 - [x] `byte_count=<1..8>`: 表示取几个字节转成整型，代表后续需要读取的字节流长度，eg：[byte_count example](./tests/test_modifier_bytecount.rs)。
-- [x] `remaining`
+- [x] `remaining`: 表示取走剩余所有字节，eg：[remaining example](./tests/test_modifier_remaining.rs)。
 - [x] `untake`: 表示读取数据不移动位置，后续可以继续从该位置读取数据，eg: [untake example](./tests/test_modifier_untake.rs)。
-- [x] `encode_value`: value处理表达式，eg: [encode_value example](./tests/test_modifier_value.rs)。
-- [x] `decode_value`: value处理表达式，eg: [decode_value example](./tests/test_modifier_value.rs)。
-- [x] `variable_name`: 指定整型类型缓存变量，并通过`get_variable_name`修饰符在其他`Struct/Enum`使用，eg: [variable_name example](./tests/test_modifier_variable_name.rs)。
+- [x] `encode_value=<expr>`: value处理表达式，eg: [encode_value example](./tests/test_modifier_value.rs)。
+- [x] `decode_value=<expr>`: value处理表达式，eg: [decode_value example](./tests/test_modifier_value.rs)。
+- [x] `variable_name=<variable>`: 指定整型类型缓存变量，并通过`get_variable_name`修饰符在其他`Struct/Enum`使用，eg: [variable_name example](./tests/test_modifier_variable_name.rs)。
 - [x] `skip`: 表示跳过该字段的`encode/decode`函数，类型需要实现`Default`trait，eg：[skip example](./tests/test_modifier_skip.rs)。
 - [x] `skip_encode`: 表示跳过该字段的`encode`函数，eg：[skip_encode example](./tests/test_modifier_skip.rs)。
 - [x] `skip_decode`: 表示跳过该字段的`decode`函数，类型需要实现`Default`trait，eg：[skip_decode example](./tests/test_modifier_skip.rs)。
 - [x] `if_expr=<bool expr>`: 指定`if`条件表达式，支持`Option<T>`类型，eg: [if_expr example](./tests/test_modifier_if_expr.rs)。
-- [x] `encode_with`: 自定义encode函数，eg: [encode_with example](./tests/test_modifier_with.rs)。
-- [x] `decode_with`: 自定义decode函数，eg: [decode_with example](./tests/test_modifier_with.rs)。
-- [x] `with`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with_1.rs)。
-- [x] `with_args`: 自定义encode/decode函数参数，eg: [with_args example](./tests/test_modifier_with_args.rs)。
-
-
-- [x] `linend|end_with=<string|bytes>`: 指定结束位置, 支持`String/&str/&[u8]/HashMap`等类型.
-- [x] `key|starts_with`: 指定精准匹配关键字, 必须配合`linend`使用, 支持`string/&str/&[u8]`等类型.
+- [x] `encode_with=<func>`: 自定义encode函数，eg: [encode_with example](./tests/test_modifier_with.rs)。
+- [x] `decode_with=<func>`: 自定义decode函数，eg: [decode_with example](./tests/test_modifier_with.rs)。
+- [x] `with=<mod>`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with_1.rs)。
+- [x] `with_args=<variable>`: 自定义encode/decode函数参数，eg: [with_args example](./tests/test_modifier_with_args.rs)。
+- [x] `linend|end_with=<string|bytes>`：指定结束位置，支持`String/&str/&[u8]/HashMap`等类型，eg：[linend](./tests/test_modifier_key.rs)。
+- [x] `key|starts_with`：指定精准匹配关键字，必须配合`linend`使用，支持`string/&str/&[u8]`等类型，eg：[key example](./tests/test_modifier_key.rs)。
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split example](./tests/test_type_hashmap.rs)
+- [x] `from_str`: 表示通过`FromStr`类型进行转换，eg：[from_str example](./tests/test_modifier_from_str.rs)。
+- [x] `from_str=<type>`：表示通过`Type::FromStr`类型进行转换，eg：[from_str example](./tests/test_modifier_from_str.rs)。
 
-- [x] `from_str`
-- [x] `from_str=<type>`
-
-- [ ] `check_value`：主要用于检查结果是否正常, 异常会返回错误
-- [x] `default`: eg: [default example](./crates/jdefault-rs/tests/test_jppe.rs)
+- [ ] `check_value`：主要用于检查结果是否正常, 如果异常会返回错误。
 
 > 容器类型修饰符，比如：Vec/HashMap/HashSet等
 
@@ -105,7 +162,7 @@ jbytes = { version="0.1.0", features = ["derive", "serde"] }
 > enum branch
 
 - [x] `branch`: 指定枚举(Enum)类型分支条件，eg: [branch example](./tests/test_modifier_branch.rs)。
-- [x] `branch_value`: 指定枚举(Enum)分支判断条件, eg: [branch_value example](./tests/test_type_modifier_branch_value.rs)
-- [x] `branch_range`: 指定枚举(Enum)分支判断条件范围, eg: [branch_range example](./tests/test_type_modifier_branch_range.rs)
-- [x] `branch_bits`: 指定枚举(Enum)分支判断条件, eg: [branch_bits example](./tests/test_type_modifier_branch_bits.rs)
-- [x] `branch_default`: 指定枚举(Enum)类型默认值, eg: [branch_default example](./tests/test_modifier_branch_default.rs)
+- [x] `branch_value`: 指定枚举(Enum)分支判断条件, eg: [branch_value example](./tests/test_type_modifier_branch_value.rs)。
+- [x] `branch_range`: 指定枚举(Enum)分支判断条件范围, eg: [branch_range example](./tests/test_type_modifier_branch_range.rs)。
+- [x] `branch_bits`: 指定枚举(Enum)分支判断条件, eg: [branch_bits example](./tests/test_type_modifier_branch_bits.rs)。
+- [x] `branch_default`: 指定枚举(Enum)类型默认值, eg: [branch_default example](./tests/test_modifier_branch_default.rs)。
