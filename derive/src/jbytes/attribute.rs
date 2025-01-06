@@ -141,6 +141,9 @@ pub struct FieldAttributes {
     pub skip: bool,
     pub skip_encode: bool,
     pub skip_decode: bool,
+
+    // check
+    pub check_value: Option<String>,
 }
 
 
@@ -254,6 +257,7 @@ impl FromAttribute for FieldAttributes {
                         "with" => result.with = Some(parse_value_string(&val)?),
                         "variable_name" => result.variable_name = Some(AttrValue::parse_list(&val)?),
                         "if_expr" => result.if_expr = Some(parse_value_string(&val)?),
+                        "check_value" => result.check_value = Some(parse_value_string(&val)?),
                         _ => return Err(Error::custom_at("Unknown field attribute", key.span())),
                     }
                 }

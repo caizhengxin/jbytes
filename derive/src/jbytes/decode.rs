@@ -71,6 +71,13 @@ pub fn generate_decode_body(fn_body: &mut StreamBuilder, crate_name: &str, attri
         if let Some(value_expr) = &attributes.value_decode {
             fn_body.push_parsed(format!("let {name} = {value_expr};"))?;
         }
+
+        // check
+        if let Some(check_value) = &attributes.check_value {
+            fn_body.push_parsed(format!("if {name} != {check_value} {{
+                return Err(jbytes::make_error(input.get_position(), jbytes::ErrorKind::InvalidValue(format!(\"{{{name}}}\"))));
+            }}"))?;
+        } 
     }
 
     // variable_name

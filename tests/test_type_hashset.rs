@@ -10,7 +10,7 @@ use jbytes::prelude::*;
 #[derive(Debug, PartialEq, Eq, ByteDecode)]
 pub struct HashSetExample {
     pub count: u8,
-    #[jbytes(count="count")] // or #[jppe(count=3)]
+    #[jbytes(count="count")] // or #[jbytes(count=3)]
     pub hashset: HashSet<u16>,
 }
 
