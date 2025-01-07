@@ -12,11 +12,16 @@ readme = "README.md"
 # https://crates.io/category_slugs
 categories = [
     "development-tools",
+    "encoding",
+    "parser-implementations",
 ]
 keywords = [
     "byte",
     "bytes",
     "jbytes",
+    "serialization",
+    "parsing",
+    "stream",
 ]
 license = "MIT OR Apache-2.0"
 include = [
@@ -31,14 +36,17 @@ include = [
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[workspace]
-members = [
-    "derive"
-]
-
 [profile.dev]
 opt-level = 1
 overflow-checks = false
+
+[workspace]
+members = [
+    "derive",
+    "crates/jdefault-rs",
+    "crates/jget-rs",
+    "crates/jget-rs/derive",
+]
 
 [features]
 default = ["std"]
@@ -49,13 +57,18 @@ std = [
     "aho-corasick/std"
 ]
 derive = ["jbytes_derive"]
+jdefault = ["jdefault_derive"]
 full = [
     "serde",
     "jbytes_derive",
+    "jdefault_derive",
+    "jget",
 ]
 
 [dependencies]
 jbytes_derive = { path = "derive", version = "0.1.0", optional = true }
+jdefault_derive = { path = "crates/jdefault-rs", version = "0", optional = true }
+jget = { path = "crates/jget-rs", version = "0", features = ["derive"], optional = true }
 thiserror = { version = "1.0", default-features = false, optional = true }
 thiserror-no-std = "2.0.2"
 serde = { version = "1.0", default-features = false, optional = true }
@@ -65,5 +78,7 @@ aho-corasick = { version = "1.1", default-features = false }
 
 [dev-dependencies]
 jbytes_derive = { path = "derive", version = "0.1.0" }
+jdefault_derive = { path = "crates/jdefault-rs" }
+jget = { path = "crates/jget-rs", version = "0", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
