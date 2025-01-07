@@ -95,7 +95,7 @@ fn main() {
 
 ```toml
 [dependencies]
-jppe = { version="1.1.1", features = ["derive", "jdefault"] }
+jbytes = { version="0.1.0", features = ["derive", "jdefault"] }
 ```
 
 ```rust
