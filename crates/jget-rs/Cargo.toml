@@ -1,0 +1,37 @@
+[package]
+name = "jget"
+version = "0.4.1"
+authors = [
+    "jankincai <jankincai12@gmail.com.cn>"
+]
+edition = "2021"
+description = "Rust tools."
+repository = "https://github.com/caizhengxin/jbytes-rs/tree/master/crates/jget-rs"
+homepage = "https://github.com/caizhengxin/jbytes-rs/tree/master/crates/jget-rs"
+readme = "README.md"
+# https://crates.io/category_slugs
+categories = [
+    "accessibility",
+    "development-tools",
+]
+license = "MIT OR Apache-2.0"
+include = [
+    "src/*",
+    "benches/*",
+    "examples/*",
+    "Cargo.toml",
+    "LICENSE*",
+    "README.md",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+derive = ["jget_derive"]
+
+[dependencies]
+jget_derive = { path = "derive", version = "0.4.1", optional = true }
+thiserror = "1.0"
+
+[dev-dependencies]
+jget_derive = { path = "derive", version = "0.4.1" }

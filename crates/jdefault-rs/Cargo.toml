@@ -1,0 +1,38 @@
+[package]
+name = "jdefault_derive"
+version = "0.3.1"
+authors = [
+    "jankincai <jankincai12@gmail.com>"
+]
+edition = "2021"
+description = "Rust default derive."
+repository = "https://github.com/caizhengxin/jbytes-rs/tree/master/crates/jdefault-rs"
+homepage = "https://github.com/caizhengxin/jbytes-rs/tree/master/crates/jdefault-rs"
+readme = "README.md"
+# https://crates.io/category_slugs
+categories = [
+    "development-tools",
+]
+keywords = [
+    "jdefault",
+    "default",
+]
+license = "MIT OR Apache-2.0"
+include = [
+    "src/*",
+    "examples/*",
+    "Cargo.toml",
+    "LICENSE*",
+    "README.md",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+virtue = "0.0"
+
+[dev-dependencies]
+jbytes = { path = "../../", features = ["derive"] }
