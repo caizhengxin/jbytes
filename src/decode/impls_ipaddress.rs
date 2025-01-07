@@ -14,7 +14,7 @@ impl ByteDecode for Ipv4Addr {
     where 
         Self: Sized
     {
-        Ok(Self::from_bits(input.take_byteorder_u32(get_byteorder(cattr, fattr))?))
+        Ok(Self::from(input.take_byteorder_u32(get_byteorder(cattr, fattr))?))
     }
 }
 
@@ -25,7 +25,7 @@ impl<'de> BorrowByteDecode<'de> for Ipv4Addr {
     where 
         Self: Sized
     {
-        Ok(Self::from_bits(input.take_byteorder_u32(get_byteorder(cattr, fattr))?))
+        Ok(Self::from(input.take_byteorder_u32(get_byteorder(cattr, fattr))?))
     }
 }
 
@@ -36,7 +36,7 @@ impl ByteDecode for Ipv6Addr {
     where 
         Self: Sized
     {
-        Ok(Self::from_bits(input.take_byteorder_u128(get_byteorder(cattr, fattr))?))
+        Ok(Self::from(input.take_byteorder_u128(get_byteorder(cattr, fattr))?))
     }
 }
 
@@ -47,7 +47,7 @@ impl<'de> BorrowByteDecode<'de> for Ipv6Addr {
     where 
         Self: Sized
     {
-        Ok(Self::from_bits(input.take_byteorder_u128(get_byteorder(cattr, fattr))?))
+        Ok(Self::from(input.take_byteorder_u128(get_byteorder(cattr, fattr))?))
     }
 }
 

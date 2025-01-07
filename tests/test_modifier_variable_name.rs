@@ -23,16 +23,16 @@ pub struct VariableExampleBody {
 
 #[derive(Debug, PartialEq, Eq, ByteDecode, ByteEncode)]
 #[jbytes(get_variable_name="length")]
-#[repr(u8)]
 pub enum VariableExampleEnumBody {
+    #[jbytes(branch_value=1)]
     Read {
         #[jbytes(length="length")]
         value: String,
-    } = 1,
+    },
     Write {
         #[jbytes(length="length")]
         value: String,
-    } = 2,
+    },
     #[jbytes(branch_default)]
     Unknown,
 }

@@ -1,3 +1,42 @@
+//!
+//! ```
+//! use jbytes::{ByteEncode, ByteDecode};
+//! use jbytes_derive::{ByteEncode, ByteDecode};
+//!
+//!
+//! #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+//! pub struct SimpleExample {
+//!     pub length: u16,
+//!     #[jbytes(length="length")]
+//!     pub value: String,
+//!     pub cmd: u8,
+//!     #[jbytes(branch="cmd")]
+//!     pub body: SimpleExampleBody,
+//! }
+//! 
+//! 
+//! #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
+//! pub enum SimpleExampleBody {
+//!     #[jbytes(branch_value=1)]
+//!     Read {
+//!         address: u8,
+//!     },
+//!     Write {
+//!         address: u8,
+//!         value: [u8; 3],
+//!     },
+//!     #[jbytes(branch_default)]
+//!     Unknown, 
+//! }
+//! 
+//! 
+//! fn main() {
+//!     let input = b"\x00\x03\x31\x32\x33\x01\x05";
+//!     let value: SimpleExample = jbytes::decode(input).unwrap();
+//!     assert_eq!(value, SimpleExample { length: 3, value: "123".to_string(), cmd: 1, body: SimpleExampleBody::Read { address: 5 } });
+//!     assert_eq!(*jbytes::encode(value).unwrap(), input);
+//! }
+//! ```
 #![allow(clippy::needless_borrow)]
 
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -11,7 +50,13 @@ extern crate alloc;
 extern crate jbytes_derive;
 
 #[cfg(feature = "jbytes_derive")]
-pub use jbytes_derive::{ByteDecode, ByteDecode, BorrowByteDecode, BorrowByteEncode};
+pub use jbytes_derive::{ByteDecode, ByteEncode, BorrowByteDecode, BorrowByteEncode};
+
+
+#[cfg(feature = "jdefault_derive")]
+extern crate jdefault_derive;
+#[cfg(feature = "jdefault_derive")]
+pub use jdefault_derive::Jdefault;
 
 
 pub mod errors;
@@ -54,7 +99,10 @@ pub mod prelude {
     pub use crate::types::{MacAddress, NetAddress, HexString, HexBytes};
 
     #[cfg(feature = "jbytes_derive")]
-    pub use jbytes_derive::{ByteDecode, ByteDecode, BorrowByteDecode, BorrowByteEncode};    
+    pub use jbytes_derive::{ByteDecode, ByteEncode, BorrowByteDecode, BorrowByteEncode};    
+
+    #[cfg(feature = "jdefault_derive")]
+    pub use jdefault_derive::Jdefault;
 }
 
 
