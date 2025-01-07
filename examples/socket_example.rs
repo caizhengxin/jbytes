@@ -14,12 +14,12 @@ pub struct Message<'a> {
 
 
 #[derive(Debug, PartialEq, Eq, BorrowByteDecode, BorrowByteEncode)]
-#[repr(u8)]
 pub enum MessageBody<'a> {
+    #[jbytes(branch_value=1)]
     ReadReq {
         address: u8,
         length: u8,
-    } = 1,
+    },
     ReadRsp {
         address: u8,
         length: u8,

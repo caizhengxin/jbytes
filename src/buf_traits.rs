@@ -752,6 +752,25 @@ pub trait BufWrite: BufRead {
         self.push(value)
     }
 
+    /// Writes array data to `self`.
+    #[inline]
+    fn push_array<const N: usize>(&mut self, value: [u8; N]) -> JResult<usize> {
+        self.push(value)
+    }
+
+    /// Writes array data to `self`.
+    #[inline]
+    fn push_byteorder_array<const N: usize>(&mut self, value: [u8; N], byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push(value),
+            ByteOrder::Le => {
+                let mut value = value;
+                value.reverse();
+                self.push(value)
+            },
+        }
+    }
+
     /// Writes a char to `self`.
     #[inline]
     fn push_char(&mut self, value: char) -> JResult<usize> {

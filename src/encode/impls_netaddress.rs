@@ -52,7 +52,7 @@ mod tests {
             ..Default::default()
         };
         let mut buffer = Buffer::new();
-        assert_eq!(NetAddress::V4(Ipv4Addr::from_bits(0x01020304)).encode_inner(&mut buffer, None, Some(&fattr)).unwrap(), 4);
+        assert_eq!(NetAddress::V4(Ipv4Addr::from(0x01020304)).encode_inner(&mut buffer, None, Some(&fattr)).unwrap(), 4);
         assert_eq!(*buffer, vec![0x01, 0x02, 0x03, 0x04]);
 
         // test ipv6 address

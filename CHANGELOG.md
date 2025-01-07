@@ -1,10 +1,10 @@
 # Change Log
 
-All notable changes to the "jbyte" will be documented in this file.
+All notable changes to the "jbytes" will be documented in this file.
 
 Check [`Keep a Changelog`](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased](https://github.com/caizhengxin/jbyte/compare/v0.1.0...HEAD)
+## [Unreleased](https://github.com/caizhengxin/jbytes/compare/v0.1.0...HEAD)
 
 ### Added
 
@@ -18,7 +18,7 @@ Check [`Keep a Changelog`](http://keepachangelog.com/) for recommendations on ho
 
 ### Security
 
-## [v0.1.0](https://github.com/caizhengxin/jbyte/releases/tag/v0.1.0) - xxxx-xx-xx
+## [v0.1.0](https://github.com/caizhengxin/jbytes/releases/tag/v0.1.0) - xxxx-xx-xx
 
 ### Added
 

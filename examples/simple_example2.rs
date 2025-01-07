@@ -11,11 +11,11 @@ pub struct SimpleExample {
 
 
 #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
-#[repr(u8)]
 pub enum SimpleExampleBody {
+    #[jbytes(branch_value=1)]
     Read {
         address: u8,
-    } = 1,
+    },
     Write {
         address: u8,
         value: [u8; 3],
