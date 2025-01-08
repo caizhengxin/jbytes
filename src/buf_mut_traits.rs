@@ -86,6 +86,20 @@ pub trait BufReadMut {
 
     /// Reads n-byte data from `self`.
     #[inline]
+    fn take_byteorder_array<const N: usize>(&mut self, byteorder: ByteOrder) -> JResult<[u8; N]> {
+        let mut array = [0_u8; N];
+
+        self.copy_to_slice(&mut array)?;
+
+        if byteorder == ByteOrder::Le {
+            array.reverse();
+        }
+
+        Ok(array)
+    }
+
+    /// Reads n-byte data from `self`.
+    #[inline]
     fn take_bytes(&mut self, nbytes: usize) -> JResult<&'_ [u8]> {
         if self.remaining_len() < nbytes {
             return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength));
@@ -774,6 +788,25 @@ pub trait BufWriteMut: BufReadMut {
     #[inline]
     fn push_bytes(&mut self, value: &[u8]) -> JResult<usize> {
         self.push(value)
+    }
+
+    /// Writes array data to `self`.
+    #[inline]
+    fn push_array<const N: usize>(&mut self, value: [u8; N]) -> JResult<usize> {
+        self.push(value)
+    }
+
+    /// Writes array data to `self`.
+    #[inline]
+    fn push_byteorder_array<const N: usize>(&mut self, value: [u8; N], byteorder: ByteOrder) -> JResult<usize> {
+        match byteorder {
+            ByteOrder::Be => self.push(value),
+            ByteOrder::Le => {
+                let mut value = value;
+                value.reverse();
+                self.push(value)
+            },
+        }
     }
 
     /// Writes a char to `self`.

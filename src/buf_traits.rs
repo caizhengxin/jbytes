@@ -62,6 +62,20 @@ pub trait BufRead {
 
     /// Reads n-byte data from `self`.
     #[inline]
+    fn take_byteorder_array<const N: usize>(&mut self, byteorder: ByteOrder) -> JResult<[u8; N]> {
+        let mut array = [0_u8; N];
+
+        self.copy_to_slice(&mut array)?;
+
+        if byteorder == ByteOrder::Le {
+            array.reverse();
+        }
+
+        Ok(array)
+    }
+
+    /// Reads n-byte data from `self`.
+    #[inline]
     fn take_bytes(&self, nbytes: usize) -> JResult<&'_ [u8]> {
         if self.remaining_len() < nbytes {
             return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength));
