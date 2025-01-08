@@ -12,14 +12,14 @@ This is a Rust-based implementation of byte stream structured serialization/dese
 
 ```toml
 [dependencies]
-jbytes = { version="0.1.0", features = ["derive"] }
+jbytes = { version="0.2.0", features = ["derive"] }
 ```
 
 no_std:
 
 ```toml
 [dependencies]
-jbytes = { version="0.1.0", default-features = false, features = ["derive"] } # default use alloc.
+jbytes = { version="0.2.0", default-features = false, features = ["derive"] } # default use alloc.
 ```
 
 ## Example
@@ -95,7 +95,7 @@ fn main() {
 
 ```toml
 [dependencies]
-jbytes = { version="0.1.0", features = ["derive", "jdefault"] }
+jbytes = { version="0.2.0", features = ["derive", "jdefault"] }
 ```
 
 ```rust
