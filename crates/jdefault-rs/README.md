@@ -8,7 +8,7 @@
 
 ```toml
 [dependencies]
-jdefault_derive = "0.3.1"
+jdefault_derive = "0.3.2"
 ```
 
 ## Usage
