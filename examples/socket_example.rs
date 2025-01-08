@@ -8,7 +8,6 @@ use jbytes::prelude::*;
 #[derive(Debug, PartialEq, Eq, BorrowByteDecode, BorrowByteEncode)]
 pub struct Message<'a> {
     pub version: u8,
-    #[jbytes(byte_count=1)]
     pub body: MessageBody<'a>
 }
 
