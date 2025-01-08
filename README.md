@@ -199,8 +199,9 @@ It is used to modify the global definition of a struct/enum, indicating that all
 - [x] `with=<mod>`: Specifies custom encode/decode function, eg: [with example](./tests/test_modifier_with2_1.rs).
 - [x] `get_variable_name=<variable>`: Get cache variable, must be used with 'variable_name', can be used for different struct or enum type passing, eg: [variable_name_example](./tests/test_modifier_variable_name.rs).
 
-> Enum branch modifier
+> Enum type modifier
 
+- [x] `byte_count_disable`: Disable the default reading of 1 byte to implement the match enumeration branch.
 - [ ] `branch_enum`
 
 ### FieldAttrModifiers

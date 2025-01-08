@@ -202,8 +202,9 @@ fn main() {
 - [x] `with=<mod>`: 自定义encode/decode函数，eg: [with example](./tests/test_modifier_with2_1.rs)。
 - [x] `get_variable_name=<variable>`: 获取缓存变量, 必须配合`variable_name`使用，可以用于不同struct或enum类型传递, eg: [variable_name_example](./tests/test_modifier_variable_name.rs)。
 
-> 枚举分支修饰符
+> 枚举(Enum)类型修饰符
 
+- [x] `byte_count_disable`: 禁用默认读取1个字节，实现match匹配枚举分支。
 - [ ] `branch_enum`
 
 ### FieldAttrModifiers
