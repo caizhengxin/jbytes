@@ -8,7 +8,7 @@ edition = "2021"
 description = "This is a byte stream structured serialization and deserialization library."
 repository = "https://github.com/caizhengxin/jbytes"
 homepage = "https://github.com/caizhengxin/jbytes"
-readme = "README.md"
+readme = "../README.md"
 # https://crates.io/category_slugs
 categories = [
     "development-tools",

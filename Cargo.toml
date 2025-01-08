@@ -21,7 +21,6 @@ keywords = [
     "jbytes",
     "serialization",
     "parsing",
-    "stream",
 ]
 license = "MIT OR Apache-2.0"
 include = [
