@@ -1,5 +1,6 @@
 
 use jbytes_derive::{ByteEncode, ByteDecode};
+use jbytes::prelude::*;
 
 
 #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
@@ -28,9 +29,11 @@ pub enum SimpleExampleBody {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let input = b"\x00\x03\x31\x32\x33\x01\x05";
-    let value: SimpleExample = jbytes::decode(input).unwrap();
+    let value: SimpleExample = jbytes::decode(input)?;
     assert_eq!(value, SimpleExample { length: 3, value: "123".to_string(), cmd: 1, body: SimpleExampleBody::Read { address: 5 } });
-    assert_eq!(*jbytes::encode(value).unwrap(), input);
+    assert_eq!(*jbytes::encode(value)?, input);
+
+    Ok(())
 }

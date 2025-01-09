@@ -44,19 +44,21 @@ pub enum HttpMethodEnum {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     // decode
     let data = b"GET http://www.jankincai.com/ HTTP/1.1\r\nHost: www.jankincai.com\r\nAccept-Encoding: gzip, deflate\r\n";
     let bytes = Bytes::new(data);
-    let value: Http = jbytes::decode_borrow(&bytes).unwrap();
+    let value: Http = jbytes::decode_borrow(&bytes)?;
     println!("{value:?}");
 
     // encode
-    assert_eq!(*jbytes::encode_borrow(value).unwrap(), data);
+    assert_eq!(*jbytes::encode_borrow(value)?, data);
 
     // error
     let data: &[u8; 97] = b"SET http://www.jankincai.com/ HTTP/1.1\r\nHost: www.jankincai.com\r\nAccept-Encoding: gzip, deflate\r\n";
     let bytes = Bytes::new(data);
     let value: JResult<Http> = jbytes::decode_borrow(&bytes);
     assert_eq!(value.is_err(), true);
+
+    Ok(())
 }

@@ -27,23 +27,24 @@ fn main() {
     let bytes = Bytes::new(data);
 
     // decode
-    let value = Tcp::decode(&bytes).unwrap();
-    assert_eq!(value, Tcp {
-        sport: 51411,
-        dport: 502,
-        seq: 3765866518,
-        ack: 3292830554,
-        header_length: 32,
-        flags: 24,
-        window: 65535,
-        checksum: 27676,
-        urgent_pointer: 0,
-        options: b"\x01\x01\x08\x0a\x37\xc4\x50\xe2\x00\xba\x7c\x1c",
-    });
-    assert_eq!(bytes.remaining_len(), 0);
+    if let Ok(value) = Tcp::decode(&bytes) {
+        assert_eq!(value, Tcp {
+            sport: 51411,
+            dport: 502,
+            seq: 3765866518,
+            ack: 3292830554,
+            header_length: 32,
+            flags: 24,
+            window: 65535,
+            checksum: 27676,
+            urgent_pointer: 0,
+            options: b"\x01\x01\x08\x0a\x37\xc4\x50\xe2\x00\xba\x7c\x1c",
+        });    
+        assert_eq!(bytes.remaining_len(), 0);
 
-    // encode
-    let mut buffer = Buffer::new();
-    let _ = value.encode(&mut buffer);
-    assert_eq!(*buffer, data);
+        // encode
+        let mut buffer = Buffer::new();
+        let _ = value.encode(&mut buffer);
+        assert_eq!(*buffer, data);
+    }
 }

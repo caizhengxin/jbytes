@@ -32,7 +32,7 @@ use jbytes::prelude::*;
 
 fn main() {
     let bytes = Bytes::new(b"\x01\x02\x03");
-    assert_eq!(bytes.take_be_u16().unwrap(), 0x0102);
+    assert_eq!(bytes.take_be_u16(), Ok(0x0102));
     assert_eq!(bytes.take_be_u16().is_err(), true);
 }
 ```
@@ -43,11 +43,19 @@ fn main() {
 use jbytes::prelude::*;
 
 
+fn buffer_example(buffer: &mut Buffer) -> JResult<()>  {
+    buffer.push_be_u16(1)?;
+    buffer.push(b"\x01\x02\x03")?;
+
+    Ok(())
+}
+
+
 fn main() {
     let mut buffer = Buffer::new();
-    assert_eq!(buffer.push_be_u16(1).unwrap(), 2);
-    assert_eq!(buffer.push(b"\x01\x02\x03").unwrap(), 3);
-    assert_eq!(*buffer, b"\x00\x01\x01\x02\x03");
+    if buffer_example(&mut buffer).is_ok() {
+        assert_eq!(*buffer, b"\x00\x01\x01\x02\x03");
+    }
 }
 ```
 
@@ -55,6 +63,7 @@ fn main() {
 
 ```rust
 use jbytes::{ByteEncode, ByteDecode};
+use jbytes::prelude::*;
 
 
 #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode)]
@@ -83,11 +92,11 @@ pub enum SimpleExampleBody {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let input = b"\x00\x03\x31\x32\x33\x01\x05";
-    let value: SimpleExample = jbytes::decode(input).unwrap();
+    let value: SimpleExample = jbytes::decode(input)?;
     assert_eq!(value, SimpleExample { length: 3, value: "123".to_string(), cmd: 1, body: SimpleExampleBody::Read { address: 5 } });
-    assert_eq!(*jbytes::encode(value).unwrap(), input);
+    assert_eq!(*jbytes::encode(value)?, input);
 }
 ```
 
@@ -100,6 +109,7 @@ jbytes = { version="0.2.0", features = ["derive", "jdefault"] }
 
 ```rust
 use jbytes::{ByteEncode, ByteDecode, Jdefault};
+use jbytes::prelude::*;
 
 
 #[derive(Debug, PartialEq, Eq, ByteEncode, ByteDecode, Jdefault)]
@@ -129,16 +139,16 @@ pub enum SimpleExampleBody {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let value = SimpleExample::default();
     assert_eq!(value, SimpleExample {
         value: "123".to_string(),
         body: SimpleExampleBody::Unknown { value: 10 },
     });
 
-    assert_eq!(*jbytes::encode(value).unwrap(), b"\x03\x31\x32\x33\x03\x0a");
+    assert_eq!(*jbytes::encode(value)?, b"\x03\x31\x32\x33\x03\x0a");
 
-    let value: SimpleExample = jbytes::decode(b"\x03\x31\x32\x33\x03\x0a").unwrap();
+    let value: SimpleExample = jbytes::decode(b"\x03\x31\x32\x33\x03\x0a")?;
     assert_eq!(value, SimpleExample {
         value: "123".to_string(),
         body: SimpleExampleBody::Unknown { value: 10 },

@@ -29,12 +29,12 @@ pub struct Ipv4<'a> {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let data = b"\x45\x00\x00\x40\xb5\xf2\x00\x00\x40\x06\xa9\x7c\x0a\x01\x01\xea\x0a\x0a\x05\x55";    
     let bytes = Bytes::new(data);
 
     // decode
-    let value = Ipv4::decode(&bytes).unwrap();
+    let value = Ipv4::decode(&bytes)?;
     assert_eq!(value, Ipv4 {
         version: 4,
         header_length: 20,
@@ -56,4 +56,6 @@ fn main() {
     let mut buffer = Buffer::new();
     let _ = value.encode(&mut buffer);
     assert_eq!(*buffer, data);
+
+    Ok(())
 }

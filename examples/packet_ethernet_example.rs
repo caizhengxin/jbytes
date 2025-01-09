@@ -13,12 +13,12 @@ pub struct Ethernet {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let data = b"\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x08\x00\x45\x00";
     let bytes = Bytes::new(data);
 
     // decode
-    let value = Ethernet::decode(&bytes).unwrap();
+    let value = Ethernet::decode(&bytes)?;
     assert_eq!(value, Ethernet {
         smac: MacAddress::from_str("ff:ff:ff:ff:ff:ff").unwrap(),
         dmac: MacAddress::from_str("00:00:00:00:00:00").unwrap(),
@@ -31,4 +31,6 @@ fn main() {
 
     let _ = value.encode(&mut buffer);
     assert_eq!(*buffer, b"\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x08\x00");
+
+    Ok(())
 }

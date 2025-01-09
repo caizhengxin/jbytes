@@ -106,7 +106,7 @@ pub struct UdpHeader<'a> {
 }
 
 
-fn main() {
+fn main() -> JResult<()> {
     let data = b"\x00\xc0\x9f\x32\x41\x8c\x00\xe0\x18\xb1\x0c\xad\x08\x00\x45\x00\
     \x00\x38\x00\x00\x40\x00\x40\x11\x65\x47\xc0\xa8\xaa\x08\xc0\xa8\
     \xaa\x14\x80\x1b\x00\x35\x00\x24\x85\xed\x10\x32\x01\x00\x00\x01\
@@ -114,7 +114,9 @@ fn main() {
     \x6d\x00\x00\x10\x00\x01";
     let bytes = Bytes::new(data);
 
-    let value: Layer<'_> = jbytes::decode_borrow(&bytes).unwrap();
+    let value: Layer<'_> = jbytes::decode_borrow(&bytes)?;
     println!(">>> {value:?}");
-    assert_eq!(*jbytes::encode_borrow(value).unwrap(), data);
+    assert_eq!(*jbytes::encode_borrow(value)?, data);
+
+    Ok(())
 }

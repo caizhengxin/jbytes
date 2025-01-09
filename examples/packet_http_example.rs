@@ -24,11 +24,11 @@ pub struct Http<'a> {
 
 
 #[cfg(feature = "std")]
-fn main() {
+fn main() -> JResult<()> {
     let data = b"GET http://www.jankincai.com/ HTTP/1.1\r\nHost: www.jankincai.com\r\nAccept-Encoding: gzip, deflate\r\n";
     let bytes = Bytes::new(data);
 
-    let value = Http::decode(&bytes).unwrap();
+    let value = Http::decode(&bytes)?;
     println!("{value:?}");
 
     // encode
@@ -37,6 +37,8 @@ fn main() {
     println!("{buffer:?}");
     // The headers hashmap is out of order and cannot be compared.
     // assert_eq!(*buffer, data);
+
+    Ok(())
 }
 
 #[cfg(not(feature = "std"))]
