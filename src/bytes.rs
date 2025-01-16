@@ -5,6 +5,20 @@ use core::{
 use crate::BufRead;
 
 
+/// This is a Bytes<T> type for including byte stream data.
+/// 
+/// # Example
+/// 
+/// ```
+/// use jbytes::prelude::*;
+///
+///
+/// fn main() {
+///     let bytes = Bytes::new(b"\x01\x02\x03");
+///     assert_eq!(bytes.take_be_u16(), Ok(0x0102));
+///     assert_eq!(bytes.take_be_u16().is_err(), true);
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Bytes<T> {
     data: T,
@@ -13,6 +27,7 @@ pub struct Bytes<T> {
 
 
 impl<T> Bytes<T> {
+    /// Constructs a new Bytes.
     #[inline]
     pub fn new(data: T) -> Self {
         Self { data, position: Cell::new(0) }
@@ -60,11 +75,12 @@ where
 }
 
 
-// pub trait ToBytes {
-//     type Target;
+pub trait ToBytes {
+    type Target: ?Sized;
 
-//     fn to_bytes(&self) -> Bytes<Self::Target>;
-// }
+    /// Returns a Bytes<T> type.
+    fn to_bytes(&self) -> Bytes<&Self::Target>;
+}
 
 
 #[cfg(test)]

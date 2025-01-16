@@ -7,10 +7,34 @@ use core::{
 use crate::std::*;
 use crate::{
     BufRead, BufWrite,
+    bytes::{Bytes, ToBytes},
     // errors::{JResult, make_error, ErrorKind},
 };
 
 
+/// This is a Buffer type based on the Vec<u8> implementation for storing byte stream data.
+/// 
+/// # Example
+/// 
+/// ```
+/// use jbytes::prelude::*;
+///
+///
+/// fn buffer_example(buffer: &mut Buffer) -> JResult<()>  {
+///     buffer.push_be_u16(1)?;
+///     buffer.push(b"\x01\x02\x03")?;
+///
+///     Ok(())
+/// }
+///
+///
+/// fn main() {
+///     let mut buffer = Buffer::new();
+///     if buffer_example(&mut buffer).is_ok() {
+///         assert_eq!(*buffer, b"\x00\x01\x01\x02\x03");
+///     }
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Buffer {
     data: Vec<u8>,
@@ -19,13 +43,22 @@ pub struct Buffer {
 
 
 impl Buffer {
-    /// Creates a buffer struct type.
+    /// Constructs a new Buffer.
     #[inline]
     pub fn new() -> Self {
         Self {
             position: Cell::new(0),
             data: Vec::new(),
         }
+    }
+}
+
+
+impl ToBytes for Buffer {
+    type Target = [u8];
+
+    fn to_bytes(&self) -> Bytes<&Self::Target> {
+        Bytes::new(&(*self.data)[..])
     }
 }
 
@@ -49,6 +82,13 @@ impl Deref for Buffer {
 
     fn deref(&self) -> &Self::Target {
         &self.data
+    }
+}
+
+
+impl AsRef<[u8]> for Buffer {
+    fn as_ref(&self) -> &[u8] {
+        &(*self.data)[..]
     }
 }
 

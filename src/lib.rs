@@ -74,7 +74,7 @@ pub mod encode;
 pub mod types;
 
 pub use buffer::Buffer;
-pub use bytes::Bytes;
+pub use bytes::{Bytes, ToBytes};
 pub use buf_mut_traits::{BufReadMut, BufWriteMut};
 pub use buf_traits::{BufRead, BufWrite};
 pub use errors::{JResult, ErrorKind, make_error};
@@ -86,7 +86,7 @@ pub use encode::{ByteEncode, BorrowByteEncode};
 
 pub mod prelude {
     pub use crate::buffer::Buffer;
-    pub use crate::bytes::Bytes;
+    pub use crate::bytes::{Bytes, ToBytes};
     pub use crate::buf_mut_traits::{BufReadMut, BufWriteMut};
     pub use crate::buf_traits::{BufRead, BufWrite};
     pub use crate::errors::{JResult, ErrorKind, make_error};
@@ -148,7 +148,7 @@ pub mod prelude {
 /// }
 /// ```
 #[inline]
-pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: &I) -> JResult<T> {
+pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: I) -> JResult<T> {
     T::decode_inner(&Bytes::new(input), None, None)
 }
 
@@ -197,6 +197,12 @@ pub fn decode<I: AsRef<[u8]>, T: ByteDecode>(input: &I) -> JResult<T> {
 /// ```
 #[inline]
 pub fn decode_borrow<'de, I: AsRef<[u8]>, T: BorrowByteDecode<'de>>(input: &'de Bytes<I>) -> JResult<T> {
+    T::decode_inner(input, None, None)
+}
+
+
+#[inline]
+pub fn decode_borrow2<'de, I: BufRead, T: BorrowByteDecode<'de>>(input: &'de I) -> JResult<T> {
     T::decode_inner(input, None, None)
 }
 
