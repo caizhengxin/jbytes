@@ -36,6 +36,7 @@ impl AttrValue {
         Ok(Self::Bytes(parse_value_string(s)?))
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn parse_option_string(s: &Literal) -> Result<Self> {
         Ok(Self::Option(parse_value_string(s)?))

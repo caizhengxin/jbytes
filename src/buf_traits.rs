@@ -4,7 +4,7 @@ use aho_corasick::AhoCorasick;
 use crate::{
     JResult, ErrorKind, make_error,
     ByteOrder,
-    macro_take_bytes,
+    macro_take_bytes, macro_untake_bytes,
 };
 
 
@@ -744,7 +744,7 @@ pub trait BufRead {
 
         let position = self.get_position();
 
-        Ok(&self.get_data()[position - nbytes..position])
+        Ok(&self.get_data()[position..position + nbytes])
     }
 
     /// Reads a bool from `self`, but don't move the position.
@@ -825,25 +825,25 @@ pub trait BufRead {
     /// Reads an unsigned 16 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_u16(&self) -> JResult<u16> {
-        macro_take_bytes!(self, u16::from_be_bytes);
+        macro_untake_bytes!(self, u16::from_be_bytes);
     }
 
     /// Reads an unsigned 16 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_u16(&self) -> JResult<u16> {
-        macro_take_bytes!(self, u16::from_be_bytes);
+        macro_untake_bytes!(self, u16::from_be_bytes);
     }
 
     /// Reads an unsigned 16 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_u16(&self) -> JResult<u16> {
-        macro_take_bytes!(self, u16::from_le_bytes);
+        macro_untake_bytes!(self, u16::from_le_bytes);
     }
 
     /// Reads an unsigned 16 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_u16(&self) -> JResult<u16> {
-        macro_take_bytes!(self, u16::from_ne_bytes);
+        macro_untake_bytes!(self, u16::from_ne_bytes);
     }
 
     /// Reads an unsigned 16 bit integer from `self`, but don't move the position.
@@ -858,25 +858,25 @@ pub trait BufRead {
     /// Reads a signed 16 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_i16(&self) -> JResult<i16> {
-        macro_take_bytes!(self, i16::from_be_bytes);
+        macro_untake_bytes!(self, i16::from_be_bytes);
     }
 
     /// Reads a signed 16 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_i16(&self) -> JResult<i16> {
-        macro_take_bytes!(self, i16::from_be_bytes);
+        macro_untake_bytes!(self, i16::from_be_bytes);
     }
 
     /// Reads a signed 16 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_i16(&self) -> JResult<i16> {
-        macro_take_bytes!(self, i16::from_le_bytes);
+        macro_untake_bytes!(self, i16::from_le_bytes);
     }
 
     /// Reads a signed 16 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_i16(&self) -> JResult<i16> {
-        macro_take_bytes!(self, i16::from_ne_bytes);
+        macro_untake_bytes!(self, i16::from_ne_bytes);
     }
 
     /// Reads a signed 16 bit integer from `self`, but don't move the position.
@@ -888,28 +888,65 @@ pub trait BufRead {
         }
     }
 
+    /// Reads an unsigned 24 bit integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_u24(&self) -> JResult<u32> {
+        macro_untake_bytes!(self, u32::from_be_bytes, 3);
+    }
+
+    /// Reads an unsigned 24 bit integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_be_u24(&self) -> JResult<u32> {
+        macro_untake_bytes!(self, u32::from_be_bytes, 3);
+    }
+
+    /// Reads an unsigned 24 bit integer from `self` in little-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_le_u24(&self) -> JResult<u32> {
+        macro_untake_bytes!(self, u32::from_le_bytes, 3);
+    }
+
+    /// Reads an unsigned 24 bit integer from `self` in native-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_ne_u24(&self) -> JResult<u32> {
+        if cfg!(target_endian = "big") {
+            self.untake_be_u24()
+        } else {
+            self.untake_le_u24()
+        }
+    }
+
+    /// Reads an unsigned 24 bit integer from `self`, but don't move the position.
+    #[inline]
+    fn untake_byteorder_u24(&self, byteorder: ByteOrder) -> JResult<u32> {
+        match byteorder {
+            ByteOrder::Be => self.untake_be_u24(),
+            ByteOrder::Le => self.untake_le_u24(),
+        }
+    }
+
     /// Reads an unsigned 32 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_u32(&self) -> JResult<u32> {
-        macro_take_bytes!(self, u32::from_be_bytes);
+        macro_untake_bytes!(self, u32::from_be_bytes);
     }
 
     /// Reads an unsigned 32 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_u32(&self) -> JResult<u32> {
-        macro_take_bytes!(self, u32::from_be_bytes);
+        macro_untake_bytes!(self, u32::from_be_bytes);
     }
 
     /// Reads an unsigned 32 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_u32(&self) -> JResult<u32> {
-        macro_take_bytes!(self, u32::from_le_bytes);
+        macro_untake_bytes!(self, u32::from_le_bytes);
     }
 
     /// Reads an unsigned 32 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_u32(&self) -> JResult<u32> {
-        macro_take_bytes!(self, u32::from_ne_bytes);
+        macro_untake_bytes!(self, u32::from_ne_bytes);
     }
 
     /// Reads an unsigned 32 bit integer from `self`, but don't move the position.
@@ -924,25 +961,25 @@ pub trait BufRead {
     /// Reads a signed 32 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_i32(&self) -> JResult<i32> {
-        macro_take_bytes!(self, i32::from_be_bytes);
+        macro_untake_bytes!(self, i32::from_be_bytes);
     }
 
     /// Reads a signed 32 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_i32(&self) -> JResult<i32> {
-        macro_take_bytes!(self, i32::from_be_bytes);
+        macro_untake_bytes!(self, i32::from_be_bytes);
     }
 
     /// Reads a signed 32 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_i32(&self) -> JResult<i32> {
-        macro_take_bytes!(self, i32::from_le_bytes);
+        macro_untake_bytes!(self, i32::from_le_bytes);
     }
 
     /// Reads a signed 32 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_i32(&self) -> JResult<i32> {
-        macro_take_bytes!(self, i32::from_ne_bytes);
+        macro_untake_bytes!(self, i32::from_ne_bytes);
     }
 
     /// Reads a signed 32 bit integer from `self`, but don't move the position.
@@ -957,25 +994,25 @@ pub trait BufRead {
     /// Reads an unsigned 32 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_u64(&self) -> JResult<u64> {
-        macro_take_bytes!(self, u64::from_be_bytes);
+        macro_untake_bytes!(self, u64::from_be_bytes);
     }
 
     /// Reads an unsigned 64 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_u64(&self) -> JResult<u64> {
-        macro_take_bytes!(self, u64::from_be_bytes);
+        macro_untake_bytes!(self, u64::from_be_bytes);
     }
 
     /// Reads an unsigned 64 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_u64(&self) -> JResult<u64> {
-        macro_take_bytes!(self, u64::from_le_bytes);
+        macro_untake_bytes!(self, u64::from_le_bytes);
     }
 
     /// Reads an unsigned 64 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_u64(&self) -> JResult<u64> {
-        macro_take_bytes!(self, u64::from_ne_bytes);
+        macro_untake_bytes!(self, u64::from_ne_bytes);
     }
 
     /// Reads an unsigned 64 bit integer from `self`, but don't move the position.
@@ -990,25 +1027,25 @@ pub trait BufRead {
     /// Reads a signed 64 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_i64(&self) -> JResult<i64> {
-        macro_take_bytes!(self, i64::from_be_bytes);
+        macro_untake_bytes!(self, i64::from_be_bytes);
     }
 
     /// Reads a signed 64 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_i64(&self) -> JResult<i64> {
-        macro_take_bytes!(self, i64::from_be_bytes);
+        macro_untake_bytes!(self, i64::from_be_bytes);
     }
 
     /// Reads a signed 64 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_i64(&self) -> JResult<i64> {
-        macro_take_bytes!(self, i64::from_le_bytes);
+        macro_untake_bytes!(self, i64::from_le_bytes);
     }
 
     /// Reads a signed 64 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_i64(&self) -> JResult<i64> {
-        macro_take_bytes!(self, i64::from_ne_bytes);
+        macro_untake_bytes!(self, i64::from_ne_bytes);
     }
 
     /// Reads a signed 64 bit integer from `self`, but don't move the position.
@@ -1023,25 +1060,25 @@ pub trait BufRead {
     /// Reads an unsigned 128 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_u128(&self) -> JResult<u128> {
-        macro_take_bytes!(self, u128::from_be_bytes);
+        macro_untake_bytes!(self, u128::from_be_bytes);
     }
 
     /// Reads an unsigned 128 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_u128(&self) -> JResult<u128> {
-        macro_take_bytes!(self, u128::from_be_bytes);
+        macro_untake_bytes!(self, u128::from_be_bytes);
     }
 
     /// Reads an unsigned 128 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_u128(&self) -> JResult<u128> {
-        macro_take_bytes!(self, u128::from_le_bytes);
+        macro_untake_bytes!(self, u128::from_le_bytes);
     }
 
     /// Reads an unsigned 128 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_u128(&self) -> JResult<u128> {
-        macro_take_bytes!(self, u128::from_ne_bytes);
+        macro_untake_bytes!(self, u128::from_ne_bytes);
     }
 
     /// Reads an unsigned 128 bit integer from `self`, but don't move the position.
@@ -1056,25 +1093,25 @@ pub trait BufRead {
     /// Reads a signed 128 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_i128(&self) -> JResult<i128> {
-        macro_take_bytes!(self, i128::from_be_bytes);
+        macro_untake_bytes!(self, i128::from_be_bytes);
     }
 
     /// Reads a signed 128 bit integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_i128(&self) -> JResult<i128> {
-        macro_take_bytes!(self, i128::from_be_bytes);
+        macro_untake_bytes!(self, i128::from_be_bytes);
     }
 
     /// Reads a signed 128 bit integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_i128(&self) -> JResult<i128> {
-        macro_take_bytes!(self, i128::from_le_bytes);
+        macro_untake_bytes!(self, i128::from_le_bytes);
     }
 
     /// Reads a signed 128 bit integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_i128(&self) -> JResult<i128> {
-        macro_take_bytes!(self, i128::from_ne_bytes);
+        macro_untake_bytes!(self, i128::from_ne_bytes);
     }
 
     /// Reads a signed 128 bit integer from `self`, but don't move the position.
@@ -1089,25 +1126,25 @@ pub trait BufRead {
     /// Reads an unsigned size integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_usize(&self) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_be_bytes);
+        macro_untake_bytes!(self, usize::from_be_bytes);
     }
 
     /// Reads an unsigned size integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_usize(&self) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_be_bytes);
+        macro_untake_bytes!(self, usize::from_be_bytes);
     }
 
     /// Reads an unsigned size integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_usize(&self) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_le_bytes);
+        macro_untake_bytes!(self, usize::from_le_bytes);
     }
 
     /// Reads an unsigned size integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_usize(&self) -> JResult<usize> {
-        macro_take_bytes!(self, usize::from_ne_bytes);
+        macro_untake_bytes!(self, usize::from_ne_bytes);
     }
 
     /// Reads an unsigned size bit integer from `self`, but don't move the position.
@@ -1122,25 +1159,25 @@ pub trait BufRead {
     /// Reads a signed size integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_isize(&self) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_be_bytes);
+        macro_untake_bytes!(self, isize::from_be_bytes);
     }
 
     /// Reads a signed size integer from `self` in big-endian byte order, but don't move the position.
     #[inline]
     fn untake_be_isize(&self) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_be_bytes);
+        macro_untake_bytes!(self, isize::from_be_bytes);
     }
 
     /// Reads a signed size integer from `self` in little-endian byte order, but don't move the position.
     #[inline]
     fn untake_le_isize(&self) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_le_bytes);
+        macro_untake_bytes!(self, isize::from_le_bytes);
     }
 
     /// Reads a signed size integer from `self` in native-endian byte order, but don't move the position.
     #[inline]
     fn untake_ne_isize(&self) -> JResult<isize> {
-        macro_take_bytes!(self, isize::from_ne_bytes);
+        macro_untake_bytes!(self, isize::from_ne_bytes);
     }
 
     /// Reads a signed size bit integer from `self`, but don't move the position.
@@ -1149,6 +1186,146 @@ pub trait BufRead {
         match byteorder {
             ByteOrder::Be => self.untake_be_isize(),
             ByteOrder::Le => self.untake_le_isize(),
+        }
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_untake_bytes!(self, u64::from_be_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_be_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_untake_bytes!(self, u64::from_be_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in little-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_le_uint(&self, nbytes: usize) -> JResult<u64> {
+        macro_untake_bytes!(self, u64::from_le_bytes, nbytes);
+    }
+
+    /// Reads an unsigned n-byte integer from `self` in native-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_ne_uint(&self, nbytes: usize) -> JResult<u64> {
+        if cfg!(target_endian = "big") {
+            self.untake_be_uint(nbytes)
+        } else {
+            self.untake_le_uint(nbytes)
+        }
+    }
+
+    /// Reads an unsigned n-byte integer from `self`, but don't move the position.
+    #[inline]
+    fn untake_byteorder_uint(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<u64> {
+        match byteorder {
+            ByteOrder::Be => self.untake_be_uint(nbytes),
+            ByteOrder::Le => self.untake_le_uint(nbytes),
+        }
+    }
+
+    /// Reads a signed n-byte integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_untake_bytes!(self, i64::from_be_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_be_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_untake_bytes!(self, i64::from_be_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in little-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_le_int(&self, nbytes: usize) -> JResult<i64> {
+        macro_untake_bytes!(self, i64::from_le_bytes, nbytes);
+    }
+
+    /// Reads a signed n-byte integer from `self` in native-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_ne_int(&self, nbytes: usize) -> JResult<i64> {
+        if cfg!(target_endian = "big") {
+            self.untake_be_int(nbytes)
+        } else {
+            self.untake_le_int(nbytes)
+        }
+    }
+
+    /// Reads a signed n-byte integer from `self`, but don't move the position.
+    #[inline]
+    fn untake_byteorder_int(&self, nbytes: usize, byteorder: ByteOrder) -> JResult<i64> {
+        match byteorder {
+            ByteOrder::Be => self.untake_be_int(nbytes),
+            ByteOrder::Le => self.untake_le_int(nbytes),
+        }
+    }
+
+    /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_f32(&self) -> JResult<f32> {
+        macro_untake_bytes!(self, f32::from_be_bytes);
+    }
+
+    /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_be_f32(&self) -> JResult<f32> {
+        macro_untake_bytes!(self, f32::from_be_bytes);
+    }
+
+    /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in little-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_le_f32(&self) -> JResult<f32> {
+        macro_untake_bytes!(self, f32::from_le_bytes);
+    }
+
+    /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self` in native-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_ne_f32(&self) -> JResult<f32> {
+        macro_untake_bytes!(self, f32::from_ne_bytes);
+    }
+
+    /// Reads an IEEE754 single-precision (4 bytes) floating point number from `self`, but don't move the position.
+    #[inline]
+    fn untake_byteorder_f32(&self, byteorder: ByteOrder) -> JResult<f32> {
+        match byteorder {
+            ByteOrder::Be => self.untake_be_f32(),
+            ByteOrder::Le => self.untake_le_f32(),
+        }
+    }
+
+    /// Reads an IEEE754 double-precision (8 bytes) floating point number from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_f64(&self) -> JResult<f64> {
+        macro_untake_bytes!(self, f64::from_be_bytes);
+    }
+
+    /// Reads an IEEE754 double-precision (8 bytes) floating point number from `self` in big-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_be_f64(&self) -> JResult<f64> {
+        macro_untake_bytes!(self, f64::from_be_bytes);
+    }
+
+    /// Reads an IEEE754 double-precision (8 bytes) floating point number from `self` in little-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_le_f64(&self) -> JResult<f64> {
+        macro_untake_bytes!(self, f64::from_le_bytes);
+    }
+
+    /// Reads an IEEE754 double-precision (8 bytes) floating point number from `self` in native-endian byte order, but don't move the position.
+    #[inline]
+    fn untake_ne_f64(&self) -> JResult<f64> {
+        macro_untake_bytes!(self, f64::from_ne_bytes);
+    }
+
+    /// Reads an IEEE754 single-precision (8 bytes) floating point number from `self`, but don't move the position.
+    #[inline]
+    fn untake_byteorder_f64(&self, byteorder: ByteOrder) -> JResult<f64> {
+        match byteorder {
+            ByteOrder::Be => self.untake_be_f64(),
+            ByteOrder::Le => self.untake_le_f64(),
         }
     }
 }

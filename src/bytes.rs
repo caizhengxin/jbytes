@@ -109,4 +109,12 @@ mod tests {
         assert_eq!(buffer.take_bytes(1).unwrap(), &[0x05]);
         assert_eq!(buffer.get_position(), 5);
     }
+
+    #[test]
+    fn test_bytes_untake() {
+        let buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.remaining_len(), 5);
+        assert_eq!(buffer.untake_u32().unwrap(), 0x01020304);
+        assert_eq!(buffer.remaining_len(), 5);
+    }
 }
