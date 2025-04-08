@@ -117,4 +117,12 @@ mod tests {
         assert_eq!(buffer.untake_u32().unwrap(), 0x01020304);
         assert_eq!(buffer.remaining_len(), 5);
     }
+
+    #[test]
+    fn test_bytes_take_bytes_starts() {
+        let buffer = Bytes::new([0x01, 0x02, 0x03, 0x04, 0x05]);
+        assert_eq!(buffer.take_bytes_starts(b"\x01\x02\x04").is_err(), true);
+        assert_eq!(buffer.take_bytes_starts(b"\x01\x02\x03"), Ok(()));
+        assert_eq!(buffer.remaining_len(), 2);
+    }
 }

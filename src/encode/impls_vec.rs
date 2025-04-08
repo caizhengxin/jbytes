@@ -14,10 +14,17 @@ impl<T: ByteEncode> ByteEncode for Vec<T> {
                                                                   fattr: Option<&FieldAttrModifiers>) -> JResult<usize> {
         let data_len = self.len();
         let mut r_nbytes = 0;
+        let loop_skip_starts = if let Some(fr) = fattr { fr.loop_skip_starts } else { None };
 
-        r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
+        if loop_skip_starts.is_none() {
+            r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
+        }
 
         for value in self {
+            if let Some(loop_skip_starts) = loop_skip_starts {
+                r_nbytes += buffer.push_bytes(loop_skip_starts)?;
+            }
+    
             r_nbytes += value.encode_inner(buffer, cattr, fattr)?;
         }
 
@@ -33,9 +40,17 @@ impl<T: BorrowByteEncode> BorrowByteEncode for Vec<T> {
         let data_len = self.len();
         let mut r_nbytes = 0;
 
-        r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
+        let loop_skip_starts = if let Some(fr) = fattr { fr.loop_skip_starts } else { None };
+
+        if loop_skip_starts.is_none() {
+            r_nbytes += push_count_and_try_count(buffer, cattr, fattr, data_len)?;
+        }
 
         for value in self {
+            if let Some(loop_skip_starts) = loop_skip_starts {
+                r_nbytes += buffer.push_bytes(loop_skip_starts)?;
+            }
+    
             r_nbytes += value.encode_inner(buffer, cattr, fattr)?;
         }
 

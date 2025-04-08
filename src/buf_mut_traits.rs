@@ -143,6 +143,24 @@ pub trait BufReadMut {
         Ok(&self.get_data()[position - nbytes..position])
     }
 
+    /// Reads n-byte of data according to the prefix from `self`.
+    #[inline]
+    fn take_bytes_starts<V: AsRef<[u8]>>(&mut self, value: V) -> JResult<()> {
+        let data = value.as_ref();
+        
+        if self.remaining_len() < data.len() {
+            return Err(make_error(self.get_position(), ErrorKind::InvalidByteLength));
+        }
+
+        match self.remaining().strip_prefix(data) {
+            Some(_v) => {
+                self.advance(data.len());
+                Ok(())
+            },
+            None => Err(make_error(self.get_position(), ErrorKind::Fail)),
+        }
+    }
+
     /// Reads a bool from `self`.
     #[inline]
     fn take_bool(&mut self) -> JResult<bool> {

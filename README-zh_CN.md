@@ -242,6 +242,7 @@ fn main() -> JResult<()> {
 - [x] `linend|end_with=<string|bytes>`：指定结束位置，支持`String/&str/&[u8]/HashMap`等类型，eg：[linend](./tests/test_modifier_key.rs)。
 - [x] `key|starts_with`：指定精准匹配关键字，必须配合`linend`使用，支持`string/&str/&[u8]`等类型，eg：[key example](./tests/test_modifier_key.rs)。
 - [x] `split`: 指定分隔符, 常常用于`Key: Value`这种内容, 支持`HashMap`类型, eg: [split example](./tests/test_type_hashmap.rs)
+- [ ] `skip_start=<string|bytes>`: 指定内容匹配当前流前缀，匹配成功移动流位置.
 - [x] `from_str`: 表示通过`FromStr`类型进行转换，eg：[from_str example](./tests/test_modifier_from_str.rs)。
 - [x] `from_str=<type>`：表示通过`Type::FromStr`类型进行转换，eg：[from_str example](./tests/test_modifier_from_str.rs)。
 - [x] `check_value`：主要用于检查结果是否正常，如果异常会返回错误，eg：[check_value example](./tests/test_modifier_check_value.rs)。

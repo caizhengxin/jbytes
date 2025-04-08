@@ -54,6 +54,8 @@ pub struct FieldAttrModifiers<'a> {
     // pub branch_func: Option<String>,
     // pub branch_enum: Option<String>,
 
+    pub loop_skip_starts: Option<&'a [u8]>,
+
     pub expr: Option<String>,
 }
 
