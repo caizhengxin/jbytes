@@ -14,6 +14,7 @@ pub enum ModifierValue {
 #[derive(Debug, Default, Clone)]
 pub struct ContainerAttrModifiers {
     pub byteorder: Option<ByteOrder>,
+    pub byte_count: Option<usize>,
     pub expr: Option<String>,
 
     // cache variable

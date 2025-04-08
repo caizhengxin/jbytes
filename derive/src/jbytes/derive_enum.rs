@@ -163,7 +163,12 @@ impl DeriveEnum {
             let code = "
                 let value;
 
-                if let Some(fr) = fattr {
+                let cr_byte_count = if let Some(cr) = cattr_new { cr.byte_count } else { None };
+                
+                if let Some(byte_count) = cr_byte_count {
+                    value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr_new, fattr))? as usize;
+                }
+                else if let Some(fr) = fattr {
                     if let Some(branch) = fr.branch {
                         value = (branch) as usize;
                     }
@@ -351,8 +356,13 @@ impl DeriveEnum {
                             variant_body.push_parsed(attributes.to_code(true, false))?;
                             
                             let default_byte_count_1byte_code = if self.attributes.byte_count_disable { "".to_string() } else { format!("r_nbytes += buffer.push_u8({variant_index} as u8)?;")};
-                            let code = format!("        
-                                if let Some(fr) = fattr {{
+                            let code = format!("
+                                let cr_byte_count = if let Some(cr) = cattr_new {{ cr.byte_count }} else {{ None }};
+                    
+                                if let Some(byte_count) = cr_byte_count {{
+                                    r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr_new, fattr))?;
+                                }}
+                                else if let Some(fr) = fattr {{
                                     if let Some(_branch) = fr.branch {{
                                         // This is a placeholder condition
                                     }}

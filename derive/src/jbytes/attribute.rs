@@ -11,12 +11,13 @@ pub struct ContainerAttributes {
     pub default_value: Option<String>,
     pub default_bool: bool,
     pub byte_count_disable: bool,
+    pub byte_count: Option<AttrValue>,
 
     // branch
-    pub branch_byte: Option<u8>,
-    pub branch_byteorder: Option<String>,
-    pub branch_func: Option<String>,
-    pub branch_enum: Option<String>,
+    // pub branch_byte: Option<u8>,
+    // pub branch_byteorder: Option<String>,
+    // pub branch_func: Option<String>,
+    // pub branch_enum: Option<String>,
 
     // custom encode/decode function.
     pub with_encode: Option<String>,
@@ -28,10 +29,12 @@ pub struct ContainerAttributes {
 impl ContainerAttributes {
     pub fn to_code(&self, is_self: bool) -> String {
         let byteorder = self.byteorder.to_byteorder(is_self);
+        let byte_count = self.byte_count.to_code(is_self, false);
 
         if self.is_use {
             format!("let mut cattr_new = jbytes::ContainerAttrModifiers {{
                 byteorder: {byteorder},
+                byte_count: {byte_count},
                 ..Default::default()}}; let cattr_new = Some(&cattr_new);")
         }
         else {
@@ -43,10 +46,20 @@ impl ContainerAttributes {
 
 impl FromAttribute for ContainerAttributes {
     fn parse(group: &Group) -> Result<Option<Self>> {
-        let attributes = match parse_tagged_attribute(group, "jbytes")? {
-            Some(body) => body,
-            None => return Ok(None),
+        let attributes = if let Some(body) = parse_tagged_attribute(group, "jbytes")? {
+            body
+        }
+        else if let Some(body) = parse_tagged_attribute(group, "repr")? {
+            body            
+        }
+        else {
+            return Ok(None);
         };
+
+        // let attributes = match parse_tagged_attribute(group, "jbytes")? {
+        //     Some(body) => body,
+        //     None => return Ok(None),
+        // };
 
         let mut result = Self::default();
 
@@ -61,6 +74,11 @@ impl FromAttribute for ContainerAttributes {
                     match i.to_string().as_str() {
                         "default" | "default_value" => result.default_bool = true,
                         "byte_count_disable" => result.byte_count_disable = true,
+                        "u8" => result.byte_count = Some(AttrValue::Usize(1)),
+                        "u16" => result.byte_count = Some(AttrValue::Usize(2)),
+                        "u32" => result.byte_count = Some(AttrValue::Usize(4)),
+                        "u64" => result.byte_count = Some(AttrValue::Usize(8)),
+                        "usize" => result.byte_count = Some(AttrValue::Usize(core::mem::size_of::<usize>())),
                         _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
                     }
                 }
@@ -69,11 +87,13 @@ impl FromAttribute for ContainerAttributes {
                     match key.to_string().as_str() {
                         "byteorder" => result.byteorder = Some(AttrValue::parse_byteorder(&val)?),
                         "get_variable_name" => result.get_variable_name = Some(AttrValue::parse_list(&val)?),
+
                         "default_value" | "default" => result.default_value = Some(parse_value_string(&val)?),
-                        "branch_byte" => result.branch_byte = Some(parse_value_string(&val)?.parse().unwrap()),
-                        "branch_byteorder" => result.branch_byteorder = Some(parse_value_string(&val)?),
-                        "branch_func" => result.branch_func = Some(parse_value_string(&val)?),
-                        "branch_enum" => result.branch_enum = Some(parse_value_string(&val)?),
+                        // "branch_byte" => result.branch_byte = Some(parse_value_string(&val)?.parse().unwrap()),
+                        // "branch_byteorder" => result.branch_byteorder = Some(parse_value_string(&val)?),
+                        // "branch_func" => result.branch_func = Some(parse_value_string(&val)?),
+                        // "branch_enum" => result.branch_enum = Some(parse_value_string(&val)?),
+
                         // custom encode/decode
                         "with_encode" | "encode_with" => result.with_encode = Some(parse_value_string(&val)?),
                         "with_decode" | "decode_with" => result.with_decode = Some(parse_value_string(&val)?),
@@ -196,12 +216,22 @@ impl FieldAttributes {
 
 impl FromAttribute for FieldAttributes {
     fn parse(group: &Group) -> Result<Option<Self>> {
-        let attributes = match parse_tagged_attribute(group, "jbytes")? {
-            Some(body) => body,
-            None => return Ok(None),
-        };
-
         let mut result = Self::default();
+
+        let stream = &mut group.stream().into_iter();
+        if let Some(TokenTree::Ident(attribute_ident)) = stream.next() {
+            if attribute_ident.to_string() == "default" {
+                result.branch_default = true;
+                return Ok(Some(result));
+            }
+        }
+
+        let attributes = if let Some(body) = parse_tagged_attribute(group, "jbytes")? {
+            body
+        }
+        else {
+            return Ok(None);
+        };
 
         if !attributes.is_empty() {
             result.is_use = true;
