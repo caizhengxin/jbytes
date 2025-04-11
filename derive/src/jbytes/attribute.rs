@@ -6,18 +6,24 @@ use super::parse::{AttrValue, AttrValueTrait, parse_value_string};
 #[derive(Debug, Default)]
 pub struct ContainerAttributes {
     pub is_use: bool,
+
     pub byteorder: Option<AttrValue>,
-    pub get_variable_name: Option<AttrValue>,
-    pub default_value: Option<String>,
-    pub default_bool: bool,
     pub byte_count_disable: bool,
     pub byte_count: Option<AttrValue>,
+
+    pub get_variable_name: Option<AttrValue>,
+
+    pub default_value: Option<String>,
+    pub default_bool: bool,
 
     // branch
     // pub branch_byte: Option<u8>,
     // pub branch_byteorder: Option<String>,
     // pub branch_func: Option<String>,
     // pub branch_enum: Option<String>,
+    pub branch_take_bytes: Option<AttrValue>,
+    pub branch_starts_with: bool,
+    pub branch_starts_with_untake: bool,
 
     // custom encode/decode function.
     pub with_encode: Option<String>,
@@ -74,6 +80,9 @@ impl FromAttribute for ContainerAttributes {
                     match i.to_string().as_str() {
                         "default" | "default_value" => result.default_bool = true,
                         "byte_count_disable" => result.byte_count_disable = true,
+                        "branch_starts_with" => result.branch_starts_with = true,
+                        "branch_starts_with_untake" => result.branch_starts_with_untake = true,
+
                         "u8" => result.byte_count = Some(AttrValue::Usize(1)),
                         "u16" => result.byte_count = Some(AttrValue::Usize(2)),
                         "u32" => result.byte_count = Some(AttrValue::Usize(4)),
@@ -86,6 +95,7 @@ impl FromAttribute for ContainerAttributes {
                     // #xxx[xxx=xxx]
                     match key.to_string().as_str() {
                         "byteorder" => result.byteorder = Some(AttrValue::parse_byteorder(&val)?),
+                        "byte_count" => result.byte_count = Some(AttrValue::parse_usize(&val)?),
                         "get_variable_name" => result.get_variable_name = Some(AttrValue::parse_list(&val)?),
 
                         "default_value" | "default" => result.default_value = Some(parse_value_string(&val)?),
@@ -93,6 +103,7 @@ impl FromAttribute for ContainerAttributes {
                         // "branch_byteorder" => result.branch_byteorder = Some(parse_value_string(&val)?),
                         // "branch_func" => result.branch_func = Some(parse_value_string(&val)?),
                         // "branch_enum" => result.branch_enum = Some(parse_value_string(&val)?),
+                        "branch_take_bytes" => result.branch_take_bytes = Some(AttrValue::parse_usize(&val)?),
 
                         // custom encode/decode
                         "with_encode" | "encode_with" => result.with_encode = Some(parse_value_string(&val)?),
