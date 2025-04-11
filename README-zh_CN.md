@@ -12,14 +12,14 @@
 
 ```toml
 [dependencies]
-jbytes = { version="0.2.0", features = ["derive"] }
+jbytes = { version="0.3.0", features = ["derive"] }
 ```
 
 no_std:
 
 ```toml
 [dependencies]
-jbytes = { version="0.2.0", default-features = false, features = ["derive"] } # default use alloc.
+jbytes = { version="0.3.0", default-features = false, features = ["derive"] } # default use alloc.
 ```
 
 ## 例子
@@ -107,7 +107,7 @@ fn main() -> JResult<()> {
 
 ```toml
 [dependencies]
-jbytes = { version="0.2.0", features = ["derive", "jdefault"] }
+jbytes = { version="0.3.0", features = ["derive", "jdefault"] }
 ```
 
 ```rust
