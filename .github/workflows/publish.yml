@@ -1,0 +1,57 @@
+# @Author: jankincai
+# @Date:   2025-06-17 14:17:00
+# @Last Modified by:   jankincai
+# @Last Modified time: 2025-06-17 15:19:30
+name: Publish to Crates.io
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        target: [
+          x86_64-unknown-linux-gnu,
+        ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          components: rustc, cargo, clippy, rustfmt
+
+      - name: Build and Test
+        run: cargo build --release --target ${{ matrix.target }} && cargo test --release --target ${{ matrix.target }}
+
+      - name: Publish jbytes_derive package
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Publish jbytes package
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: |
+          cd derive
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
