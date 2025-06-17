@@ -264,14 +264,15 @@ impl DeriveEnum {
             let branch_take_bytes = branch_take_bytes.to_code2(false, false);
             format!("let value = input.take_bytes({branch_take_bytes})?;")
         }
-        else if let Some(byte_count) = &self.attributes.byte_count {
-            let byte_count = byte_count.to_code2(false, false);
+        // else if let Some(byte_count) = &self.attributes.byte_count {
+        //     let byte_count = byte_count.to_code2(false, false);
 
-            format!("let value = input.take_byteorder_uint({byte_count}, jbytes::get_byteorder(cattr_new, fattr))? as usize;")
-        }
+        //     format!("let value = input.take_byteorder_uint({byte_count}, jbytes::get_byteorder(cattr_new, fattr))? as usize;")
+        // }
         else {
             format!("
                 let value;
+                let cr_byte_count = if let Some(cr) = cattr_new {{ cr.byte_count }} else {{ None }};
 
                 if let Some(fr) = fattr {{
                     if let Some(branch) = fr.branch {{
@@ -280,9 +281,15 @@ impl DeriveEnum {
                     else if let Some(byte_count) = fr.byte_count {{
                         value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr, fattr))? as usize;
                     }}
+                    else if let Some(byte_count) = cr_byte_count {{
+                        value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr, fattr))? as usize;
+                    }}
                     else {{
                         value = input.take_u8()? as usize;
                     }}
+                }}
+                else if let Some(byte_count) = cr_byte_count {{
+                    value = input.take_byteorder_uint(byte_count, jbytes::get_byteorder(cattr, fattr))? as usize;
                 }}
                 else {{
                     value = input.take_u8()? as usize;
@@ -489,12 +496,12 @@ impl DeriveEnum {
                                 let code = format!("
                                     let cr_byte_count = if let Some(cr) = cattr_new {{ cr.byte_count }} else {{ None }};
                         
-                                    if let Some(byte_count) = cr_byte_count {{
-                                        r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr_new, fattr))?;
-                                    }}
-                                    else if let Some(fr) = fattr {{
+                                    if let Some(fr) = fattr {{
                                         if let Some(_branch) = fr.branch {{
                                             // This is a placeholder condition
+                                        }}
+                                        else if let Some(byte_count) = cr_byte_count {{
+                                            r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr, fattr))?;
                                         }}
                                         else if let Some(byte_count) = fr.byte_count {{
                                             r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr, fattr))?;
@@ -502,6 +509,9 @@ impl DeriveEnum {
                                         else {{
                                             {default_byte_count_1byte_code}
                                         }}
+                                    }}
+                                    else if let Some(byte_count) = cr_byte_count {{
+                                        r_nbytes += buffer.push_byteorder_uint({variant_index} as u64, byte_count, jbytes::get_byteorder(cattr, fattr))?;
                                     }}
                                     else {{
                                         {default_byte_count_1byte_code}

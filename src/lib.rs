@@ -58,6 +58,9 @@ extern crate jdefault_derive;
 #[cfg(feature = "jdefault_derive")]
 pub use jdefault_derive::Jdefault;
 
+#[cfg(feature = "jget")]
+pub use jget::Jget;
+
 
 pub mod errors;
 pub mod buffer;
